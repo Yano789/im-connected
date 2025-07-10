@@ -1,15 +1,12 @@
 const express = require("express");
-const {createPost,editPost,deletePost,getTenPosts} = require("./controller");
+const {createPost,editPost,deletePost,modeLimit,getFilteredPosts} = require("./controller");
 const router = express.Router();
 
 //create post
 router.post("/create",async(req,res)=>{
     try {
-        let{title,content,tag,username} = req.body;
-        username = username.trim()
-        content = content.trim()
-        title = title.trim()
-        if(!(username&&content&&title&&tag)){
+       const {title,content,tag,username} = req.body;
+        if(!(content&&title&&tag)){
             throw Error ("Empty Content Given!");
         }
 
@@ -22,12 +19,13 @@ router.post("/create",async(req,res)=>{
 })
 
 //edit post via postId
-router.put("/edit", async (req, res) => {
+router.put("/:post/edit", async (req, res) => {
     try {
-        let {postId,newTitle,newContent,newTag} = req.body
-        newContent = newContent.trim()
-        if (!(newContent&&postId&&newTitle&&newTag)) {
-            throw Error("Empty Content Given!")
+        const postId = req.params.post
+        const {newTitle,newContent,newTag} = req.body
+        
+        if (!postId) {
+            throw Error("Invalid post id!")
         }
         const editedPost = await editPost({ postId, newContent,newTitle,newTag})
         res.status(200).json(editedPost)
@@ -47,20 +45,24 @@ router.delete("/delete",async(req,res)=>{
     }
 })
 
-//gets the ten most recent posts
+//gets post based on the filter, display mode and sorting 
+//TODO: UPDATE THE GET POST FILTERS THAT USES THE DISPLAY MODE AND PREFERRED TAGS
+// CHECK IF WE CAN USE MULTIPLE QUERY OPTIONS PER PARAMETER
 router.get("/",async(req,res)=>{
     try {
-        const mode = req.query.mode || "default";
-        const posts = await getTenPosts(mode)
-        res.status(200).json(posts)
+        const filter = req.query.filter || "default";
+        const mode = req.query.mode || "default"
+        const sort = req.query.sort || "latest"
+        const post = await getFilteredPosts({filter,sort})
+        const limitedPosts = await modeLimit({post,mode})
+        res.status(200).json(limitedPosts)
     } catch (error) {
         res.status(400).send(error.message)
     }
 })
 
-//TODO do a filter by oldest
+//TODO GET POST WHEN WE CLICK ON A LINK, VIEW ONE POST WITH COMMENTS!
 
-//TODO do a filter by tag
 
 //TODO do a filter by username -> relevant for my posts under profile
 
