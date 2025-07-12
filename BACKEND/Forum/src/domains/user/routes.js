@@ -36,6 +36,7 @@ router.post("/",async(req,res)=>{
 
 
 //Signup
+//TODO: CHECK IF NEED TO INCLUDE LIKE LANGUAGES AND DISPLAY MODE AS ATTRIBUTES FOR MODEL
 router.post("/signup",async(req,res)=>{
     try {
         let{firstName,lastName,username,email,password,confirmPassword} = req.body;

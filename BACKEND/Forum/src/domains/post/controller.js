@@ -34,7 +34,10 @@ const editPost = async(data)=>{
         if(!existingPost){
             throw Error("Post does not exist!")
         }else{
-            await Post.updateOne({postId},{title:newTitle,content:newContent,tag:newTag,createdAt:Date.now(),edited:true})
+            const editedTag = newTag == null ? existingPost.tag: newTag
+            const editedTitle = newTitle==null ? existingPost.title:newTitle
+            const editedContent = newContent == null ? existingPost.content:newContent
+            await Post.updateOne({postId},{title:editedTitle,content:editedContent,tag:editedTag,createdAt:Date.now(),edited:true})
             const existingEditedPost = await Post.findOne({postId})
             return existingEditedPost
         }
@@ -59,18 +62,40 @@ const deletePost = async(data)=>{
     }
 }
 
-const getTenPosts = async(data)=>{
+
+const getFilteredPosts = async ({ filter, sort }) => {
     try {
+        // Determine sort order for MongoDB
+        const sortOption = (sort === "earliest") ? 1 : -1; // 1 = ascending, -1 = descending
+
+        // Build query
+        const query = (filter && filter !== "default")
+            ? { tag: filter }
+            : {};
+
+        // Fetch posts with filter and sort directly in DB
+        const posts = await Post.find(query).sort({ createdAt: sortOption });
+        return posts;
+    } catch (error) {
+        throw new Error("Failed to filter/sort posts: " + error.message);
+    }
+};
+
+
+//used as a general function to slice array according to mode 
+const modeLimit = async(data)=>{
+ try {
         let limit = 10;
-        if(data == "Big"){
+        const{post,mode} = data
+        if(mode == "Big"){
             limit = 5
         }
         
-        const posts = await Post.find().sort({createdAt:-1}).limit(limit);
+        const posts = post.slice(0,limit)
         return posts
     } catch (error) {
         throw error
     }
 }
 
-module.exports = {createPost,editPost,deletePost,getTenPosts}
+module.exports = {createPost,editPost,deletePost,modeLimit,getFilteredPosts}
