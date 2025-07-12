@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+
+@layer components{
+    .icons {
+    @apply self-stretch flex max-w-full flex-row items-start justify-center gap-5;
+    }
+    .dashboard {
+    @apply relative leading-6 text-sm sm:text-base md:text-lg;
+    }
+    .applicationIcon {
+    @apply w-10 relative h-10 object-cover;
+    }
+    .currentPage {
+    @apply w-fit flex flex-col items-center justify-center gap-[5px];
+    }
+    .navigateTo {
+    @apply w-fit flex flex-col items-center justify-center gap-[5px] cursor-pointer;
+    }
+}
