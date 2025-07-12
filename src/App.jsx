@@ -1,4 +1,5 @@
-import Header from './Header/Header'
+import Header from './Header/Header';
+import DashboardBody from './DashboardBody/DashboardBody';
 
 function App() {
 
@@ -6,6 +7,7 @@ function App() {
   return (
     <>
     <Header></Header>
+    <DashboardBody></DashboardBody>
     </>
   )
 }

@@ -1,4 +1,5 @@
-import styles from './Header.module.css';
+import "./Header.css"
+import TabBar from "../TabBar/TabBar";
 function Header(){
     const onFrameContainerClick = () => {
     };
@@ -6,46 +7,26 @@ function Header(){
 
   	
   	return (
-    		<div className={styles.header}>
-      			<div className={styles.main}>
-        				<div className={styles.sitelogo}>
-          					<img className={styles.applicationIcon} alt="" src="src\assets\Application.png" />
-          					<div className={styles.imconnected}>
+    		<div class="header">
+      			<div class="main">
+        				<div class="sitelogo">
+          					<img class="applicationIcon" alt="" src="src\assets\Application.png" />
+          					<div class="imconnected">
             						<i>im</i>
-            						<span className={styles.connected}>Connected</span>
+            						<span class="connected">Connected</span>
           					</div>
         				</div>
-        				<div className={styles.search}>
-          					<div className={styles.title}>
-            						<div className={styles.typeHereTo}>Type here to search...</div>
-            						<img className={styles.applicationIcon} alt="" src="src\assets\Search.png" />
+        				<div class="search">
+          					<div class="title">
+            						<div class="typeHereTo">Type here to search...</div>
+            						<img class="applicationIcon" alt="" src="src\assets\Search.png" />
           					</div>
         				</div>
-        				<div className={styles.icons}>
-          					<div className={styles.currentPage}>
-            						<img className={styles.applicationIcon} alt="" src="src\assets\Home.png" />
-            						<div className={styles.dashboard}>Dashboard</div>
-          					</div>
-          					<div className={styles.navigateTo} onClick={onFrameContainerClick}>
-            						<img className={styles.applicationIcon} alt="" src="src\assets\Communication.png" />
-            						<div className={styles.dashboard}>Forum</div>
-          					</div>
-          					<div className={styles.navigateTo} onClick={onFrameContainerClick}>
-            						<img className={styles.applicationIcon} alt="" src="src\assets\Pill.png" />
-            						<div className={styles.dashboard}>Medication</div>
-          					</div>
-          					<div className={styles.navigateTo} onClick={onFrameContainerClick}>
-            						<img className={styles.applicationIcon} alt="" src="src\assets\Bot.png" />
-            						<div className={styles.dashboard}>Chatbot</div>
-          					</div>
-          					<div className={styles.navigateTo} onClick={onFrameContainerClick}>
-            						<img className={styles.applicationIcon} alt="" src="src\assets\User.png" />
-            						<div className={styles.dashboard}>Profile</div>
-          					</div>
-        				</div>
-						<button className={styles.buttonStyle1} onClick={onFrameContainerClick}>Sign Out</button>
+						<TabBar></TabBar>
+						<button class="buttonStyle1" onClick={onFrameContainerClick}>Sign Out</button>
       			</div>
-    		</div>);
+    		</div>
+			);
 };
 
 export default Header;
