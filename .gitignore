@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # env
-**/openai-assistants-quickstart/.env
+/BACKEND/AI_chatbot/openai-assistants-quickstart/.env

@@ -1,4 +1,4 @@
-// File: C:\Users\Chadrick\Documents\term5_ai_chatbot\test_assistant\openai-assistants-quickstart\app\layout.tsx
+// File: C:\Users\Chadrick\Documents\term5_ai_chatbot\IM-CONNECTED\BACKEND\AI_chatbot\openai-assistants-quickstart\app\layout.tsx
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
