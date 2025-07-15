@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@layer components{
+    .forumBody {
+    @apply relative w-fit h-full flex flex-col items-center align-middle box-border gap-5 text-left text-base text-black p-5;
+    }
+    .forumLeftBar{
+        @apply flex flex-col h-full w-fit gap-10 p-5
+    }
+    .forumMain{
+        @apply flex flex-row h-full w-fit
+    }
+    .forumRightBar {
+         @apply flex flex-col h-full w-fit gap-10 p-5
+    }
+
+}

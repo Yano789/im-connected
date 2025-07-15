@@ -1,15 +1,19 @@
 import Header from './Header/Header';
-import DashboardBody from './DashboardBody/DashboardBody';
-
+import ForumBody from './Forum/ForumBody/ForumBody';
 function App() {
-
-
   return (
     <>
-    <Header></Header>
-    <DashboardBody></DashboardBody>
+      <div
+        style={{
+          backgroundImage: "linear-gradient(to bottom, #FFFDF9 75%, #F1C5C0 100%)",
+        }}
+      >
+        <Header />
+        <ForumBody/>
+      </div>
     </>
-  )
+  );
 }
+
 
 export default App

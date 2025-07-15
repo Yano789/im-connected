@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@layer components{
+    .filterText {
+    @apply relative text-xl leading-6;
+    }
+    .filterIcon {
+    @apply w-[50px] relative h-[50px] object-cover;
+    }
+    .filterTypeText {
+    @apply relative leading-[18px];
+    }
+    .filterTypeDiv {
+    @apply flex flex-row items-center justify-start gap-1.5;
+    }
+    .filterType {
+    @apply self-stretch shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border flex flex-row items-center justify-start px-[5px] py-1.5 rounded-md border-solid border-[#1e1e1e];
+    }
+    .title {
+    @apply flex flex-row items-center justify-center gap-0.5;
+    }
+    .main3 {
+    @apply flex flex-row items-center justify-start;
+    }
+    .filterMain {
+    @apply flex flex-col items-start justify-start gap-[15px];
+    }
+    .filterBy {
+    @apply relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border w-fit h-fit flex flex-col items-center justify-center text-left text-base text-[#1e1e1e] p-5 rounded-[5px] border-solid border-[#1e1e1e];
+    font-family: Poppins;
+    }
+
+}

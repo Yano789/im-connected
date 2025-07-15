@@ -1,0 +1,26 @@
+    @import "tailwindcss";
+
+@layer components{
+    .postNow {
+    @apply relative leading-5 self-stretch ;
+    }
+    .postDrafts {
+    @apply relative leading-5 text-[#2b2b2b];
+    }
+    .toPostTitle {
+    @apply self-stretch flex flex-row items-center justify-between;
+    }
+    .postArrow {
+    @apply w-5 relative h-5;
+    }
+    .savedPostDiv {
+    @apply self-stretch flex flex-row items-center justify-between gap-0 text-[#2b2b2b];
+    }
+    .toPostMain {
+    @apply w-[190px] flex flex-col items-start justify-start gap-5;
+    }
+    .toPost {
+    @apply relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border w-fit h-fit flex flex-col items-center justify-center cursor-pointer text-left text-xl text-[#1e1e1e] p-[20px] rounded-[5px] border-solid border-black;
+    }
+
+}

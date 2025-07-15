@@ -8,7 +8,7 @@ function Header(){
   	
   	return (
     		<div class="header">
-      			<div class="main">
+      			<div class="headerMain">
         				<div class="sitelogo">
           					<img class="applicationIcon" alt="" src="src\assets\Application.png" />
           					<div class="imconnected">

@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@layer components{
+.topicImage {
+  @apply w-[50px] relative h-[50px] object-cover;
+}
+.topicName {
+  @apply w-[215px] relative font-medium flex items-center shrink-0;
+}
+.topicMain {
+  @apply flex-1 bg-[#fffdf9] border flex flex-row items-center justify-start gap-[5px] p-2.5 rounded-md border-solid border-[#2d2d2d];
+}
+.topicDiv {
+  @apply w-fit relative shadow-[0px_4px_4px_rgba(0,0,0,0.25)] h-[70px] flex flex-row items-center justify-start text-left text-lg text-[#2d2d2d];
+}
+}

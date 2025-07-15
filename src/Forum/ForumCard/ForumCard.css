@@ -1,0 +1,62 @@
+@import "tailwindcss";
+
+@layer components{
+
+    .titleOfPost {
+    @apply relative leading-[26px];
+    }
+    .postedParent {
+    @apply flex flex-row items-center justify-end gap-5 text-base;
+    }
+    .titleOfPostParent {
+    @apply self-stretch flex flex-row items-center justify-between gap-0;
+    }
+    .name, .postUser {
+    @apply relative leading-4;
+    }
+    .bookmarkIcon,.likesIcon {
+    @apply w-[30px] relative max-h-full object-cover;
+    }
+    .nameParent {
+    @apply self-stretch flex flex-row items-center justify-between gap-0 text-base text-black;
+    }
+    .tagItem {
+    @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border flex flex-row items-center justify-center px-5 py-2.5 rounded-[20px] border-solid border-[#1e1e1e];
+    }
+    .tags {
+    @apply flex flex-row items-start justify-start gap-2.5 text-xl text-[#1e1e1e];
+    }
+    .forumTitle {
+    @apply self-stretch flex flex-col items-start justify-start gap-2.5;
+    }
+    .data {
+    @apply self-stretch flex flex-col items-start justify-start text-2xl text-[#2b2b2b];
+    }
+    .postDescription {
+    @apply flex-1 relative leading-4;
+    }
+    .description {
+    @apply self-stretch bg-[#fff2f0] flex flex-row items-center justify-center p-2.5 rounded-[5px];
+    }
+    .imagePreviewHere {
+    @apply absolute w-[calc(100%_-_19px)] leading-4 inline-block left-[9.5px] top-[46px];
+    }
+    .rectangleParent {
+    @apply w-[120px] relative h-[120px] bg-green-300;
+    }
+    .images {
+    @apply self-stretch h-[120px] flex flex-row items-start justify-between gap-0 text-center;
+    }
+    .commentsIcon {
+    @apply w-[30px] relative h-[30px] object-cover;
+    }
+    .commentsNumber, .likesNumber {
+    @apply flex flex-row items-center justify-center gap-2.5;
+    }
+    .stats {
+    @apply self-stretch flex flex-row items-center justify-start gap-2.5 text-center;
+    }
+    .post {
+    @apply w-[1000px] relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border flex flex-col items-start justify-start gap-5 cursor-pointer text-left text-base text-black p-5 rounded-[5px] border-solid border-[#1e1e1e];
+    }
+}

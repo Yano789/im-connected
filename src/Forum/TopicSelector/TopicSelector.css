@@ -1,0 +1,16 @@
+@import "tailwindcss";
+@layer components{
+    .showPostsRelated {
+    @apply relative leading-6;
+    }
+    .topicTitle {
+    @apply flex flex-row items-end justify-start;
+    }
+    .topicTags {
+    @apply flex flex-col flex-wrap *:items-start justify-start gap-2.5 text-center text-lg;
+    }
+    .topicSelector {
+    @apply relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border w-fit flex flex-col items-start text-xl justify-start text-left  text-[#1e1e1e] pl-5 pr-[25px] py-5 rounded-[5px] border-solid border-black gap-5;
+    }
+
+}

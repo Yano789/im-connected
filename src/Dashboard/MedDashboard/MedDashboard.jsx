@@ -1,11 +1,11 @@
 import "./MedDashboard.css";
 import MedDashboardEntry from "../MedDashboardEntry/MedDashboardEntry";
 
-function MedDashboard(){
+function DashboardItem(){
   	
   	
   	return (
-    		<div className="card">
+    		<div className="card dashboardColour">
 				<p className="card-header">Medicine Logger</p>
       			<p className="card-subheader">Has your care recipient taken:</p>
       			<MedDashboardEntry medicineName="Metformin XR 500mg" medicineDosage="1st pill @ 6pm" medicineStatus="Not yet"></MedDashboardEntry>
@@ -15,4 +15,4 @@ function MedDashboard(){
             );
 };
 
-export default MedDashboard;
+export default DashboardItem;
