@@ -1,0 +1,39 @@
+.medications-grid-layout {
+  display: grid;
+  /* Define two columns: the first takes 1 part of the space, the second takes 1.5 parts */
+  grid-template-columns: 1fr 1.5fr;
+  /* Define two rows that size automatically based on their content */
+  grid-template-rows: auto auto;
+  gap: 2rem;
+  padding: 2rem;
+  align-items: start; /* Aligns items to the top of their grid cell */
+}
+
+.grid-item-title {
+    /* This tells the title to vertically center itself within its grid cell */
+    align-self: center;
+}
+
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+.recipient-name {
+  font-weight: 700;
+  color: #c74b50;
+}
+
+
+/* Media query for responsiveness */
+@media (max-width: 900px) {
+  .medications-grid-layout {
+    /* On smaller screens, stack everything into a single column */
+    grid-template-columns: 1fr;
+  }
+  .grid-item-title {
+      /* On mobile, the title should also be at the top */
+      align-self: start;
+  }
+}
