@@ -1,6 +1,4 @@
 {
   "/page": "app/page.js",
-  "/api/assistants/threads/route": "app/api/assistants/threads/route.js",
-  "/examples/basic-chat/page": "app/examples/basic-chat/page.js",
   "/api/assistants/threads/[threadId]/messages/route": "app/api/assistants/threads/[threadId]/messages/route.js"
 }

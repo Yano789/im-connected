@@ -75,7 +75,7 @@ const Chat = ({
   }, [messages]);
 
   // create a new threadID when chat component created
-  useEffect(() => {
+  /*useEffect(() => {
     const createThread = async () => {
       const res = await fetch(`/api/assistants/threads`, {
         method: "POST",
@@ -84,6 +84,27 @@ const Chat = ({
       setThreadId(data.threadId);
     };
     createThread();
+  }, []);*/
+  useEffect(() => {
+    // guard: only run in the browser
+    if (typeof window === "undefined") return;
+
+    //const saved = localStorage.getItem("threadId");
+    const saved = "thread_MRJJrC53m6DmI8q2pNPipqRB";
+    console.log("saved threadId from localStorage:", saved);
+    if (saved) {
+      // we found an existing thread—keep using it
+      setThreadId(saved);
+    } else {
+      // no thread saved yet, so create one on the backend
+      ;(async () => {
+        const res = await fetch("/api/assistants/threads", { method: "POST" });
+        const { threadId: newId } = await res.json();
+        setThreadId(newId);
+        console.log("🆕 created new threadId:", newId);
+        localStorage.setItem("threadId", newId);
+      })();
+    }
   }, []);
 
   const sendMessage = async (text) => {

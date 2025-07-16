@@ -28,3 +28,4 @@ dist-ssr
 
 *.env
 node_modules
+/BACKEND/AI_chatbot/openai-assistants-quickstart/.env
