@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {sendPasswordResetOTPEmail,resetUserPassword} = require("./controller");
+const {sendPasswordResetOTPEmail,resetUserPassword} = require("./controller.cjs");
 
 
 router.post("/reset",async(req,res)=>{

@@ -1,6 +1,6 @@
-const User = require("./../user/model");
-const  {sendOTP,verifyOTP,deleteOTP} = require("./../otp/controller");
-const {hashData} = require("./../../utils/hashData");
+const User = require("../user/model.cjs");
+const  {sendOTP,verifyOTP,deleteOTP} = require("./../otp/controller.cjs");
+const {hashData} = require("../../utils/hashData.cjs");
 
 const resetUserPassword = async({email,otp,newPassword})=>{
     try {

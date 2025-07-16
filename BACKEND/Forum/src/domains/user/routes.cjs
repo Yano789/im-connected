@@ -1,8 +1,8 @@
 const express = require("express");
 const router  = express.Router();
-const {createNewUser,authenticateUser} = require("./controller");
-const auth = require("./../../middleware/auth");
-const{sendVerificationOTPEmail}=require("./../email_verification/controller");
+const {createNewUser,authenticateUser} = require("./controller.cjs");
+const auth = require("../../middleware/auth.cjs");
+const{sendVerificationOTPEmail}=require("../email_verification/controller.cjs");
 
 
 //Protected Route
@@ -14,18 +14,22 @@ router.get("/private_data",auth,(req,res)=>{
 
 
 
-
-//Login
-router.post("/",async(req,res)=>{
+//login
+router.post("/", async (req, res) => {
     try {
-        let{username,password} = req.body;
-        username = username.trim();
-        password = password.trim();
+        let { username, password } = req.body;
+        const isProduction = process.env.NODE_ENV === "production"
 
-        if(!(username&&password)){
-            throw Error ("Empty Credentials Given!");
+        if (!(username && password)) {
+            throw Error("Empty Credentials Given!");
         }
-        const authenticatedUser = await authenticateUser({username,password});
+        const authenticatedUser = await authenticateUser({ username, password });
+        res.cookie("token", authenticatedUser.token, {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: "Strict",
+            maxAge: 24 * 60 * 60 * 1000
+        });
         res.status(200).json(authenticatedUser);
 
     } catch (error) {
@@ -40,12 +44,6 @@ router.post("/",async(req,res)=>{
 router.post("/signup",async(req,res)=>{
     try {
         let{firstName,lastName,username,email,password,confirmPassword} = req.body;
-        firstName = firstName.trim();
-        lastName = lastName.trim();
-        username = username.trim();
-        email = email.trim();
-        password = password.trim();
-        confirmPassword = confirmPassword.trim();
 
         //simple checking of inputs
         if(!(firstName&&lastName&&username&&email&&password&&confirmPassword)){
@@ -59,9 +57,6 @@ router.post("/signup",async(req,res)=>{
         else if(!/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/.test(password)){
             throw Error("Invalid Password!");
         }
-        else if (!(confirmPassword === password)){
-            throw Error("Different Password!");
-        }
         else{
             //good credentials, create new user
             const newUser = await createNewUser({
@@ -73,6 +68,15 @@ router.post("/signup",async(req,res)=>{
     } catch (error) {
         res.status(400).send(error.message);
     }
+});
+//logout
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Strict"
+  });
+  return res.status(200).send("Logged out successfully");
 });
 
 module.exports = router;

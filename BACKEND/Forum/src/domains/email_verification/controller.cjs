@@ -1,5 +1,5 @@
-const User = require("./../user/model");
-const {sendOTP,verifyOTP,deleteOTP} = require("./../otp/controller");
+const User = require("../user/model.cjs");
+const {sendOTP,verifyOTP,deleteOTP} = require("../otp/controller.cjs");
 const verifyUserEmail = async({email,otp})=>{
     try {
         const validOTP = await verifyOTP({email,otp});

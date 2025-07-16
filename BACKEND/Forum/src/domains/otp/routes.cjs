@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const {sendOTP,verifyOTP} = require("./controller");
+const {sendOTP,verifyOTP} = require("./controller.cjs");
 
 //verify otp 
 router.post("/verify",async(req,res)=>{

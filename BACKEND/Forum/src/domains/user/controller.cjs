@@ -1,6 +1,6 @@
-const User = require("./model");
-const {hashData,verifyHashedData} = require("./../../utils/hashData");
-const createToken = require("./../../utils/createToken");
+const User = require("./model.cjs");
+const {hashData,verifyHashedData} = require("../../utils/hashData.cjs");
+const createToken = require("../../utils/createToken.cjs");
 const authenticateUser = async(data)=>{
     try {
         const{username,password} = data;
@@ -17,12 +17,12 @@ const authenticateUser = async(data)=>{
             throw Error ("Incorrect Password Given!");
         }
         //Create User Token
-        const tokenData = {userId: fetchedUser._id,email: fetchedUser.email};
+        const tokenData = {userId: fetchedUser._id,email: fetchedUser.email,username:fetchedUser.username};
         const token = await createToken(tokenData);
 
         //assign user token
-        fetchedUser.token = token;
-        return fetchedUser;
+        const authenticatedUser = await User.findOneAndUpdate({username},{token:token},{new:true})
+        return authenticatedUser;
     } catch (error) {
         throw error;
     }

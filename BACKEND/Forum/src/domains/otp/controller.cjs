@@ -1,7 +1,7 @@
-const generateOTP = require("./../../utils/generateOTP");
-const sendEmail = require("./../../utils/sendEmail");
-const {hashData,verifyHashedData} = require("./../../utils/hashData");
-const OTP = require("./model");
+const generateOTP = require("../../utils/generateOTP.cjs");
+const sendEmail = require("../../utils/sendEmail.cjs");
+const {hashData,verifyHashedData} = require("../../utils/hashData.cjs");
+const OTP = require("./model.cjs");
 const {AUTH_EMAIL} = process.env;
 
 const verifyOTP = async({email,otp})=>{
@@ -9,7 +9,7 @@ const verifyOTP = async({email,otp})=>{
         if(!(email&&otp)){
             throw Error("Provide values for email,otp");
         }
-        const matchedOTPRecord = await OTP.findOne({email,});
+        const matchedOTPRecord = await OTP.findOne({email});
         if(!(matchedOTPRecord)){
             throw Error("No otp records found.");
         }
@@ -20,6 +20,7 @@ const verifyOTP = async({email,otp})=>{
         }
         const hashedOTP = matchedOTPRecord.otp;
         const validOTP = await verifyHashedData(otp,hashedOTP);
+        if(!validOTP) throw new Error("Invalid OTP!")
         return validOTP;
     } catch (error) {
         throw error;

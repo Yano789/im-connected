@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const{sendVerificationOTPEmail,verifyUserEmail} = require("./controller");
+const{sendVerificationOTPEmail,verifyUserEmail} = require("./controller.cjs");
 
 //verifies email otp
 router.post("/verify",async(req,res)=>{

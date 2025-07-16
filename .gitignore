@@ -25,3 +25,6 @@ dist-ssr
 
 # env
 **/openai-assistants-quickstart/.env
+
+*.env
+node_modules
