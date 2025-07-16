@@ -22,7 +22,7 @@ function buildCommentTree(comments) {
 }
 
 const createNestedComment = async(comments)=>{
-    buildCommentTree(comments)
+    return buildCommentTree(comments)
 }
 
 module.exports = createNestedComment

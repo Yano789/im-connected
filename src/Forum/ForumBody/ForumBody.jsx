@@ -3,9 +3,30 @@ import ForumCard from "../ForumCard/ForumCard";
 import Filter from "../Filter/Filter";
 import ToPost from "../ToPost/ToPost";
 import TopicSelector from "../TopicSelector/TopicSelector";
+import { useState,useEffect } from "react";
 function ForumBody(){
     //const forumData = props.forumData;
-    
+    const [posts,setPosts] = useState([])
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    useEffect(() => {
+        const fetchPosts = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/v1/post/", {
+  method: "GET",
+  credentials: "include",
+});
+                if (!response.ok) throw new Error("Failed to fetch posts");
+                const data = await response.json();
+                setPosts(data);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPosts();
+    }, []);        
     return (
         <div className="forumMain">
             <div className="forumLeftBar">
@@ -13,10 +34,27 @@ function ForumBody(){
                 <Filter/>
             </div>
 
-            <div className="forumBody">
-                <ForumCard postUser="Camellia Tan" postDate="7/15/2025" postTitle="I fell down" postTags={["lol tag 1", "test tag 2"]} postDescription="HI I FELL DOWN I AM BLEEDING HELP"/>
-                <ForumCard postUser="Leanne Chua" postDate="1/1/2000" postTitle="test" postTags={["lol tag 1", null]} postDescription="description insert here"/>
-            </div>
+<div className="forumBody">
+  {loading ? (
+    <p>Loading...</p>
+  ) : error ? (
+    <p>Error: {error}</p>
+  ) : posts.length > 0 ? (
+    posts.map((post) => (
+      <ForumCard
+        key={post.postId} // unique key for React list rendering
+        postUser={post.username}
+        postDate={new Date(post.createdAt).toLocaleDateString()}
+        postTitle={post.title}
+        postTags={post.tags}
+        postDescription={post.content}
+      />
+    ))
+  ) : (
+    <p>No posts available.</p>
+  )}
+</div>
+
             <div className="forumRightBar">
                 <TopicSelector/>
             </div>

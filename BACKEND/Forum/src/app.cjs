@@ -12,7 +12,7 @@ const app = express();
 //middleware
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5000", // Your frontend URL
+  origin: "http://localhost:5173", // Your frontend URL
   credentials: true                // This is REQUIRED for cookies to work
 }));
 app.use(bodyParser());
