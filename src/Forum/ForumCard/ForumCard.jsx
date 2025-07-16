@@ -1,12 +1,14 @@
 import "./ForumCard.css";
+import { useState } from "react";
 
 function ForumCard(props) {
-  const postUser = props.postUser;
-  const postDate = props.postDate;
-  const postTitle = props.postTitle;
-  const postTags = props.postTags; //max 2 tag
-  const postImages = props.postImages;
-  const postDescription = props.postDescription;
+  const { postUser, postDate, postTitle, postTags, postDescription } = props;
+
+  const [liked, setLiked] = useState(false);
+  const [bookmarked, setBookmarked] = useState(false);
+
+  const likeIcon = liked ? "src/assets/Likes.png" : "src/assets/Unlikes.png";
+  const bookmarkIcon = bookmarked ? "src/assets/Bookmark.png" : "src/assets/Unbookmark.png";
 
   return (
     <div className="post">
@@ -18,38 +20,42 @@ function ForumCard(props) {
               <div className="posted">Posted:</div>
               <div className="postDate">{postDate}</div>
             </div>
-          </div>
+          </div>  
           <div className="nameParent">
             <div className="postUser">{postUser}</div>
-            <img className="bookmarkIcon" alt="" src="src\assets\Bookmark.png" />
+            {/* Toggle bookmark on click */}
+            <img
+              className="bookmarkIcon"
+              alt="bookmark"
+              src={bookmarkIcon}
+              onClick={() => setBookmarked(!bookmarked)}
+              style={{ cursor: "pointer" }}
+            />
           </div>
           <div className="tags">
-            {/* might need use state to pass data instead of tag */}
-            <div className="tagItem">
-              <div className="name">{postTags[0]}</div>
-            </div>
-            <div className="tagItem">
-              <div className="name">{postTags[1]}</div>
-            </div>
+            <div className="tagItem"><div className="name">{postTags[0]}</div></div>
+            <div className="tagItem"><div className="name">{postTags[1]}</div></div>
           </div>
         </div>
       </div>
+
       <div className="description">
         <p className="postDescription">{postDescription}</p>
       </div>
+
       <div className="images">
-        {/* might need use state to pass data instead of tag */}
         <div className="rectangleParent">
-            <img className="postImage" src={postImages}></img>
+          <img className="postImage" src="src\assets\Boo.jpg" alt="post" />
         </div>
       </div>
+
       <div className="stats">
         <div className="commentsNumber">
-          <img className="commentsIcon" alt="commentsIcon" src="src\assets\Comments.png" />
+          <img className="commentsIcon" alt="comments" src="src\assets\Comments.png" />
           <div className="name">78</div>
         </div>
-        <div className="likesNumber">
-          <img className="likesIcon" alt="likesIcon" src="src\assets\Likes.png" />
+        <div className="likesNumber" onClick={() => setLiked(!liked)} style={{ cursor: "pointer" }}>
+          <img className="likesIcon" alt="likes" src={likeIcon} />
           <div className="name">7,354</div>
         </div>
       </div>

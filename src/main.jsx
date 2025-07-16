@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import setupLocatorUI from "@locator/runtime";
-import './index.css'
+import "./Index.css"
 import App from './App.jsx'
 setupLocatorUI()
 

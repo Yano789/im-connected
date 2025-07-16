@@ -1,4 +1,8 @@
-body {
-  	margin: 0; line-height: normal;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+@import "tailwindcss";
+
+@theme {
+  --color-custom-pink: oklch(0.8604 0.0509 25.75);
+  --color-custom-purple: oklch(0.8071 0.0515 305.92);
+  --color-custom-purple-header: oklch(0.7091 0.0667 305.42);
+  --color-custom-white: oklch(0.9945 0.0057 84.57);
 }
