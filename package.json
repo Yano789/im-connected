@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "start": "nodemon BACKEND/Forum/src/index.cjs",
+    "test":"jest",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

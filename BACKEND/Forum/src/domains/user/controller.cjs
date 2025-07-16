@@ -1,6 +1,7 @@
 const User = require("./model.cjs");
 const {hashData,verifyHashedData} = require("../../utils/hashData.cjs");
 const createToken = require("../../utils/createToken.cjs");
+
 const authenticateUser = async(data)=>{
     try {
         const{username,password} = data;
