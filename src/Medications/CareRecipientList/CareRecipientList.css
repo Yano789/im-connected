@@ -1,0 +1,76 @@
+.card {
+    background-color: #fff;
+    border-radius: 16px; /* Slightly more rounded corners */
+    padding: 1.5rem;
+    position: relative;
+    /* Multiple Box Shadows */
+    /* 1. The pink layer (solid, offset down) */
+    /* 2. The subtle blur shadow (for depth) */
+    box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin: 0;
+    padding-bottom: 1rem; /* Space for the line */
+    /* The line under the header */
+    border-bottom: 4px solid #F87575; 
+}
+
+.recipient-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.recipient-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0.25rem; /* Vertical padding */
+    cursor: pointer;
+    /* The line between items */
+    border-bottom: 4px solid #F87575;
+    
+}
+
+/* Remove the bottom border from the last item in the list */
+.recipient-item:last-of-type {
+    border-bottom: none;
+}
+
+.recipient-item span {
+    font-weight: 500;
+}
+
+.switch-button, .show-button {
+    border: none;
+    background-color: #f0f0f0;
+    padding: 0.4rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.show-button {
+    background-color: #F87575; /* Pinkish color from Figma */
+    color: white;
+}
+
+.add-recipient-button {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background-color: transparent;
+    border: none; /* No border in the design */
+    cursor: pointer;
+    font-weight: 500;
+    text-align: center;
+    color: #555;
+    border-radius: 8px;
+}
+
+.add-recipient-button:hover {
+    background-color: #fafafa;
+}

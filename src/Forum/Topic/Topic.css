@@ -1,16 +1,22 @@
 @import "tailwindcss";
 
-@layer components{
-.topicImage {
-  @apply w-[50px] relative h-[50px] object-cover;
+@layer components {
+  .topicImage {
+    @apply w-6 h-6 sm:w-8 sm:h-8 md:w-[30px] md:h-[30px] object-cover flex-shrink-0;
+  }
+
+  .topicName {
+    @apply text-xs sm:text-sm md:text-base leading-snug break-words whitespace-normal;
+  }
+  .topicMainDefault {
+  @apply flex flex-col xl:flex-row w-full max-w-[250px] items-center gap-2 p-2.5 rounded-md border border-[#2d2d2d] bg-[#FFF2F0];
 }
-.topicName {
-  @apply w-[215px] relative font-medium flex items-center shrink-0;
+
+.topicMainClicked {
+  @apply flex flex-col xl:flex-row w-full max-w-[250px] items-center gap-2 p-2.5 rounded-md border border-[#2d2d2d] bg-[#C8B8DB];
 }
-.topicMain {
-  @apply flex-1 bg-[#fffdf9] border flex flex-row items-center justify-start gap-[5px] p-2.5 rounded-md border-solid border-[#2d2d2d];
-}
-.topicDiv {
-  @apply w-fit relative shadow-[0px_4px_4px_rgba(0,0,0,0.25)] h-[70px] flex flex-row items-center justify-start text-left text-lg text-[#2d2d2d];
-}
+
+  .topicDiv {
+    @apply w-full max-w-full flex-shrink text-left text-[#2d2d2d] cursor-pointer;
+  }
 }

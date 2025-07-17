@@ -1,35 +1,32 @@
 import "./Filter.css";
+import Topic from "../Topic/Topic";
+import { useState } from "react";
+
 function Filter() {
+  const [clicked, setClicked] = useState(null);
+
+  const handleFilterClicked = (topicId) => {
+    setClicked(topicId);
+  };
+
   return (
     <div className="filterBy">
       <div className="filterMain">
         <div className="filterText">Filter By</div>
-        <div className="filterType">
-          <div className="filterTypeDiv">
-            <img className="filterIcon" alt="newest posts" src="src\assets\Latest.png" />
-            <div className="filterTypeText">Newest Posts</div>
-          </div>
-        </div>
-        <div className="filterType">
-          <div className="filterTypeDiv">
-            <img className="filterIcon" alt="oldest posts" src="src\assets\Earliest.png" />
-            <div className="filterTypeText">Oldest Posts</div>
-          </div>
-        </div>
-        <div className="filterType">
-          <div className="filterTypeDiv">
-            <img className="filterIcon" alt="highest comments" src="src\assets\Comments.png" />
-            <div className="filterTypeText">Highest Comments</div>
-          </div>
-        </div>
-        <div className="filterType">
-          <div className="filterTypeDiv">
-            <img className="filterIcon" alt="highest likes" src="src\assets\Likes.png" />
-            <div className="filterTypeText">Highest Likes</div>
-          </div>
-        </div>
-        </div>
+
+        <Topic topicId={1} topicName="Newest Post" topicImage="src/assets/Latest.png"
+               clicked={clicked === 1} onClick={() => handleFilterClicked(1)} />
+
+        <Topic topicId={2} topicName="Oldest Post" topicImage="src/assets/Earliest.png"
+               clicked={clicked === 2} onClick={() => handleFilterClicked(2)} />
+
+        <Topic topicId={3} topicName="Highest Comments" topicImage="src/assets/Comments.png"
+               clicked={clicked === 3} onClick={() => handleFilterClicked(3)} />
+
+        <Topic topicId={4} topicName="Highest Likes" topicImage="src/assets/Likes.png"
+               clicked={clicked === 4} onClick={() => handleFilterClicked(4)} />
       </div>
+    </div>
   );
 }
 
