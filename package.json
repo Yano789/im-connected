@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "start": "nodemon BACKEND/Forum/src/index.cjs",
-    "test":"jest",
+    "test": "jest",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -19,6 +19,7 @@
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.17.0",
     "mongoose": "^8.16.3",
     "node.js": "^0.0.1-security",
     "nodemailer": "^7.0.5",
