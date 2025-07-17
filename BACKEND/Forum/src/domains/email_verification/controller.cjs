@@ -17,11 +17,6 @@ const verifyUserEmail = async({email,otp})=>{
 
 
 
-
-
-
-
-
 const sendVerificationOTPEmail = async(email)=>{
     try {
        const existingUser = await User.findOne({email});

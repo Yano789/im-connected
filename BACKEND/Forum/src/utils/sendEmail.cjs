@@ -14,13 +14,15 @@ const transporter = nodemailer.createTransport({
 });
 
 // Test transporter
+if (process.env.NODE_ENV !== 'test') {
 transporter.verify((error, success) => {
   if (error) {
     console.log("Transporter error:", error);
   } else {
     console.log("Server is ready to send emails");
   }
-});
+})
+}
 
 const sendEmail = async (mailOptions) => {
   try {
