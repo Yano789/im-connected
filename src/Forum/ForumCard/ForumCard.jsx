@@ -52,11 +52,11 @@ function ForumCard(props) {
       <div className="stats">
         <div className="commentsNumber">
           <img className="commentsIcon" alt="comments" src="src\assets\Comments.png" />
-          <div className="name">78</div>
+          <div className="name">0</div>
         </div>
         <div className="likesNumber" onClick={() => setLiked(!liked)} style={{ cursor: "pointer" }}>
           <img className="likesIcon" alt="likes" src={likeIcon} />
-          <div className="name">7,354</div>
+          <div className="name">0</div>
         </div>
       </div>
     </div>

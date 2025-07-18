@@ -11,9 +11,6 @@
     .applicationIcon {
     @apply w-10 relative h-10 object-cover;
     }
-    .currentPage {
-    @apply w-fit flex flex-col items-center justify-center gap-[5px];
-    }
     .navigateTo {
     @apply w-fit flex flex-col items-center justify-center gap-[5px] cursor-pointer;
     }

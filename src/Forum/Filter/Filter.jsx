@@ -2,11 +2,31 @@ import "./Filter.css";
 import Topic from "../Topic/Topic";
 import { useState } from "react";
 
-function Filter() {
+function Filter({ onFilter }) {
   const [clicked, setClicked] = useState(null);
 
   const handleFilterClicked = (topicId) => {
     setClicked(topicId);
+
+    // Trigger the parent's filter handler
+    if (onFilter) {
+      switch (topicId) {
+        case 1:
+          onFilter({ sort: "latest" });
+          break;
+        case 2:
+          onFilter({ sort: "earliest" });
+          break;
+        case 3:
+          onFilter({ sort: "comments" });
+          break;
+        case 4:
+          onFilter({ sort: "likes" });
+          break;
+        default:
+          break;
+      }
+    }
   };
 
   return (
@@ -14,17 +34,37 @@ function Filter() {
       <div className="filterMain">
         <div className="filterText">Filter By</div>
 
-        <Topic topicId={1} topicName="Newest Post" topicImage="src/assets/Latest.png"
-               clicked={clicked === 1} onClick={() => handleFilterClicked(1)} />
+        <Topic
+          topicId={1}
+          topicName="Newest Post"
+          topicImage="src/assets/Latest.png"
+          clicked={clicked === 1}
+          onClick={() => handleFilterClicked(1)}
+        />
 
-        <Topic topicId={2} topicName="Oldest Post" topicImage="src/assets/Earliest.png"
-               clicked={clicked === 2} onClick={() => handleFilterClicked(2)} />
+        <Topic
+          topicId={2}
+          topicName="Oldest Post"
+          topicImage="src/assets/Earliest.png"
+          clicked={clicked === 2}
+          onClick={() => handleFilterClicked(2)}
+        />
 
-        <Topic topicId={3} topicName="Highest Comments" topicImage="src/assets/Comments.png"
-               clicked={clicked === 3} onClick={() => handleFilterClicked(3)} />
+        <Topic
+          topicId={3}
+          topicName="Highest Comments"
+          topicImage="src/assets/Comments.png"
+          clicked={clicked === 3}
+          onClick={() => handleFilterClicked(3)}
+        />
 
-        <Topic topicId={4} topicName="Highest Likes" topicImage="src/assets/Likes.png"
-               clicked={clicked === 4} onClick={() => handleFilterClicked(4)} />
+        <Topic
+          topicId={4}
+          topicName="Highest Likes"
+          topicImage="src/assets/Likes.png"
+          clicked={clicked === 4}
+          onClick={() => handleFilterClicked(4)}
+        />
       </div>
     </div>
   );

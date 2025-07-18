@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+@layer components{
+    .X{
+    @apply relative leading-[26px] cursor-pointer;
+    }
+    .viewPostDetails {
+    @apply relative leading-[26px];
+    }
+    .viewPostPostedDiv {
+    @apply flex flex-row items-center justify-end gap-5 text-base;
+    }
+    .viewPostTitleParent {
+    @apply self-stretch flex flex-row items-center justify-between gap-0;
+    }
+    .viewPostUsername, .name {
+    @apply relative leading-4;
+    }
+    .bookmarkIcon {
+    @apply w-[30px] relative max-h-full object-cover;
+    }
+    .viewPostName {
+    @apply self-stretch flex flex-row items-center justify-between gap-0 text-base text-black;
+    }
+    .tag {
+    @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border flex flex-row items-center justify-center px-5 py-2.5 rounded-[20px] border-solid border-[#1e1e1e];
+    }
+    .viewPostTags {
+    @apply flex flex-row items-start justify-start gap-2.5 text-xl text-[#1e1e1e];
+    }
+    .viewPostTitleDiv {
+    @apply self-stretch flex flex-col items-start justify-start gap-2.5;
+    }
+    .viewPostdata {
+    @apply self-stretch flex flex-col items-start justify-start text-2xl text-[#2b2b2b];
+    }
+    .viewPostDescription {
+    @apply flex-1 relative leading-4;
+    }
+    .viewPostDescriptionDiv {
+    @apply self-stretch bg-[#fff2f0] flex flex-row items-center justify-center p-2.5 rounded-[5px];
+    }
+    .commentsIcon, .likesIcon {
+    @apply w-[30px] relative h-[30px] object-cover;
+    }
+    .commentsNumber, .likesNumber {
+    @apply flex flex-row items-center justify-center gap-2.5;
+    }
+    .viewPostStatsDiv {
+    @apply self-stretch flex flex-row items-center justify-start gap-2.5 text-center;
+    }
+    .addAComment {
+    @apply relative;
+    }
+    .buttonStyle1 {
+    @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#c8b8db] border flex flex-row items-center justify-end p-2.5 rounded-2xl border-solid border-[#1e1e1e];
+    }
+    .addComment {
+    @apply self-stretch shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border box-border h-[100px] flex flex-row items-end justify-end text-left text-[#333] p-2.5 rounded-[5px] border-solid border-[#1e1e1e];
+    }
+    .viewPostComment {
+    @apply relative text-left;
+    }
+    .viewPostCommentsDiv {
+    @apply self-stretch flex flex-col items-start justify-start gap-[15px];
+    }
+    .viewPostBody {
+    @apply self-stretch flex flex-col items-start justify-start gap-5 text-left text-base;
+    }
+    .viewPostDiv {
+    @apply w-full relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border h-[936px] flex flex-col items-start justify-start gap-2.5 text-center text-xl text-black p-5 rounded-[5px] border-solid border-[#1e1e1e];
+    font-family: Poppins;
+    }
+
+}

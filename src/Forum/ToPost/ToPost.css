@@ -19,7 +19,7 @@
   }
 
   .toPostTitle {
-    @apply w-full flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-5;
+    @apply w-full flex flex-col lg:flex-row items-start lg:items-center gap-2 sm:gap-5;
   }
 
   .toPost {

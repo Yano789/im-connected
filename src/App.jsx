@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Forum from "./Forum/Forum/Forum";
 import NewPost from "./Forum/NewPost/NewPost";
+import ViewPost from "./Forum/ViewPost/ViewPost";
 import MedicationsPage from "./Medications/MedicationsPage/MedicationsPage";
 
 function App() {
@@ -20,10 +21,10 @@ function App() {
           <Route path="/emailauthentication" element={<EmailAuthentication/>}/>
           <Route path="/forgetpassword" element={<ForgetPassword/>}/> 
           <Route path="/dashboard" element={<Dashboard/>}/>
-          <Route path="/forum/post?postid=xxx" element={<SelectedPost/>}/> 
           */}
           <Route path="/forum" element={<Forum/>}/>
           <Route path="/forum/newpost" element={<NewPost/>}/>
+          <Route path="/forum/showpost" element={<ViewPost/>}/> 
           <Route path="/medication" element={<MedicationsPage/>}/>
           {/*
           <Route path="/profile" element={<Profile/>}/>

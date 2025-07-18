@@ -1,16 +1,24 @@
 import "./TopicSelector.css";
 import Topic from "../Topic/Topic";
 import { useState } from "react";
-function TopicSelector() {
+
+function TopicSelector({ onTagFilterChange }) {
   const [clickedTopics, setClickedTopics] = useState([]);
+
   const handleTopicClicked = (topicId) => {
+    let updatedTopics;
     if (clickedTopics.includes(topicId)) {
-      //to uncheck the button lol
-      setClickedTopics(clickedTopics.filter((id) => id !== topicId));
+      updatedTopics = clickedTopics.filter((id) => id !== topicId);
     } else {
-      if (clickedTopics.length < 2) {
-        setClickedTopics([...clickedTopics, topicId]);
-      }
+      updatedTopics =
+        clickedTopics.length < 2 ? [...clickedTopics, topicId] : clickedTopics;
+    }
+
+    setClickedTopics(updatedTopics);
+
+    // Notify parent of tag filter change
+    if (onTagFilterChange) {
+      onTagFilterChange(updatedTopics);
     }
   };
 
