@@ -18,7 +18,7 @@ function buildCommentTree(comments) {
         }
     }
     
-    return roots.sort((a, b) => b.createdAt - a.createdAt); // Sort roots by newest first
+    return roots.sort((a, b) => a.createdAt - b.createdAt); // Sort roots by newest first
 }
 
 const createNestedComment = async(comments)=>{

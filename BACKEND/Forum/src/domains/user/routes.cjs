@@ -23,8 +23,8 @@ router.post("/", async (req, res) => {
         if (!(username && password)) {
             throw Error("Empty Credentials Given!");
         }
-        const authenticatedUser = await authenticateUser({ username, password });
-        res.cookie("token", authenticatedUser.token, {
+        const {token,authenticatedUser} = await authenticateUser({ username, password });
+        res.cookie("token", token, {
             httpOnly: true,
             secure: isProduction,
             sameSite: "Strict",

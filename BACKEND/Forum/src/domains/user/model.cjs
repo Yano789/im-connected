@@ -8,7 +8,6 @@ const UserSchema = new Schema({
     email: {type: String,unique: true},
     password: String,
     confirmPassword: String,
-    token: String,
     verified: {type:Boolean,default:false}, //For authorisation purposes 
 
 });

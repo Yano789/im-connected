@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const allowedTags = ['Physical Disability & Chronic Illness', 'Personal Mental Health', 'End of Life Care', 'Financial & Legal Help', 'Mental Disability','Hospitals and Clinics','Pediatric Care','Subsidies and Govt Support'];
 const PostSchema = new Schema({
-postId: { type: String, required: true, unique: true, index: true }, // index + unique
+postId: { type: String, unique: true, index: true }, // index + unique
   title: { type: String },
   content: { type: String },
-  username: { type: String, required: true, index: true },             // index for filtering by user
+  username: { type: String, index: true },             // index for filtering by user
   tags: [{
     type: String,
     enum: allowedTags,
@@ -14,7 +14,8 @@ postId: { type: String, required: true, unique: true, index: true }, // index + 
   createdAt: { type: Date, default: Date.now },
   edited: { type: Boolean, default: false },
   comments: { type: Number, default: 0 },
-  likes: { type: Number, default: 0 }
+  likes: { type: Number, default: 0 },
+  draft:{type:Boolean,default:false}
 
 });
 

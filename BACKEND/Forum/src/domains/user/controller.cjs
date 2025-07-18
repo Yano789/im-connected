@@ -22,8 +22,8 @@ const authenticateUser = async(data)=>{
         const token = await createToken(tokenData);
 
         //assign user token
-        const authenticatedUser = await User.findOneAndUpdate({username},{token:token},{new:true})
-        return authenticatedUser;
+        const authenticatedUser = await User.findOne({username})
+        return {token,authenticatedUser};
     } catch (error) {
         throw error;
     }

@@ -7,7 +7,7 @@ const savedPost = require("../savedPosts/model.cjs")
 
 const createPost = async(data)=>{
     try {
-        const {title,content,tags,username} = data;
+        const {title,content,tags,username, draft = false} = data;
         const existingUsername = await User.findOne({username})
         if(!existingUsername){
             throw Error("Username does not exist")
@@ -20,7 +20,8 @@ const createPost = async(data)=>{
                 content,
                 username,
                 tags,
-                createdAt:Date.now()
+                createdAt:Date.now(),
+                draft: draft
             })
             const createdPost = await newPost.save()
             return createdPost
@@ -30,16 +31,19 @@ const createPost = async(data)=>{
     }
 }
 
-const editPost = async (data) => {
+const editDraft = async (data) => {
     try {
-        const { postId, newContent, newTitle, newTags ,username} = data;
-        const existingPost = await Post.findOne({postId})
-        if(existingPost.username !== username) throw new Error("unauthorized");
-        const existingEditedPost = await Post.findOneAndUpdate({ postId }, { title: newTitle, content: newContent, tags: newTags, createdAt: Date.now(), edited: true },{ new: true })
-        if (!existingEditedPost) {
+        const { postId, content, title, tags ,username,draft} = data;
+        const existingDraft = await Post.findOne({postId})
+
+        if (!existingDraft) throw Error("Draft does not exist");
+        if(existingDraft.username !== username) throw new Error("unauthorized");
+        if (!existingDraft.draft) throw Error("Cannot edit a published post");
+        const existingEditedDraft = await Post.findOneAndUpdate({ postId }, { title: title, content: content, tags: Array.isArray(tags) ? tags : [], createdAt: Date.now(), edited: true ,draft:draft},{ new: true })
+        if (!existingEditedDraft) {
             throw Error("Post does not exist!")
         }
-        return existingEditedPost
+        return existingEditedDraft
         
     } catch (error) {
         throw error
@@ -54,7 +58,7 @@ const deletePost = async(data)=>{
         if(!existingPost){
             throw Error("Post does not exist")
         }else{
-            await Promise.all([ Post.deleteOne({postId}),Comment.deleteMany({postId:postId}),savedPost.deleteMany({savedPostId:postId})])
+            await Promise.all([ Post.deleteOne({postId:postId,draft:false}),Comment.deleteMany({postId:postId}),savedPost.deleteMany({savedPostId:postId})])
             return existingPost
         }
 
@@ -84,7 +88,7 @@ const getFilteredPosts = async ({ tags = [], sort = "latest" }) => {
         else if (sort === "earliest") sortOptions.createdAt = 1;
 
         // Fetch posts with filter and sort directly in DB
-        const posts = await Post.find(filter).sort(sortOptions);
+        const posts = await Post.find({...filter,draft:false}).sort(sortOptions);
         return posts;
     } catch (error) {
         throw new Error("Failed to filter/sort posts: " + error.message);
@@ -119,7 +123,7 @@ const getPostWithComment = async(data)=>{
             return res.status(404).send("Post not found");
         }
         if(post.comments != comments.length){
-            post = await Post.findOneAndUpdate({postId},{comments:comments.length},{new:true})
+            post = await Post.findOneAndUpdate({postId:postId,draft:false},{comments:comments.length},{new:true})
         }
         const nestedComments = await createNestedComment(comments)
         const response = {
@@ -140,7 +144,7 @@ const likePosts = async(data)=>{
         const query = (like && like === "like")
             ? { likes: 1 }
             : {likes:-1};
-        await Post.updateOne({postId},{$inc:query})
+        await Post.updateOne({postId:postId,draft:false},{$inc:query})
         const updatedLikes = await Post.findOne({ postId })
         return updatedLikes
     } catch (error) {
@@ -151,11 +155,41 @@ const likePosts = async(data)=>{
 const getAllMyPosts = async(data)=>{
     try {
         const username = data
-        const allMyPosts = await Post.find({username:username}).sort({ createdAt: -1 });
+        const allMyPosts = await Post.find({username:username,draft:false}).sort({ createdAt: -1 });
         return allMyPosts
     } catch (error) {
         throw error
     }
 }
 
-module.exports = {createPost,editPost,deletePost,modeLimit,getFilteredPosts,getPostWithComment,likePosts,getAllMyPosts}
+const getAllMyDrafts = async(data)=>{
+    try {
+        const username = data
+        const myDrafts = await Post.find({username,draft:true}).sort({createdAt: -1});
+        return myDrafts
+    } catch (error) {
+        throw error
+    }
+}
+
+const getMyDraft = async(data)=>{
+    try {
+        const {username,postId} = data
+        const myDraft = await Post.findOne({username:username,postId:postId,draft:true})
+        return myDraft
+    } catch (error) {
+        throw error
+    }
+}
+
+const deleteDrafts = async(data)=>{
+    try {
+        const {username,postId} = data
+        const deletedDraft = await Post.findOneAndDelete({username:username,postId:postId,draft:true})
+        return deletedDraft
+    } catch (error) {
+        throw error
+    }
+}
+
+module.exports = {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,likePosts,getAllMyPosts,getAllMyDrafts,getMyDraft,deleteDrafts}
