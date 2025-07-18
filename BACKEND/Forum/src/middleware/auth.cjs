@@ -5,7 +5,7 @@ const verifyToken = async(req,res,next)=>{
     //const token = req?.body?.token || req?.query?.token || req?.headers?.["x-access-token"];
     
     const token = req.cookies.token
-    console.log(token)
+    //console.log(token)
     if(!token){
         return res.status(403).send("An authentication token is required!");
 
