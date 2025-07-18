@@ -12,7 +12,7 @@ function ForumBody(){
     useEffect(() => {
         const fetchPosts = async () => {
             try {
-                const response = await fetch("http://localhost:5000/api/v1/post/", {
+                const response = await fetch("http://localhost:5001/api/v1/post/", {
   method: "GET",
   credentials: "include",
 });
