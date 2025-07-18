@@ -7,10 +7,9 @@ import { useState, useEffect } from "react";
 
 function ForumBody() {
   const [posts, setPosts] = useState([]);
-  const [filteredPosts, setFilteredPosts] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]); // array of tagIds
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const [query, setQuery] = useState({
     filter: "default",
     mode: "default",
@@ -24,6 +23,14 @@ function ForumBody() {
     }));
   };
 
+  // Handler for tag filter from TopicSelector
+  const handleTagFilterChange = (filterString) => {
+    if (!filterString || filterString === "") {
+      updateQuery({ filter: "default" });
+    } else {
+      updateQuery({ filter: filterString });
+    }
+  };
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -46,28 +53,11 @@ function ForumBody() {
     fetchPosts();
   }, [query]);
 
-  // Filter posts when selectedTags change
-  useEffect(() => {
-    if (selectedTags.length === 0 || selectedTags.includes(1)) {
-      setFilteredPosts(posts);
-    } else {
-      setFilteredPosts(
-        posts.filter((post) =>
-          post.tags?.some((tagId) => selectedTags.includes(tagId))
-        )
-      );
-    }
-  }, [selectedTags, posts]);
-
-  const handleTagFilterChange = (tags) => {
-    setSelectedTags(tags);
-  };
-
   return (
     <div className="forumMain">
       <div className="forumLeftBar">
         <ToPost />
-        <Filter onFilter={updateQuery}/>
+        <Filter onFilter={updateQuery} />
       </div>
 
       <div className="forumBody">
@@ -75,8 +65,8 @@ function ForumBody() {
           <p>Loading...</p>
         ) : error ? (
           <p>Error: {error}</p>
-        ) : filteredPosts.length > 0 ? (
-          filteredPosts.map((post) => (
+        ) : posts.length > 0 ? (
+          posts.map((post) => (
             <ForumCard
               key={post.postId}
               postUser={post.username}
