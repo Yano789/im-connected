@@ -1,0 +1,90 @@
+.details-card {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.12);
+    height: 100%;
+}
+
+.details-card.placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 1.2rem;
+}
+
+.medication-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0 0 1.5rem 0;
+}
+
+.detail-section {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #fbe0e0;
+}
+
+.detail-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.section-header {
+    font-size: 0.9rem;
+    font-weight: bold;
+    color: #555;
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+}
+
+.section-content {
+    margin: 0;
+    color: #333;
+}
+
+.schedule-icons {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.icon-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: #555;
+}
+
+.icon-item span {
+    font-size: 1.75rem; /* Emoji size */
+}
+
+.medication-image {
+    width: 100%;
+    max-width: 250px;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+    border: 1px solid #eee;
+}
+
+.edit-button {
+    width: 100%;
+    background-color: #F87575;
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background-color 0.2s;
+}
+
+.edit-button:hover {
+    background-color: #e56b6f;
+}
