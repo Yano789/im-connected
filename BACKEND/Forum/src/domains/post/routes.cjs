@@ -60,6 +60,8 @@ router.get("/",async(req,res)=>{
 })
 
 //TODO GET POST WHEN WE CLICK ON A LINK, VIEW ONE POST WITH COMMENTS!
+// comment structure is top level commments are by earliest, nested levels are by earliest
+//reason is to show ordering in replies to post
 router.get("/getPost/:post", async (req, res) => {
     try {
         const postId = req.params.post

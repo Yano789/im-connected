@@ -12,9 +12,9 @@ describe("utils.buildNestedComments() tests",()=>{
 
         const result = await createNestedComment(input)
         expect(result.length).toBe(2)
-        expect(result[0].commentId).toBe("5")
-        expect(result[1].children[0].commentId).toBe("2") // while top level comments are arranged to be newest, nested comments are earliest
-        expect(result[1].children[1].children[0].commentId).toBe("4")
+        expect(result[0].commentId).toBe("1")
+        expect(result[0].children[0].commentId).toBe("2") // while top level comments are arranged to be newest, nested comments are earliest
+        expect(result[0].children[1].children[0].commentId).toBe("4")
     })
 
     test ("testing empty array in buildNestedComments()",async()=>{

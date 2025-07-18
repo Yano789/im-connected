@@ -34,11 +34,11 @@ const createComment = async (data) => {
 
 const editComment = async (data) => {
     try {
-        const { commentId, newContent,username } = data
+        const { commentId, content,username } = data
         const existingComment = await Comment.findOne({commentId})
         if (!existingComment) throw new Error("Comment not found")
         if(existingComment.username !== username) throw new Error("Invalid User!");
-        const existingEditedComment = await Comment.findOneAndUpdate({ commentId }, { content: newContent, createdAt: Date.now(), edited: true },{ new: true })
+        const existingEditedComment = await Comment.findOneAndUpdate({ commentId }, { content: content, createdAt: Date.now(), edited: true },{ new: true })
         if (!existingEditedComment) {
             throw Error("Updated comment does not exist!")
 
@@ -93,5 +93,24 @@ const getAllComments = async(postId) => {
   }
 }
 
+const getComment = async (data) => {
+    try {
+        const { postId, commentId} = data
+        if (!postId) {
+            throw Error("No postId")
+        }
+        if (!commentId) {
+            throw Error("No commentId")
+        }
+        const comment = await Comment.findOne({ postId: postId, commentId: commentId })
+        if (!comment) {
+            throw Error("No such comment found")
+        }
+        return comment
 
-module.exports = {createComment,editComment,deleteComment,getAllComments}
+    } catch (error) {
+        throw error
+    }
+}
+
+module.exports = {createComment,editComment,deleteComment,getAllComments,getComment}

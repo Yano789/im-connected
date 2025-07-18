@@ -1,5 +1,5 @@
 const express = require("express");
-const { createComment, editComment, deleteComment, getAllComments } = require("./controller.cjs")
+const { createComment, editComment, deleteComment, getAllComments,getComment } = require("./controller.cjs")
 const auth = require("./../../middleware/auth.cjs");
 const router = express.Router({ mergeParams: true });
 
@@ -38,14 +38,14 @@ router.put("/:comment/edit",auth,async (req, res) => {
     try {
         const commentId = req.params.comment
         const username = req.currentUser.username;
-        const { newContent } = req.body
+        const { content } = req.body
         if (!(commentId)) {
             throw Error("Invalid comment id!")
         }
-        if(!(newContent)){
+        if(!(content)){
             throw Error("Invalid content!")
         }
-        const editedComment = await editComment({ commentId, newContent,username })
+        const editedComment = await editComment({ commentId, content,username })
         res.status(200).json(editedComment)
     } catch (error) {
         res.status(400).send(error.message)
@@ -67,12 +67,24 @@ router.delete("/:comment/delete", auth ,async (req, res) => {
     }
 })
 
-//get all comments in a nested structure
+//get only all the comments in a nested structure
 router.get("/",async (req, res) => {
     try {
         const postId = req.params.post
         const nestedComments = await getAllComments(postId)
         res.status(200).json(nestedComments)
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+})
+
+//get a specific comment
+router.get("/:comment",async(req,res)=>{
+    try {
+        const postId = req.params.post
+        const commentId = req.params.comment
+        const comment = await getComment({postId,commentId})
+        res.status(200).json(comment)
     } catch (error) {
         res.status(400).send(error.message)
     }
