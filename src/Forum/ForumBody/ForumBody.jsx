@@ -82,7 +82,8 @@ function ForumBody() {
       </div>
 
       <div className="forumRightBar">
-        <TopicSelector onTagFilterChange={handleTagFilterChange} />
+        <TopicSelector 
+        onTagFilterChange={handleTagFilterChange} />
       </div>
     </div>
   );

@@ -54,7 +54,7 @@ function ViewPost(props) {
       <div className="viewPostTitleDiv">
         <div className="addAComment">Add a Comment</div>
         <textarea className="addComment">
-          <button className="buttonStyle1">Post </button>
+          <button className="viewPostButton">Post </button>
         </textarea>
       </div>
       <div className="viewPostCommentsDiv">

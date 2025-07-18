@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import UploadIcon from "../../assets/Upload.png";
 import "./mediaUploader.css";
 
 function MediaUploader() {
@@ -39,7 +40,7 @@ function MediaUploader() {
         onDragOver={handleDragOver}
       >
         <p className="text-gray-500">Click or Drag & Drop Media Here</p>
-        <img src="/assets/Upload.png" alt="Upload" className="media-upload-icon" />
+        <img src={UploadIcon} alt="Upload" className="media-upload-icon" />
         <input
           type="file"
           accept="image/*,video/*"

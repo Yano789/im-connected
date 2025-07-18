@@ -15,7 +15,7 @@
   @apply flex flex-row items-center justify-start gap-2.5 text-[32px];
 }
 .typeHereTo {
-  @apply relative leading-[22px];
+  @apply w-full leading-[22px];
 }
 .title {
   @apply self-stretch flex flex-row items-center justify-between gap-0;

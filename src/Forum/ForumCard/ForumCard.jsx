@@ -8,7 +8,9 @@ function ForumCard(props) {
   const [bookmarked, setBookmarked] = useState(false);
 
   const likeIcon = liked ? "src/assets/Likes.png" : "src/assets/Unlikes.png";
-  const bookmarkIcon = bookmarked ? "src/assets/Bookmark.png" : "src/assets/Unbookmark.png";
+  const bookmarkIcon = bookmarked
+    ? "src/assets/Bookmark.png"
+    : "src/assets/Unbookmark.png";
 
   return (
     <div className="post">
@@ -20,7 +22,7 @@ function ForumCard(props) {
               <div className="posted">Posted:</div>
               <div className="postDate">{postDate}</div>
             </div>
-          </div>  
+          </div>
           <div className="nameParent">
             <div className="postUser">{postUser}</div>
             {/* Toggle bookmark on click */}
@@ -33,8 +35,17 @@ function ForumCard(props) {
             />
           </div>
           <div className="tags">
-            <div className="tagItem"><div className="name">{postTags[0]}</div></div>
-            <div className="tagItem"><div className="name">{postTags[1]}</div></div>
+            {postTags && postTags.length > 0 ? (
+              postTags.map((tag, index) => (
+                <div className="tagItem" key={index}>
+                  <div className="name">{tag}</div>
+                </div>
+              ))
+            ) : (
+              <div className="tagItem">
+                <div className="name">No tags</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -51,10 +62,18 @@ function ForumCard(props) {
 
       <div className="stats">
         <div className="commentsNumber">
-          <img className="commentsIcon" alt="comments" src="src\assets\Comments.png" />
+          <img
+            className="commentsIcon"
+            alt="comments"
+            src="src\assets\Comments.png"
+          />
           <div className="name">0</div>
         </div>
-        <div className="likesNumber" onClick={() => setLiked(!liked)} style={{ cursor: "pointer" }}>
+        <div
+          className="likesNumber"
+          onClick={() => setLiked(!liked)}
+          style={{ cursor: "pointer" }}
+        >
           <img className="likesIcon" alt="likes" src={likeIcon} />
           <div className="name">0</div>
         </div>

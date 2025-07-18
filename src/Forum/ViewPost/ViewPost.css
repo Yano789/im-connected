@@ -52,7 +52,7 @@
     .addAComment {
     @apply relative;
     }
-    .buttonStyle1 {
+    .viewPostButton {
     @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#c8b8db] border flex flex-row items-center justify-end p-2.5 rounded-2xl border-solid border-[#1e1e1e];
     }
     .addComment {

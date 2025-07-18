@@ -1,4 +1,5 @@
-import "./DraftEntry.css"
+import "./DraftEntry.css";
+import TrashIcon from "../../assets/Trash.png";
 function DraftEntry(props){
     const draftTitle = props.draftTitle;
     const draftContents = props.draftContents;
@@ -9,7 +10,7 @@ function DraftEntry(props){
       			<div className="draftText">{draftContents}</div>
       			<div className="draftDateDiv">
         				<div className="draftDate">{draftDate}</div>
-        				<img className="draftDelete" alt="" src="src\assets\Trash.png" />
+        				<img className="draftDelete" alt="" src={TrashIcon} />
       			</div>
     		</div>);
 };
