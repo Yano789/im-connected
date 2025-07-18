@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@layer components {
+  .media-container {
+    @apply w-full;
+  }
+
+  .media-label {
+    @apply mb-2 text-sm font-medium text-gray-700;
+  }
+
+  .media-dropzone {
+    @apply flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 cursor-pointer hover:border-blue-400 transition duration-200;
+  }
+
+  .media-upload-icon {
+    @apply mt-3 w-8 h-8;
+  }
+
+  .media-grid {
+    @apply mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4;
+  }
+
+  .media-preview {
+    @apply relative flex flex-row;
+  }
+
+  .media-remove-button {
+    @apply absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition;
+  }
+
+  .media-thumb {
+    @apply w-full h-32 object-cover rounded-lg border;
+  }
+
+  .media-filename {
+    @apply mt-1 text-xs text-center truncate;
+  }
+}
