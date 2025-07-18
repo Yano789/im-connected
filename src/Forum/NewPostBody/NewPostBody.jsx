@@ -1,10 +1,12 @@
-import NewPost from "../NewPost/NewPost";
+import NewPostCard from "../NewPostCard/NewPostCard";
 import DraftPosts from "../DraftPosts/DraftPosts";
 import "./NewPostBody.css";
 function NewPostBody(){
     return (
-        <div className="newPostsBody">
-            <NewPost/>
+        <div className="newPostDiv">
+            <div className="newPostBody">
+                <NewPostCard/>
+            </div>
             <DraftPosts/>
         </div>
     );

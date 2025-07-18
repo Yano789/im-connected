@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import './MedicationsPage.css';
 import CareRecipientList from '../CareRecipientList/CareRecipientList'; 
+import Header from '../../TopHeader/Header/Header';
 // import MedicationLogging from '../MedicationLogging/MedicationLogging';
 // import MedicationDetails from '../MedicationDetails/MedicationDetails';
 
@@ -27,34 +28,37 @@ function MedicationsPage() {
     };
 
     return (
-        <div className="medications-grid-layout">
-            {/* -- Row 1 -- */}
-            <div className="grid-item-recipients">
-                <CareRecipientList 
-                    recipients={careRecipientsData}
-                    onSelect={handleRecipientSelect}
-                    selectedRecipientId={selectedRecipient.id}
-                />
-            </div>
-            <div className="grid-item-title">
-                <h1 className="page-title">
-                    Medications for <span className="recipient-name">{selectedRecipient.name.toUpperCase()}</span>
-                </h1>
-            </div>
-
-            {/* -- Row 2 -- */}
-            <div className="grid-item-logging">
-                {/* Placeholder for MedicationLogging */}
-                <div style={{ border: '2px dashed #ccc', padding: '1rem', textAlign: 'center' }}>
-                    <h3>Medication Logging</h3>
-                    <p>(This is where the medications will be listed)</p>
+        <div>
+            <Header/>
+            <div className="medications-grid-layout">
+                {/* -- Row 1 -- */}
+                <div className="grid-item-recipients">
+                    <CareRecipientList 
+                        recipients={careRecipientsData}
+                        onSelect={handleRecipientSelect}
+                        selectedRecipientId={selectedRecipient.id}
+                    />
                 </div>
-            </div>
-            <div className="grid-item-details">
-                {/* Placeholder for MedicationDetails */}
-                <div style={{ border: '2px dashed #ccc', padding: '1rem', textAlign: 'center', height: '400px' }}>
-                    <h3>Medication Details</h3>
-                    <p>(Details will appear here)</p>
+                <div className="grid-item-title">
+                    <h1 className="page-title">
+                        Medications for <span className="recipient-name">{selectedRecipient.name.toUpperCase()}</span>
+                    </h1>
+                </div>
+
+                {/* -- Row 2 -- */}
+                <div className="grid-item-logging">
+                    {/* Placeholder for MedicationLogging */}
+                    <div style={{ border: '2px dashed #ccc', padding: '1rem', textAlign: 'center' }}>
+                        <h3>Medication Logging</h3>
+                        <p>(This is where the medications will be listed)</p>
+                    </div>
+                </div>
+                <div className="grid-item-details">
+                    {/* Placeholder for MedicationDetails */}
+                    <div style={{ border: '2px dashed #ccc', padding: '1rem', textAlign: 'center', height: '400px' }}>
+                        <h3>Medication Details</h3>
+                        <p>(Details will appear here)</p>
+                    </div>
                 </div>
             </div>
         </div>

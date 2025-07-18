@@ -14,7 +14,7 @@
     @apply w-4 h-4 sm:w-5 sm:h-5;
   }
 
-  .savedPostDiv {
+  .toSavedPostDiv {
     @apply w-full flex flex-row flex-wrap items-center justify-between gap-2 text-sm sm:text-base text-[#2b2b2b];
   }
 

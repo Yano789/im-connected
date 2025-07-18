@@ -39,7 +39,7 @@ function MediaUploader() {
         onDragOver={handleDragOver}
       >
         <p className="text-gray-500">Click or Drag & Drop Media Here</p>
-        <img src="src/assets/Upload.png" alt="Upload" className="media-upload-icon" />
+        <img src="/assets/Upload.png" alt="Upload" className="media-upload-icon" />
         <input
           type="file"
           accept="image/*,video/*"

@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @layer components{
-    .savedDrafts {
+    .myDrafts {
     @apply relative leading-6;
     }
-    .savedPostTitle {
+    .draftsTitle {
     @apply flex flex-col items-start justify-start gap-2 text-xl text-[#1e1e1e];
     }
 
-    .savedPostMain {
+    .draftsMain {
     @apply flex-1 flex flex-col items-start justify-start gap-5;
     }
-    .savedPostDiv {
+    .draftsDiv {
   @apply w-fit h-fit min-h-screen relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] 
          bg-[#fffdf9] border box-border flex flex-col items-start justify-start 
          text-left text-base text-black px-5 py-5 rounded-[5px] border-solid border-black;

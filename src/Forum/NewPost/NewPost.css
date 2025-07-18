@@ -1,7 +1,1 @@
-@import "tailwindcss";
 
-@layer components{
-    .newPostBody{
-        @apply w-fit min-h-screen;
-    }
-}   
