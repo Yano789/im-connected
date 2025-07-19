@@ -1,22 +1,21 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import "./NewPostCard.css";
 import MediaUploader from "../MediaUploader/MediaUploader.jsx";
 
-function NewPostCard({onDraftAdded}) {
+function NewPostCard({ onDraftAdded, renderDraft }) {
   const [selectedTags, setSelectedTags] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const tags = [
-  'Physical Disability & Chronic Illness',
-  'Personal Mental Health',
-  'End of Life Care',
-  'Financial & Legal Help',
-  'Mental Disability',
-  'Hospitals and Clinics',
-  'Pediatric Care',
-  'Subsidies and Govt Support',
-];
-
+    "Physical Disability & Chronic Illness",
+    "Personal Mental Health",
+    "End of Life Care",
+    "Financial & Legal Help",
+    "Mental Disability",
+    "Hospitals and Clinics",
+    "Pediatric Care",
+    "Subsidies and Govt Support",
+  ];
 
   const toggleTag = useCallback((tag) => {
     console.log("clicked", tag);
@@ -55,10 +54,23 @@ function NewPostCard({onDraftAdded}) {
       console.error("error creating draft: ", error.message);
     }
   };
+  useEffect(() => {
+    if (renderDraft && renderDraft._id) {
+      setTitle(renderDraft.title || "");
+      setContent(renderDraft.content || "");
+      setSelectedTags(renderDraft.tags || []);
+    }
+  }, [renderDraft]);
 
   return (
     <div className="postMain">
-      <form className="postData" onSubmit={handleSubmit}>
+      <form
+        className="postData"
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit(true); // Submit as draft on form submission
+        }}
+      >
         <div className="createPostDiv">
           <div className="createPost">Create Post</div>
           <div className="x">X</div>
@@ -107,16 +119,24 @@ function NewPostCard({onDraftAdded}) {
         </div>
         <MediaUploader />
         <div className="postButtonsDiv">
-          <button 
-          type="submit" 
-          className="buttonStyle1"
-          onClick={() => handleSubmit(false)}>
+          <button
+            type="submit"
+            className="buttonStyle1"
+            onClick={(e) => {
+              e.preventDefault();
+              handleSubmit(false);
+            }}
+          >
             <div className="tagText">Post</div>
           </button>
+
           <button
             type="button"
             className="buttonStyle2"
-            onClick={() => handleSubmit(true)} // Pass `true` to indicate draft
+            onClick={(e) => {
+              e.preventDefault();
+              handleSubmit(true);
+            }}
           >
             <div className="tagText">Save as Draft</div>
           </button>

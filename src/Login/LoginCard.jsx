@@ -16,7 +16,7 @@ function LoginCard() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // ⭐ important for setting cookies
+        credentials: "include", 
         body: JSON.stringify({ username, password }),
       });
 

@@ -158,7 +158,7 @@ router.delete("/myDrafts/:post/delete",auth,async(req,res)=>{
         res.status(200).json(deletedDraft)
     } catch (error) {
         res.status(400).send(error.message)
-    }
+    }   
 })
 
 

@@ -6,6 +6,7 @@ import { useState } from "react";
 function NewPostBody() {
     
   const [refreshCount, setRefreshCount] = useState(0);
+  const [selectedDraft, setSelectedDraft] = useState(null);
 
   const handleDraftAdded = () => {
     setRefreshCount((count) => count + 1); 
@@ -14,9 +15,9 @@ function NewPostBody() {
   return (
     <div className="newPostDiv">
       <div className="newPostBody">
-        <NewPostCard onDraftAdded={handleDraftAdded} />
+        <NewPostCard onDraftAdded={handleDraftAdded} renderDraft={selectedDraft} />
       </div>
-      <DraftPosts refreshTrigger={refreshCount} />
+      <DraftPosts refreshTrigger={refreshCount} onDraftSelected={(selectedDraft) => setSelectedDraft(selectedDraft)} />
     </div>
   );
 }
