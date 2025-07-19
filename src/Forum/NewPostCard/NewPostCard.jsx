@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "./NewPostCard.css";
 import MediaUploader from "../MediaUploader/MediaUploader.jsx";
 
@@ -7,7 +8,6 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [draftPostId, setDraftPostId] = useState(null);
-
   const tags = [
     "Physical Disability & Chronic Illness",
     "Personal Mental Health",
@@ -18,6 +18,8 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
     "Pediatric Care",
     "Subsidies and Govt Support",
   ];
+
+  const navigate = useNavigate();
 
   const toggleTag = useCallback((tag) => {
     setSelectedTags((prev) => {
@@ -68,6 +70,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
       }
 
       const data = await response.json();
+      console.log(data.postId);
       console.log("Success:", data);
       if (!draftPostId && data._id) {
         setDraftPostId(data._id);
@@ -106,7 +109,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
       >
         <div className="createPostDiv">
           <div className="createPost">Create Post</div>
-          <div className="x">X</div>
+          <div className="x" onClick={() => navigate("/forum")}>X</div>
         </div>
 
         <div className="postTitleDiv">

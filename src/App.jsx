@@ -25,7 +25,7 @@ function App() {
           */}
           <Route path="/forum" element={<Forum/>}/>
           <Route path="/forum/newpost" element={<NewPost/>}/>
-          <Route path="/forum/showpost" element={<ViewPost/>}/> 
+          <Route path="/forum/viewpost" element={<ViewPost/>}/> 
           <Route path="/medication" element={<MedicationsPage/>}/>
           {/*
           <Route path="/profile" element={<Profile/>}/>

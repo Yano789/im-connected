@@ -1,19 +1,27 @@
 import "./ForumCard.css";
+import BookmarkIcon from "../../assets/Bookmark.png";
+import CommentsIcon from "../../assets/Comments.png";
+import LikesIcon from "../../assets/Likes.png";
+import UnbookmarkIcon from "../../assets/Unbookmark.png";
+import UncommentsIcon from "../../assets/Uncomments.png";
+import UnlikesIcon from "../../assets/Unlikes.png";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function ForumCard(props) {
-  const { postUser, postDate, postTitle, postTags, postDescription } = props;
-
+  const { postId, postUser, postDate, postTitle, postTags, postDescription } = props;
+  
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
 
-  const likeIcon = liked ? "src/assets/Likes.png" : "src/assets/Unlikes.png";
-  const bookmarkIcon = bookmarked
-    ? "src/assets/Bookmark.png"
-    : "src/assets/Unbookmark.png";
+  const likeIcon = liked ? {LikesIcon} : {UnlikesIcon};
+  const bookmarkIcon = bookmarked ? {bookmarkIcon} : {UnbookmarkIcon};
+
+  const navigate = useNavigate();
+  const encodedPostId = encodeURIComponent(postId);
 
   return (
-    <div className="post">
+    <div className="post" onClick={() => navigate(`/forum/viewpost?postId=${encodedPostId}`)}>
       <div className="data">
         <div className="forumTitle">
           <div className="titleOfPostParent">
@@ -65,7 +73,7 @@ function ForumCard(props) {
           <img
             className="commentsIcon"
             alt="comments"
-            src="src\assets\Comments.png"
+            src={CommentsIcon}
           />
           <div className="name">0</div>
         </div>

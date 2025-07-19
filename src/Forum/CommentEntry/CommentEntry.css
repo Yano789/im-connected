@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@layer components {
+  .commentUsername{
+    @apply relative;
+  }
+  .commentDate {
+    @apply relative text-base;
+  }
+  .commentBody {
+    @apply self-stretch flex flex-row items-center justify-start gap-5;
+  }
+  .commentContent {
+    @apply self-stretch relative text-base text-left;
+  }
+  .commentDiv {
+    @apply w-full relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#c8b8db] flex flex-col items-start justify-start box-border gap-[5px] text-center text-xl text-black p-2.5 rounded-[5px];
+    font-family: Poppins;
+  }
+}
