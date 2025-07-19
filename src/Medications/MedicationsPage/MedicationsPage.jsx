@@ -1,65 +1,98 @@
 import React, { useState } from 'react';
 import './MedicationsPage.css';
-import CareRecipientList from '../CareRecipientList/CareRecipientList'; 
-import Header from '../../TopHeader/Header/Header';
-// import MedicationLogging from '../MedicationLogging/MedicationLogging';
-// import MedicationDetails from '../MedicationDetails/MedicationDetails';
+import CareRecipientList from '../CareRecipientList/CareRecipientList';
+import MedicationLogging from '../MedicationLogging/MedicationLogging';
+import MedicationDetails from '../MedicationDetails/MedicationDetails';
+import MedicationForm from '../MedicationForm/MedicationForm';
 
-// --- DUMMY DATA (stays the same) ---
+
+// --- DUMMY DATA ---
 const careRecipientsData = [
-    { id: 1, name: 'James Tan', medications: [
-        { id: 'med1', name: 'Metformin XR 500mg', dosage: '1st pill @ 10am', taken: true, schedule: ['Morning'], usedTo: 'Manages Type 2 Diabetes Mellitus.', sideEffects: 'May cause Drowsiness', image: 'path/to/metformin_image.jpg' },
-        { id: 'med2', name: 'Glucosamine Sulfate 500 mg', dosage: '1st pill @ 10am', taken: true, schedule: ['Morning'], usedTo: 'Treats osteoarthritis.', sideEffects: 'Nausea, heartburn.', image: 'path/to/glucosamine_image.jpg' },
-        { id: 'med3', name: 'Gliclazide (Diamicron) 30 mg', dosage: '1st pill @ 10am', taken: false, schedule: ['Morning'], usedTo: 'Controls blood sugar.', sideEffects: 'Hypoglycemia.', image: 'path/to/gliclazide_image.jpg' },
-    ]},
+    {
+        id: 1, name: 'James Tan', medications: [
+            { id: 'med1', name: 'Metformin XR 500mg', dosages: [{ time: '1st pill @ 10am', taken: true }, { time: '2nd pill @ 12pm', taken: false }, { time: '3rd pill @ 6pm', taken: true }], usedTo: 'Manages Type 2 Diabetes Mellitus.', sideEffects: 'May cause Drowsiness', image: 'https://i.imgur.com/8m2bAOr.jpeg' },
+            { id: 'med2', name: 'Glucosamine Sulfate 500 mg', dosages: [{ time: '1st pill @ 10am', taken: true }], usedTo: 'Treats osteoarthritis.', sideEffects: 'Nausea, heartburn.', image: 'https://i.imgur.com/8m2bAOr.jpeg' },
+            { id: 'med3', name: 'Gliclazide (Diamicron) 30 mg', dosages: [{ time: '1st pill @ 10am', taken: true }, { time: '2nd pill @ 12pm', taken: false }, { time: '3rd pill @ 6pm', taken: false }, { time: '4th pill @ 10pm', taken: false }], usedTo: 'Controls blood sugar.', sideEffects: 'Hypoglycemia.', image: 'https://i.imgur.com/8m2bAOr.jpeg' },
+        ]
+    },
     { id: 2, name: 'Amelia Tan', medications: [
-        { id: 'med4', name: 'Aspirin 100mg', dosage: '1st pill @ 8am', taken: false, schedule: ['Morning'], usedTo: 'Pain relief, blood thinner.', sideEffects: 'Upset stomach.', image: 'path/to/aspirin_image.jpg' }
+        { id: 'med4', name: 'Aspirin 100mg', dosages: [{ time: '1st pill @ 8am', taken: false }], usedTo: 'Pain relief, blood thinner.', sideEffects: 'Upset stomach.', image: 'https://i.imgur.com/8m2bAOr.jpeg' }
     ]}
 ];
-// ------------------------------------
 
 function MedicationsPage() {
     const [selectedRecipient, setSelectedRecipient] = useState(careRecipientsData[0]);
     const [selectedMedication, setSelectedMedication] = useState(selectedRecipient.medications[0]);
+    const [mode, setMode] = useState('view');
 
     const handleRecipientSelect = (recipient) => {
         setSelectedRecipient(recipient);
         setSelectedMedication(recipient.medications[0] || null);
+        setMode('view');
     };
 
+    const handleSelectMedication = (med) => {
+        setSelectedMedication(med);
+        setMode('view');
+    };
+    
+    const handleAddNewClick = () => {
+        setSelectedMedication(null);
+        setMode('create');
+    };
+    
+    const handleEditClick = () => {
+        setMode('edit');
+    };
+    
+    const handleCancel = () => {
+        if (mode === 'create') {
+            setSelectedMedication(selectedRecipient.medications[0]);
+        }
+        setMode('view');
+    };
+    
+    const handleSave = (medData) => {
+        console.log("Saving medication data:", medData);
+        setMode('view');
+    };
+    
     return (
-        <div>
-            <Header/>
-            <div className="medications-grid-layout">
-                {/* -- Row 1 -- */}
-                <div className="grid-item-recipients">
-                    <CareRecipientList 
-                        recipients={careRecipientsData}
-                        onSelect={handleRecipientSelect}
-                        selectedRecipientId={selectedRecipient.id}
-                    />
-                </div>
-                <div className="grid-item-title">
-                    <h1 className="page-title">
-                        Medications for <span className="recipient-name">{selectedRecipient.name.toUpperCase()}</span>
-                    </h1>
-                </div>
+        <div className="medications-grid-layout">
+            <div className="grid-item-recipients">
+                <CareRecipientList 
+                    recipients={careRecipientsData}
+                    onSelect={handleRecipientSelect}
+                    selectedRecipientId={selectedRecipient.id}
+                />
+            </div>
+            <div className="grid-item-title">
+                <h1 className="page-title">
+                    Medications for <span className="recipient-name">{selectedRecipient.name.toUpperCase()}</span>
+                </h1>
+            </div>
 
-                {/* -- Row 2 -- */}
-                <div className="grid-item-logging">
-                    {/* Placeholder for MedicationLogging */}
-                    <div style={{ border: '2px dashed #ccc', padding: '1rem', textAlign: 'center' }}>
-                        <h3>Medication Logging</h3>
-                        <p>(This is where the medications will be listed)</p>
-                    </div>
-                </div>
-                <div className="grid-item-details">
-                    {/* Placeholder for MedicationDetails */}
-                    <div style={{ border: '2px dashed #ccc', padding: '1rem', textAlign: 'center', height: '400px' }}>
-                        <h3>Medication Details</h3>
-                        <p>(Details will appear here)</p>
-                    </div>
-                </div>
+            <div className="grid-item-logging">
+                <MedicationLogging
+                    medications={selectedRecipient.medications}
+                    onSelect={handleSelectMedication} 
+                    selectedMedicationId={selectedMedication ? selectedMedication.id : null}
+                    onAddNew={handleAddNewClick}
+                />
+            </div>
+            <div className="grid-item-details">
+                {mode === 'view' ? (
+                    <MedicationDetails 
+                        medication={selectedMedication} 
+                        onEdit={handleEditClick}
+                    />
+                ) : (
+                    <MedicationForm 
+                        medication={selectedMedication} 
+                        onSave={handleSave}
+                        onCancel={handleCancel}
+                    />
+                )}
             </div>
         </div>
     );

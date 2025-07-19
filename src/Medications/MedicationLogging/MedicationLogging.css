@@ -1,0 +1,67 @@
+.logging-card {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+.sub-header {
+    font-size: 1rem;
+    color: #666;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.medication-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.add-medication-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+}
+
+.add-button {
+    background-color: #F87575;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 1.5rem;
+    line-height: 28px;
+    text-align: center;
+    cursor: pointer;
+}
+
+.add-medication-section span {
+    font-weight: 500;
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.upload-button, .camera-button {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid #ddd;
+}
+
+.upload-button {
+    background-color: #f0f0f0;
+}
+
+.camera-button {
+    background-color: #f0f0f0;
+}
