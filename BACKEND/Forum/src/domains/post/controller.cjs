@@ -6,31 +6,34 @@ const createNestedComment = require("../../utils/buildNestedComments.cjs")
 const savedPost = require("../savedPosts/model.cjs")
 
 
-const createPost = async(data)=>{
+const createPost = async (data) => {
     try {
-        const {title,content,tags,username, draft} = data;
-        const existingUsername = await User.findOne({username})
-        if(!existingUsername){
-            throw Error("Username does not exist")
+        const { title, content, tags, username, draft } = data;
+        const existingUsername = await User.findOne({ username });
+
+        if (!existingUsername) {
+            throw new Error("Username does not exist");
         }
-        else{
-            const createdPostId = await hashData(username+Date.now())
-            const newPost = new Post({
-                postId:createdPostId,
-                title,
-                content,
-                username,
-                tags,
-                createdAt:Date.now(),
-                draft: draft
-            })
-            const createdPost = await newPost.save()
-            return createdPost
-        }
+
+        const now = Date.now();
+        const createdPostId = await hashData(username + now);
+
+        const newPost = new Post({
+            postId: createdPostId,
+            title,
+            content,
+            username,
+            tags,
+            createdAt: now,
+            draft: draft
+        });
+
+        const createdPost = await newPost.save();
+        return createdPost;
     } catch (error) {
         throw error;
     }
-}
+};
 
 const editDraft = async (data) => {
     try {
@@ -55,9 +58,11 @@ const deletePost = async(data)=>{
     try {
         const {postId,username} = data;
         const existingPost = await Post.findOne({postId})
-        if(existingPost.username !== username) throw new Error("unauthorized");
-        if(!existingPost){
+                if(!existingPost){
             throw Error("Post does not exist")
+        }
+        if(existingPost.username !== username){
+            throw Error("unauthorized");
         }else{
             await Promise.all([ Post.deleteOne({postId:postId,draft:false}),Comment.deleteMany({postId:postId}),savedPost.deleteMany({savedPostId:postId})])
             return existingPost
@@ -133,7 +138,7 @@ const getPostWithComment = async(data)=>{
             Comment.find({ postId }).sort({ createdAt: -1 }).lean()
         ]);
         if (!post) {
-            return res.status(404).send("Post not found");
+            throw Error ("Post not found");
         }
         if(post.comments != comments.length){
             post = await Post.findOneAndUpdate({postId:postId,draft:false},{comments:comments.length},{new:true})
