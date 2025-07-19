@@ -80,6 +80,8 @@ function DraftPosts({ refreshTrigger, onDraftSelected }) {
       console.error("Fetch draft failed", err);
     }
   };
+  
+  
 
   return (
     <div className="draftsDiv">

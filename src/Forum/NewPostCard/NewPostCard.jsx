@@ -6,6 +6,8 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
   const [selectedTags, setSelectedTags] = useState([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [draftPostId, setDraftPostId] = useState(null);
+
   const tags = [
     "Physical Disability & Chronic Illness",
     "Personal Mental Health",
@@ -18,7 +20,6 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
   ];
 
   const toggleTag = useCallback((tag) => {
-    console.log("clicked", tag);
     setSelectedTags((prev) => {
       if (prev.includes(tag)) return prev.filter((t) => t !== tag);
       if (prev.length >= 2) return prev;
@@ -28,37 +29,69 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
 
   const handleSubmit = async (isDraft = true) => {
     try {
-      const response = await fetch("http://localhost:5000/api/v1/post/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          title,
-          content,
-          tags: selectedTags,
-          draft: isDraft,
-        }),
-      });
+      const payload = {
+        title,
+        content,
+        tags: selectedTags,
+        draft: isDraft,
+      };
+
+      let response;
+      if (isDraft && draftPostId) {
+        const encodedPostId = encodeURIComponent(draftPostId);
+        response = await fetch(
+          `http://localhost:5000/api/v1/post/myDrafts/${encodedPostId}/edit`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(payload),
+          }
+        );
+      } else {
+        // CREATE new post or draft
+        response = await fetch("http://localhost:5000/api/v1/post/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        });
+      }
+
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText);
       }
+
       const data = await response.json();
-      console.log("success: ", data);
+      console.log("Success:", data);
+      if (!draftPostId && data._id) {
+        setDraftPostId(data._id);
+      }
+
       if (isDraft && onDraftAdded) {
-        onDraftAdded(); // Notify parent to refresh drafts
+        onDraftAdded(data);
       }
     } catch (error) {
-      console.error("error creating draft: ", error.message);
+      console.error("Error submitting post:", error.message);
     }
   };
+
   useEffect(() => {
     if (renderDraft && renderDraft._id) {
       setTitle(renderDraft.title || "");
       setContent(renderDraft.content || "");
       setSelectedTags(renderDraft.tags || []);
+      setDraftPostId(renderDraft.postId || null);
+    } else {
+      setTitle("");
+      setContent("");
+      setSelectedTags([]);
+      setDraftPostId(null);
     }
   }, [renderDraft]);
 
@@ -68,7 +101,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
         className="postData"
         onSubmit={(e) => {
           e.preventDefault();
-          handleSubmit(true); // Submit as draft on form submission
+          handleSubmit(true);
         }}
       >
         <div className="createPostDiv">
@@ -108,6 +141,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
             ))}
           </div>
         </div>
+
         <div className="addTextDiv">
           <div className="addText">Add Text</div>
           <textarea
@@ -117,7 +151,9 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
             placeholder="Add your post's contents here"
           />
         </div>
+
         <MediaUploader />
+
         <div className="postButtonsDiv">
           <button
             type="submit"
