@@ -9,6 +9,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete }) {
         usedTo: isEditing ? medication.usedTo : '',
         sideEffects: isEditing ? medication.sideEffects : '',
         dosages: isEditing ? JSON.parse(JSON.stringify(medication.dosages)) : [{ time: '', taken: false }],
+        image: isEditing ? medication.image : '' 
     });
 
     useEffect(() => {
@@ -19,14 +20,23 @@ function MedicationForm({ medication, onSave, onCancel, onDelete }) {
             usedTo: isEditing ? medication.usedTo : '',
             sideEffects: isEditing ? medication.sideEffects : '',
             dosages: isEditing ? JSON.parse(JSON.stringify(medication.dosages)) : [{ time: '', taken: false }],
+            image: isEditing ? medication.image : '' 
         });
     }, [medication]); 
-
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({ ...prevData, [name]: value }));
     };
+
+    const handleImageChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            // Create a temporary URL for the selected image to show a preview
+            const newImageUrl = URL.createObjectURL(e.target.files[0]);
+            setFormData(prev => ({ ...prev, image: newImageUrl }));
+        }
+    };
+
 
     const handleDosageChange = (index, event) => {
         const newDosages = [...formData.dosages];
@@ -75,6 +85,17 @@ function MedicationForm({ medication, onSave, onCancel, onDelete }) {
             <div className="form-group">
                 <label htmlFor="sideEffects">Side Effects</label>
                 <input type="text" id="sideEffects" name="sideEffects" value={formData.sideEffects} onChange={handleChange} />
+            </div>
+
+            <div className="form-group">
+                <label>Image</label>
+                <div className="image-preview-container">
+                    {formData.image && <img src={formData.image} alt="Medication Preview" className="image-preview" />}
+                </div>
+                <label htmlFor="image-upload" className="upload-image-button">
+                    {isEditing ? 'Upload New Image' : 'Upload Image'}
+                </label>
+                <input type="file" id="image-upload" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
             </div>
 
             <div className="form-group">
