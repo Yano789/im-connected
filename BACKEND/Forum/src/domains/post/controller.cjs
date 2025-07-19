@@ -14,7 +14,7 @@ const createPost = async(data)=>{
             throw Error("Username does not exist")
         }
         else{
-            const createdPostId = await hashData(username+Date.now().toLocaleString())
+            const createdPostId = await hashData(username+Date.now())
             const newPost = new Post({
                 postId:createdPostId,
                 title,
