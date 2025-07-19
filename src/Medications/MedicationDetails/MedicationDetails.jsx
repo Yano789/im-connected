@@ -1,7 +1,7 @@
 import React from 'react';
 import './MedicationDetails.css';
 
-function MedicationDetails({ medication }) {
+function MedicationDetails({ medication, onEdit }) {
   // If no medication is selected, show a placeholder message
   if (!medication) {
     return (
@@ -54,7 +54,7 @@ function MedicationDetails({ medication }) {
         <img src={medication.image} alt={medication.name} className="medication-image" />
       </div>
 
-      <button className="edit-button">Edit medicine</button>
+      <button className="edit-button" onClick={onEdit}>Edit medicine</button>
     </div>
   );
 }

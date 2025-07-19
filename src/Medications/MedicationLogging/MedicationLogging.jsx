@@ -2,7 +2,7 @@ import React from 'react';
 import './MedicationLogging.css';
 import MedicationItem from '../MedicationItem/MedicationItem';
 
-function MedicationLogging({ medications, onSelect, selectedMedicationId }) {
+function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddNew }) {
     return (
         <div className="card logging-card">
             <h2 className="card-header">Medication Logging</h2>
@@ -20,7 +20,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId }) {
             </div>
 
             <div className="add-medication-section">
-                <button className="add-button">+</button>
+                <button className="add-button" onClick={onAddNew}>+</button>
                 <span>Add more medication</span>
             </div>
             
