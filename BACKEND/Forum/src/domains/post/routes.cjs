@@ -1,20 +1,15 @@
 const express = require("express");
 const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,likePosts,getAllMyPosts,getAllMyDrafts,getMyDraft,deleteDrafts} = require("./controller.cjs");
 const auth = require("./../../middleware/auth.cjs");
+const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
 const {allowedTags} = require("./model.cjs");
+const {postDraftSchema,querySchema,paramsSchema} = require("./../../utils/validators/postValidator.cjs")
 const router = express.Router();
 
 //create post/Draft
-router.post("/create",auth,async (req,res)=>{
+router.post("/create",auth,validateBody(postDraftSchema),async (req,res)=>{
     try {
         const { title, content, tags ,draft = false} = req.body;
-    if (!draft) {
-      // Creating a real post → enforce validation
-      if (!title || !content) throw Error("Title and Content required");
-      if (!Array.isArray(tags) || tags.some(tag => !allowedTags.includes(tag))||tags.length === 0) {
-        throw Error("Invalid tags");
-      }
-    }
         const username = req.currentUser.username;
         const createdPost = await createPost({ title, content, tags, username ,draft})
         res.status(200).json(createdPost);
@@ -26,7 +21,7 @@ router.post("/create",auth,async (req,res)=>{
 
 
 //delete post via postId
-router.delete("/:post/delete",auth,async(req,res)=>{
+router.delete("/:post/delete",auth,validateParams(paramsSchema),async(req,res)=>{
     try {
         const postId = req.params.post
         const username = req.currentUser.username;
@@ -44,7 +39,7 @@ router.delete("/:post/delete",auth,async(req,res)=>{
 })
 
 //gets post based on the filter, display mode and sorting 
-router.get("/",async(req,res)=>{
+router.get("/",validateQuery(querySchema),async(req,res)=>{
     try {
         let { filter = "default", mode = "default", sort = "latest" } = req.query;
         let tags = []
@@ -62,7 +57,7 @@ router.get("/",async(req,res)=>{
 //TODO GET POST WHEN WE CLICK ON A LINK, VIEW ONE POST WITH COMMENTS!
 // comment structure is top level commments are by earliest, nested levels are by earliest
 //reason is to show ordering in replies to post
-router.get("/getPost/:post", async (req, res) => {
+router.get("/getPost/:post", validateParams(paramsSchema),async (req, res) => {
     try {
         const postId = req.params.post
         if (!postId) {
@@ -89,7 +84,7 @@ router.get("/myPosts/", auth, async (req, res) => {
 });
 
 //TODO, do a like counter
-router.put("/:post/like",auth,async(req,res)=>{
+router.put("/:post/like",auth,validateParams(paramsSchema),async(req,res)=>{
     try {
         const postId = req.params.post
                 if(!postId){
@@ -106,27 +101,8 @@ router.put("/:post/like",auth,async(req,res)=>{
     }
 })
 
-//create draft
-router.post("/draft",auth,async(req,res)=>{
-    try {
-        const {title,content,tags} = req.body
-        const username = req.currentUser.username
-        if (!Array.isArray(tags) || tags.some(tag => !allowedTags.includes(tag))) {
-            throw Error('Invalid tag(s) provided');
-        }
 
-        const createdPost = await createPost({
-            title,
-            content,
-            tags,
-            username,
-            draft:true
-        })
-        res.status(200).json(createdPost)
-    } catch (error) {
-        res.status(400).send(error.message)
-    }
-})
+
 //displays all current draft by username
 router.get("/myDrafts",auth,async(req,res)=>{
     try {
@@ -139,7 +115,7 @@ router.get("/myDrafts",auth,async(req,res)=>{
 })
 
 //displays the draft
-router.get("/myDrafts/:post",auth,async(req,res)=>{
+router.get("/myDrafts/:post",auth,validateParams(paramsSchema),async(req,res)=>{
     try {
         const username = req.currentUser.username
         const postId = req.params.post
@@ -150,7 +126,7 @@ router.get("/myDrafts/:post",auth,async(req,res)=>{
     }
 })
 
-router.delete("/myDrafts/:post/delete",auth,async(req,res)=>{
+router.delete("/myDrafts/:post/delete",auth,validateParams(paramsSchema),async(req,res)=>{
     try {
         const username = req.currentUser.username
         const postId = req.params.post
@@ -163,7 +139,7 @@ router.delete("/myDrafts/:post/delete",auth,async(req,res)=>{
 
 
 //edit draft via postId
-router.put("/myDrafts/:post/edit", auth ,async (req, res) => {
+router.put("/myDrafts/:post/edit", auth ,validateParams(paramsSchema),validateBody(postDraftSchema),async (req, res) => {
     try {
         const postId = req.params.post
         const {title,content,tags,draft = true} = req.body
@@ -175,14 +151,6 @@ router.put("/myDrafts/:post/edit", auth ,async (req, res) => {
         if (!username) {
             throw Error("No Username given")
         }
-
-    if (!draft) {
-      // Creating a real post → enforce validation
-      if (!title || !content) throw Error("Title and Content required");
-      if (!Array.isArray(tags) || tags.some(tag => !allowedTags.includes(tag))||tags.length === 0) {
-        throw Error("Invalid tags");
-      }
-    }
         const existingEditedDraft = await editDraft({ postId, content,title,tags,username,draft})
         res.status(200).json(existingEditedDraft)
     } catch (error) {

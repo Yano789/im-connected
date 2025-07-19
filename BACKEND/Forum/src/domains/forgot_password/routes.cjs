@@ -1,13 +1,14 @@
 const express = require("express");
 const router = express.Router();
 const {sendPasswordResetOTPEmail,resetUserPassword} = require("./controller.cjs");
+const {resetPasswordSchema,passwordResetRequestSchema} = require("./../../utils/validators/forgot_passwordValidators.cjs")
+const {validateBody} = require("./../../middleware/validate.cjs")
 
 
-router.post("/reset",async(req,res)=>{
+
+router.post("/reset",validateBody(resetPasswordSchema),async(req,res)=>{
     try {
-        let {email,otp,newPassword} = req.body;
-        if(!(email&&otp&&newPassword))
-            throw Error("Empty Credentials are not allowed");
+        const {email,otp,newPassword} = req.body;
         await resetUserPassword({email,otp,newPassword});
         res.status(200).json({email,passwordreset:true});
     } catch (error) {
@@ -16,10 +17,9 @@ router.post("/reset",async(req,res)=>{
 });
 
 //Password reset request
-router.post("/",async(req,res)=>{
+router.post("/",validateBody(passwordResetRequestSchema),async(req,res)=>{
     try {
         const {email} = req.body;
-        if(!email) throw Error("An email is required");
         const createdPasswordResetOTP = await sendPasswordResetOTPEmail(email);
         res.status(200).json(createdPasswordResetOTP);
     } catch (error) {

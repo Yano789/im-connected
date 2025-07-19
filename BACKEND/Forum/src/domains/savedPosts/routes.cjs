@@ -1,19 +1,15 @@
 const express = require("express");
 const {createSavedPost,deleteSavedPost,getAllSavedPosts} = require("./controller.cjs")
 const auth = require("../../middleware/auth.cjs");
+const {validateParams} = require("../../middleware/validate.cjs")
+const paramsSchema = require("./../../utils/validators/savePostValidators.cjs")
 const router = express.Router({ mergeParams: true });
 
 //save a post
-router.post("/:post/save",auth,async(req,res)=>{
+router.post("/:post/save",auth,validateParams(paramsSchema),async(req,res)=>{
     try {
         const username = req.currentUser.username
-        const postId = req.params.post
-        if (!postId) {
-            throw Error("No PostId Given!");
-        }
-        if (!username) {
-            throw Error("No username Given!");
-        }        
+        const postId = req.params.post   
         const savedPosts = await createSavedPost({ postId, username })
         res.status(200).json(savedPosts)
     } catch (error) {
@@ -22,13 +18,10 @@ router.post("/:post/save",auth,async(req,res)=>{
 })
 
 //unsave a post
-router.delete("/:post/delete",auth ,async (req, res) => {
+router.delete("/:post/delete",auth,validateParams(paramsSchema),async (req, res) => {
     try {
         const username = req.currentUser.username
         const postId = req.params.post
-        if (!((postId && username))) {
-            throw Error("Empty Content Given!");
-        }
         const deletedSavedPosts = await deleteSavedPost({ postId, username })
         res.status(200).json(deletedSavedPosts)
     } catch (error) {

@@ -5,9 +5,10 @@ const Comment = require("../comment/model.cjs")
 const createNestedComment = require("../../utils/buildNestedComments.cjs")
 const savedPost = require("../savedPosts/model.cjs")
 
+
 const createPost = async(data)=>{
     try {
-        const {title,content,tags,username, draft = false} = data;
+        const {title,content,tags,username, draft} = data;
         const existingUsername = await User.findOne({username})
         if(!existingUsername){
             throw Error("Username does not exist")
@@ -82,10 +83,22 @@ const getFilteredPosts = async ({ tags = [], sort = "latest" }) => {
         }
 
         let sortOptions = {};
-        if (sort === "latest") sortOptions.createdAt = -1;
-        else if (sort === "most likes") sortOptions.likes = -1;
-        else if (sort === "most comments") sortOptions.comments = -1;
-        else if (sort === "earliest") sortOptions.createdAt = 1;
+        switch (sort.toLowerCase()) {
+            case "latest":
+                sortOptions.createdAt = -1;
+                break;
+            case "most likes":
+                sortOptions.likes = -1;
+                break;
+            case "most comments":
+                sortOptions.comments = -1;
+                break;
+            case "earliest":
+                sortOptions.createdAt = 1;
+                break;
+            default:
+                sortOptions.createdAt = -1;
+        }
 
         // Fetch posts with filter and sort directly in DB
         const posts = await Post.find({...filter,draft:false}).sort(sortOptions);
