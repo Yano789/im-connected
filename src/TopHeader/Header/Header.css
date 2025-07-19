@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+@layer components{
+
+.applicationIcon {
+  @apply w-10 relative h-10 object-cover;
+}
+.connected {
+  @apply font-semibold;
+}
+.imconnected {
+  @apply relative;
+}
+.sitelogo {
+  @apply flex flex-row items-center justify-start gap-2.5 text-[32px];
+}
+.typeHereTo {
+  @apply w-full leading-[22px];
+}
+.title {
+  @apply self-stretch flex flex-row items-center justify-between gap-0;
+}
+.search {
+  @apply flex-1 min-w-[300px] max-w-[700px] bg-[#c8b8db] h-fit flex flex-row items-center justify-start box-border px-5 py-[9px] rounded-lg text-sm sm:text-base md:text-lg;
+}
+.dashboard {
+  @apply relative leading-6;
+}
+.buttonStyle1 {
+  @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#f1c5c0] border flex flex-row items-center justify-center cursor-pointer whitespace-nowrap px-5 py-2.5 rounded-[15px] border-solid border-[#c8b8db] text-sm sm:text-base md:text-lg;
+}
+.headerMain {
+  @apply flex h-fit w-full max-w-screen flex-wrap transition-all duration-300 ease-in-out items-center justify-center gap-5 px-5 py-0 flex-col sm:flex-row;
+}
+.header {
+  @apply min-h-fit w-full h-fit relative bg-[#ab97c3] flex items-start justify-start p-[10px] box-border text-left text-[20px] text-[#2d2d2d] font-[Poppins]
+}
+}
+
+

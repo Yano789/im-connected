@@ -1,9 +1,11 @@
 const express = require("express");
-const router = express.Router();
+const {validateBody} = require("./../../middleware/validate.cjs")
+const {otpVerifySchema,sendOTPSchema} = require("./../../utils/validators/otpValidators.cjs")
 const {sendOTP,verifyOTP} = require("./controller.cjs");
+const router = express.Router();
 
 //verify otp 
-router.post("/verify",async(req,res)=>{
+router.post("/verify",validateBody(otpVerifySchema),async(req,res)=>{
     try {
         let {email,otp} =req.body;
         const validOTP = await verifyOTP({email,otp});
@@ -15,7 +17,7 @@ router.post("/verify",async(req,res)=>{
 
 
 //request new verification otp
-router.post("/", async(req,res)=>{
+router.post("/",validateBody(sendOTPSchema),async(req,res)=>{
     try {
         const {email,subject,message,duration} = req.body;
         const createdOTP = await sendOTP({

@@ -5,6 +5,7 @@ import MedicationLogging from '../MedicationLogging/MedicationLogging';
 import MedicationDetails from '../MedicationDetails/MedicationDetails';
 import MedicationForm from '../MedicationForm/MedicationForm';
 
+
 // --- DUMMY DATA ---
 const careRecipientsData = [
     {
@@ -74,17 +75,16 @@ function MedicationsPage() {
             <div className="grid-item-logging">
                 <MedicationLogging
                     medications={selectedRecipient.medications}
-                    onSelect={handleSelectMedication} // Use the correct handler function
+                    onSelect={handleSelectMedication} 
                     selectedMedicationId={selectedMedication ? selectedMedication.id : null}
-                    onAddNew={handleAddNewClick} // Pass the add new handler
+                    onAddNew={handleAddNewClick}
                 />
             </div>
             <div className="grid-item-details">
-                {/* This logic will now correctly switch between components */}
                 {mode === 'view' ? (
                     <MedicationDetails 
                         medication={selectedMedication} 
-                        onEdit={handleEditClick} // Pass the edit handler
+                        onEdit={handleEditClick}
                     />
                 ) : (
                     <MedicationForm 

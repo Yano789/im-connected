@@ -1,24 +1,16 @@
 const express = require("express");
-const {createPost,editPost,deletePost,modeLimit,getFilteredPosts,getPostWithComment,likePosts,getAllMyPosts} = require("./controller.cjs");
+const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,likePosts,getAllMyPosts,getAllMyDrafts,getMyDraft,deleteDrafts} = require("./controller.cjs");
 const auth = require("./../../middleware/auth.cjs");
-const {allowedTags} = require("./model.cjs");
+const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
+const {postDraftSchema,querySchema,paramsSchema} = require("./../../utils/validators/postValidator.cjs")
 const router = express.Router();
 
-//create post
-router.post("/create",auth,async (req,res)=>{
+//create post/Draft
+router.post("/create",auth,validateBody(postDraftSchema),async (req,res)=>{
     try {
-        const { title, content, tags } = req.body;
-        if (!content) {
-            throw Error("Empty Content Given!");
-        }
-        if (!title) {
-            throw Error("Empty Title Given!");
-        }
-        if (!Array.isArray(tags) || tags.some(tag => !allowedTags.includes(tag))) {
-            throw Error('Invalid tag(s) provided');
-        }
+        const { title, content, tags ,draft = false} = req.body;
         const username = req.currentUser.username;
-        const createdPost = await createPost({ title, content, tags, username })
+        const createdPost = await createPost({ title, content, tags, username ,draft})
         res.status(200).json(createdPost);
 
     } catch (error) {
@@ -26,38 +18,9 @@ router.post("/create",auth,async (req,res)=>{
     }
 })
 
-//edit post via postId
-router.put("/:post/edit", auth ,async (req, res) => {
-    try {
-        const postId = req.params.post
-        const {newTitle,newContent,newTags} = req.body
-        const username = req.currentUser.username;
-        
-        if (!newContent) {
-            throw Error("Empty Content Given!");
-        }
-        if (!newTitle) {
-            throw Error("Empty Title Given!");
-        }
-        if (!Array.isArray(newTags) || newTags.some(tag => !allowedTags.includes(tag))) {
-            throw Error('Invalid tag(s) provided');
-        }
-        if (!postId) {
-            throw Error("No PostId given")
-        }
-        if (!username) {
-            throw Error("No Username given")
-        }
-        const editedPost = await editPost({ postId, newContent,newTitle,newTags,username})
-        res.status(200).json(editedPost)
-    } catch (error) {
-        res.status(400).send(error.message)
-    }
-})
-
 
 //delete post via postId
-router.delete("/:post/delete",auth,async(req,res)=>{
+router.delete("/:post/delete",auth,validateParams(paramsSchema),async(req,res)=>{
     try {
         const postId = req.params.post
         const username = req.currentUser.username;
@@ -75,7 +38,7 @@ router.delete("/:post/delete",auth,async(req,res)=>{
 })
 
 //gets post based on the filter, display mode and sorting 
-router.get("/",async(req,res)=>{
+router.get("/",validateQuery(querySchema),async(req,res)=>{
     try {
         let { filter = "default", mode = "default", sort = "latest" } = req.query;
         let tags = []
@@ -91,7 +54,9 @@ router.get("/",async(req,res)=>{
 })
 
 //TODO GET POST WHEN WE CLICK ON A LINK, VIEW ONE POST WITH COMMENTS!
-router.get("/getPost/:post", async (req, res) => {
+// comment structure is top level commments are by earliest, nested levels are by earliest
+//reason is to show ordering in replies to post
+router.get("/getPost/:post", validateParams(paramsSchema),async (req, res) => {
     try {
         const postId = req.params.post
         if (!postId) {
@@ -118,7 +83,7 @@ router.get("/myPosts/", auth, async (req, res) => {
 });
 
 //TODO, do a like counter
-router.put("/:post/like",auth,async(req,res)=>{
+router.put("/:post/like",auth,validateParams(paramsSchema),async(req,res)=>{
     try {
         const postId = req.params.post
                 if(!postId){
@@ -130,6 +95,63 @@ router.put("/:post/like",auth,async(req,res)=>{
             likes: updatedLikes.likes,
             message: "Like added successfully"
         });
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+})
+
+
+
+//displays all current draft by username
+router.get("/myDrafts",auth,async(req,res)=>{
+    try {
+        const username = req.currentUser.username
+        const myDrafts = await getAllMyDrafts(username)
+        res.status(200).json(myDrafts)
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+})
+
+//displays the draft
+router.get("/myDrafts/:post",auth,validateParams(paramsSchema),async(req,res)=>{
+    try {
+        const username = req.currentUser.username
+        const postId = req.params.post
+        const myDrafts = await getMyDraft({username,postId})
+        res.status(200).json(myDrafts)
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+})
+
+router.delete("/myDrafts/:post/delete",auth,validateParams(paramsSchema),async(req,res)=>{
+    try {
+        const username = req.currentUser.username
+        const postId = req.params.post
+        const deletedDraft = await deleteDrafts({username,postId})
+        res.status(200).json(deletedDraft)
+    } catch (error) {
+        res.status(400).send(error.message)
+    }   
+})
+
+
+//edit draft via postId
+router.put("/myDrafts/:post/edit", auth ,validateParams(paramsSchema),validateBody(postDraftSchema),async (req, res) => {
+    try {
+        const postId = req.params.post
+        const {title,content,tags,draft = true} = req.body
+        const username = req.currentUser.username;
+        
+        if (!postId) {
+            throw Error("No PostId given")
+        }
+        if (!username) {
+            throw Error("No Username given")
+        }
+        const existingEditedDraft = await editDraft({ postId, content,title,tags,username,draft})
+        res.status(200).json(existingEditedDraft)
     } catch (error) {
         res.status(400).send(error.message)
     }
