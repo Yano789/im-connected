@@ -14,13 +14,28 @@ type MessageProps = {
 };
 
 const UserMessage = ({ text }: { text: string }) => {
-  return <div className={styles.userMessage}>{text}</div>;
+  return (
+  <div className={styles.userMessageRow}>
+      <div className={styles.userBubble}>{text}</div>
+      <img
+        src="/user-avatar.png" // Make sure this image is in your `public/` folder
+        alt="User avatar"
+        className={styles.avatar}
+      />
+    </div>
+  );
 };
 
 const AssistantMessage = ({ text }: { text: string }) => {
   return (
-    <div className={styles.assistantMessage}>
-      <Markdown>{text}</Markdown>
+    <div className={styles.assistantMessageRow}>
+        <img
+        src="/ChatbotIcon.png" // Make sure this image is in your `public/` folder
+        alt="Assistant avatar"
+        className={styles.avatar}
+      />
+      <div className={styles.assistantBubble}>{text}</div>
+      
     </div>
   );
 };
@@ -97,7 +112,7 @@ const Chat = ({
       setThreadId(saved);
     } else {
       // no thread saved yet, so create one on the backend
-      ;(async () => {
+      ; (async () => {
         const res = await fetch("/api/assistants/threads", { method: "POST" });
         const { threadId: newId } = await res.json();
         setThreadId(newId);
@@ -266,36 +281,43 @@ const Chat = ({
       })
       return [...prevMessages.slice(0, -1), updatedLastMessage];
     });
-    
+
   }
 
   return (
-    <div className={styles.chatContainer}>
-      <div className={styles.messages}>
-        {messages.map((msg, index) => (
-          <Message key={index} role={msg.role} text={msg.text} />
-        ))}
-        <div ref={messagesEndRef} />
-      </div>
-      <form
-        onSubmit={handleSubmit}
-        className={`${styles.inputForm} ${styles.clearfix}`}
-      >
-        <input
-          type="text"
-          className={styles.input}
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          placeholder="Enter your question"
-        />
-        <button
-          type="submit"
-          className={styles.button}
-          disabled={inputDisabled}
+    <div>
+      <div className={styles.Title}> AI Chatbot <span className={styles.Title2}> Companion </span></div>
+      <div className={styles.SubTitle}> safe, secure, anonymized </div>
+      <div className={styles.chatContainer}>
+        <div className={styles.messages}>
+          {messages.map((msg, index) => (
+            <Message key={index} role={msg.role} text={msg.text} />
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+        <form
+          onSubmit={handleSubmit}
+          className={`${styles.inputForm} ${styles.clearfix}`}
         >
-          Send
-        </button>
-      </form>
+          <input
+            type="text"
+            className={styles.input}
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            placeholder="Enter your question"
+          />
+          <button
+            type="submit"
+            className={styles.button}
+            disabled={inputDisabled}
+          >
+            <img
+              src="/send-icon.png"
+              alt="Send"
+            />
+          </button>
+        </form>
+      </div>
     </div>
   );
 };
