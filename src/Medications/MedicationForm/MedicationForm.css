@@ -1,5 +1,38 @@
 .form-card {
-    box-shadow: 0 10px 0px #a2d2ff, 0 12px 28px rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Styles for the header container (title + delete button) */
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.medication-title {
+    margin: 0;
+}
+
+/* Styles for the top-right delete button */
+.delete-button-top-right {
+    background: #fde2e4;
+    color: #c14a4e;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    font-size: 1.75rem;
+    font-weight: 300;
+    line-height: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    padding: 0;
+}
+
+.delete-button-top-right:hover {
+    background-color: #f8c2c2;
 }
 
 .form-group {
@@ -19,8 +52,44 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
+    box-sizing: border-box; /* Important for sizing */
 }
 
+.dosage-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.dosage-input-row input {
+    flex-grow: 1;
+}
+
+.remove-dosage-button, .add-dosage-button {
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.remove-dosage-button {
+    background-color: #fde2e4;
+    color: #c74b50;
+    font-weight: bold;
+    font-size: 1.25rem;
+    padding: 0.25rem 0.75rem;
+}
+
+.add-dosage-button {
+    background-color: #e9ecef;
+    color: #333;
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.5rem;
+}
+
+/* Styles for the bottom action buttons */
 .form-actions {
     display: flex;
     gap: 1rem;
@@ -43,6 +112,6 @@
 }
 
 .cancel-button {
-    background-color: #eee;
+    background-color: #f1f3f5;
     color: #333;
 }

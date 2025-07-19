@@ -1,32 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MedicationForm.css';
 
-function MedicationForm({ medication, onSave, onCancel }) {
-    // Determine if we are editing an existing medication or creating a new one
+function MedicationForm({ medication, onSave, onCancel, onDelete }) {
     const isEditing = medication !== null;
 
-    // Set up state to hold the form's data
     const [formData, setFormData] = useState({
         name: isEditing ? medication.name : '',
         usedTo: isEditing ? medication.usedTo : '',
         sideEffects: isEditing ? medication.sideEffects : '',
+        dosages: isEditing ? JSON.parse(JSON.stringify(medication.dosages)) : [{ time: '', taken: false }],
     });
 
-    // A function to handle changes in any input field
+    useEffect(() => {
+        const isEditing = medication !== null;
+        // Resets the form's internal state with the new data
+        setFormData({
+            name: isEditing ? medication.name : '',
+            usedTo: isEditing ? medication.usedTo : '',
+            sideEffects: isEditing ? medication.sideEffects : '',
+            dosages: isEditing ? JSON.parse(JSON.stringify(medication.dosages)) : [{ time: '', taken: false }],
+        });
+    }, [medication]); 
+
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prevData => ({ ...prevData, [name]: value }));
     };
 
-    // A function to handle the form submission
+    const handleDosageChange = (index, event) => {
+        const newDosages = [...formData.dosages];
+        newDosages[index].time = event.target.value;
+        setFormData(prev => ({ ...prev, dosages: newDosages }));
+    };
+
+    const handleAddDosage = () => {
+        setFormData(prev => ({
+            ...prev,
+            dosages: [...prev.dosages, { time: '', taken: false }]
+        }));
+    };
+
+    const handleRemoveDosage = (index) => {
+        const newDosages = formData.dosages.filter((_, i) => i !== index);
+        setFormData(prev => ({ ...prev, dosages: newDosages }));
+    };
+
     const handleSubmit = (e) => {
-        e.preventDefault(); // Prevents the page from reloading
-        onSave(formData); // Send the data back to the parent component
+        e.preventDefault();
+        onSave(formData);
     };
 
     return (
         <form className="details-card form-card" onSubmit={handleSubmit}>
-            <h2 className="medication-title">{isEditing ? 'Edit Medication' : 'Add New Medication'}</h2>
+            <div className="form-header">
+                <h2 className="medication-title">{isEditing ? 'Edit Medication' : 'Add New Medication'}</h2>
+                {isEditing && (
+                    <button type="button" onClick={onDelete} className="delete-button-top-right" title="Delete Medication">
+                        &times;
+                    </button>
+                )}
+            </div>
 
             <div className="form-group">
                 <label htmlFor="name">Medication Name</label>
@@ -43,7 +77,21 @@ function MedicationForm({ medication, onSave, onCancel }) {
                 <input type="text" id="sideEffects" name="sideEffects" value={formData.sideEffects} onChange={handleChange} />
             </div>
 
-            {/* TODO: Add inputs for dosages and image upload later */}
+            <div className="form-group">
+                <label>Dosage Times</label>
+                {formData.dosages.map((dosage, index) => (
+                    <div key={index} className="dosage-input-row">
+                        <input
+                            type="text"
+                            value={dosage.time}
+                            onChange={(e) => handleDosageChange(index, e)}
+                            placeholder="e.g., 1st pill @ 10am"
+                        />
+                        <button type="button" onClick={() => handleRemoveDosage(index)} className="remove-dosage-button">&times;</button>
+                    </div>
+                ))}
+                <button type="button" onClick={handleAddDosage} className="add-dosage-button">+ Add Dosage</button>
+            </div>
 
             <div className="form-actions">
                 <button type="button" onClick={onCancel} className="cancel-button">Cancel</button>
