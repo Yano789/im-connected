@@ -133,7 +133,7 @@ router.delete("/myDrafts/:post/delete",auth,validateParams(paramsSchema),async(r
         res.status(200).json(deletedDraft)
     } catch (error) {
         res.status(400).send(error.message)
-    }
+    }   
 })
 
 
