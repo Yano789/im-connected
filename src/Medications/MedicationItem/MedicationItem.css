@@ -1,0 +1,64 @@
+.medication-wrapper {
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    /* This is the separator line between each medication */
+    border-bottom: 2px solid #fbe0e0;
+}
+
+/* Removes the line from the very last item in the list */
+.medication-wrapper:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.med-item-layout {
+    display: flex;
+    gap: 1.5rem;
+    align-items: stretch; /* Makes columns equal height */
+}
+
+.med-name-container {
+    flex: 1; /* Takes up 1 part of the available space */
+}
+
+.med-name-button {
+    width: 100%;
+    height: 100%;
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    background-color: #fafafa;
+    text-align: left;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.med-item-layout.selected .med-name-button {
+    background-color: #F87575;
+    color: white;
+    border-color: #e56b6f;
+}
+
+.dosage-list-container {
+    flex: 1.5; /* Takes up 1.5 parts of space */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.dosage-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.med-checkbox {
+    width: 22px;
+    height: 22px;
+    accent-color: #F87575; /* Styles the checkmark color */
+    cursor: pointer;
+}

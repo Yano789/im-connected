@@ -12,10 +12,11 @@
 .grid-item-title {
     /* This tells the title to vertically center itself within its grid cell */
     align-self: center;
+    text-align: center;
 }
 
 .page-title {
-  font-size: 1.75rem;
+  font-size: 3rem;
   font-weight: 300;
   margin: 0;
 }

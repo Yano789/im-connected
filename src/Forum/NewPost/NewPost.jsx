@@ -1,6 +1,5 @@
 import Header from "../../TopHeader/Header/Header";
 import NewPostBody from "../NewPostBody/NewPostBody";
-import "./NewPost.css";
 
 function NewPost(){
     return (

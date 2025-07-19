@@ -1,4 +1,5 @@
 import "./ToPost.css";
+import ArrowIcon from "../../assets/Arrow.png";
 import { useNavigate } from "react-router-dom";
 function ToPost() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ function ToPost() {
         </div>
         <div className="toSavedPostDiv">
           <div className="postNow">Saved Posts</div>
-          <img className="postArrow" alt="" src="src\assets\Arrow.png" />
+          <img className="postArrow" alt="" src={ArrowIcon} />
         </div>
       </div>
     </div>

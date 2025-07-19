@@ -69,6 +69,7 @@ function ForumBody() {
           posts.map((post) => (
             <ForumCard
               key={post.postId}
+              postId={post.postId}
               postUser={post.username}
               postDate={new Date(post.createdAt).toLocaleDateString()}
               postTitle={post.title}

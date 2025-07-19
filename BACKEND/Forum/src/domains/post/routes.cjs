@@ -2,7 +2,6 @@ const express = require("express");
 const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,likePosts,getAllMyPosts,getAllMyDrafts,getMyDraft,deleteDrafts} = require("./controller.cjs");
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
-const {allowedTags} = require("./model.cjs");
 const {postDraftSchema,querySchema,paramsSchema} = require("./../../utils/validators/postValidator.cjs")
 const router = express.Router();
 
