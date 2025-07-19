@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const{sendVerificationOTPEmail,verifyUserEmail} = require("./controller.cjs");
+const{validateBody} = require("./../../middleware/validate.cjs")
+const {emailVerifySchema,emailOTPRequestSchema} = require("./../../utils/validators/email_verificationValidators.cjs")
 
 //verifies email otp
-router.post("/verify",async(req,res)=>{
+router.post("/verify",validateBody(emailVerifySchema),async(req,res)=>{
     try {
-        let {email,otp} = req.body;
-        if(!(email&&otp)) throw Error("Empty otp details are not allowed.");
+        const {email,otp} = req.body;
         await verifyUserEmail({email,otp});
         res.status(200).json({email,verified:true});
 
@@ -18,10 +19,9 @@ router.post("/verify",async(req,res)=>{
 
 
 //request new verification otp
-router.post("/",async(req,res)=>{
+router.post("/",validateBody(emailOTPRequestSchema),async(req,res)=>{
     try {
         const {email} = req.body;
-        if(!email) throw Error("An email is required");
         const createdEmailVerificationOTP = await sendVerificationOTPEmail(email);
         res.status(200).json(createdEmailVerificationOTP);
     } catch (error) {
