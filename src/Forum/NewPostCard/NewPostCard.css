@@ -29,10 +29,10 @@
     .tagText {
     @apply relative leading-4 break-words text-sm sm:text-base;
     }
-    .tag {
+    .newPostTag {
     @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border flex flex-row items-center justify-center p-3 rounded-[20px] border-solid border-[#1e1e1e];
-    } 
-    .tagSelected{
+    }
+    .newPostTagSelected{
     @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#C8B8DB] border flex flex-row items-center justify-center p-3 rounded-[20px] border-solid border-[#1e1e1e];
     } 
     .tags {

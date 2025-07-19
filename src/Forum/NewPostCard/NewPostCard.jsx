@@ -1,32 +1,64 @@
-import { useState} from "react";
+import { useState, useCallback } from "react";
 import "./NewPostCard.css";
 import MediaUploader from "../MediaUploader/MediaUploader.jsx";
 
-function NewPostCard() {
+function NewPostCard({onDraftAdded}) {
   const [selectedTags, setSelectedTags] = useState([]);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const tags = [
-    "Mental Disability",
-    "Mental Health",
-    "End of Life Care",
-    "Govt Support",
-    "Financial Help",
-    "Disability & Chronic Illness",
-    "Hospitals",
-    "Pediatric",
-  ];
+  'Physical Disability & Chronic Illness',
+  'Personal Mental Health',
+  'End of Life Care',
+  'Financial & Legal Help',
+  'Mental Disability',
+  'Hospitals and Clinics',
+  'Pediatric Care',
+  'Subsidies and Govt Support',
+];
 
-  const toggleTag = (tag) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter((t) => t !== tag));
-    } else if (selectedTags.length < 2) {
-      setSelectedTags([...selectedTags, tag]);
+
+  const toggleTag = useCallback((tag) => {
+    console.log("clicked", tag);
+    setSelectedTags((prev) => {
+      if (prev.includes(tag)) return prev.filter((t) => t !== tag);
+      if (prev.length >= 2) return prev;
+      return [...prev, tag];
+    });
+  }, []);
+
+  const handleSubmit = async (isDraft = true) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/v1/post/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          title,
+          content,
+          tags: selectedTags,
+          draft: isDraft,
+        }),
+      });
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+      const data = await response.json();
+      console.log("success: ", data);
+      if (isDraft && onDraftAdded) {
+        onDraftAdded(); // Notify parent to refresh drafts
+      }
+    } catch (error) {
+      console.error("error creating draft: ", error.message);
     }
   };
 
-
   return (
     <div className="postMain">
-      <div className="postData">
+      <form className="postData" onSubmit={handleSubmit}>
         <div className="createPostDiv">
           <div className="createPost">Create Post</div>
           <div className="x">X</div>
@@ -34,7 +66,12 @@ function NewPostCard() {
 
         <div className="postTitleDiv">
           <div className="postTitle">Title</div>
-          <textarea className="createPostWrapper">Suggest a name for this Text</textarea>
+          <textarea
+            className="createPostWrapper"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Suggest a name for this Text"
+          />
         </div>
 
         <div className="postData">
@@ -45,8 +82,14 @@ function NewPostCard() {
             {tags.map((tag) => (
               <div
                 key={tag}
-                className={`tag ${selectedTags.includes(tag) ? "tagSelected" : ""}`}
-                onClick={() => toggleTag(tag)}
+                className={`newPostTag ${
+                  selectedTags.includes(tag) ? "newPostTagSelected" : ""
+                }`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  toggleTag(tag);
+                }}
               >
                 <div className="tagText">{tag}</div>
               </div>
@@ -55,18 +98,30 @@ function NewPostCard() {
         </div>
         <div className="addTextDiv">
           <div className="addText">Add Text</div>
-          <textarea className="addTextWrapper">Add your post's contents here</textarea>
+          <textarea
+            className="addTextWrapper"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            placeholder="Add your post's contents here"
+          />
         </div>
-		<MediaUploader/>
+        <MediaUploader />
         <div className="postButtonsDiv">
-          <div className="buttonStyle1">
+          <button 
+          type="submit" 
+          className="buttonStyle1"
+          onClick={() => handleSubmit(false)}>
             <div className="tagText">Post</div>
-          </div>
-          <div className="buttonStyle2">
+          </button>
+          <button
+            type="button"
+            className="buttonStyle2"
+            onClick={() => handleSubmit(true)} // Pass `true` to indicate draft
+          >
             <div className="tagText">Save as Draft</div>
-          </div>
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

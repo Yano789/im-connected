@@ -3,6 +3,7 @@ import Forum from "./Forum/Forum/Forum";
 import NewPost from "./Forum/NewPost/NewPost";
 import ViewPost from "./Forum/ViewPost/ViewPost";
 import MedicationsPage from "./Medications/MedicationsPage/MedicationsPage";
+import LoginCard from "./Login/LoginCard";
 
 function App() {
   return (
@@ -13,8 +14,8 @@ function App() {
     >
       <Router>
         <Routes>
-           {/* 
-           <Route path="/" element={<SplashScreen/>}/>
+          <Route path="/" element={<LoginCard/>}/>
+          {/* 
           <Route path="/signup" element={<SignUp/>}/>
           <Route path="/signin" element={<SignIn/>}/>
           <Route path="/preferences" element={<Preferences/>}/>
