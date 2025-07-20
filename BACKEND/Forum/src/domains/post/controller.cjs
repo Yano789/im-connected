@@ -52,50 +52,56 @@ const createPost = async (data) => {
 };
 
 const editDraft = async (data) => {
-    try {
-        const { postId, content, title, tags, username, draft, newMedia } = data;
-        const existingDraft = await Post.findOne({ postId })
+  try {
+    const { postId, content, title, tags, username, draft, newMedia, mediaToRemove } = data;
+    const existingDraft = await Post.findOne({ postId });
 
-        if (!existingDraft) throw Error("Draft does not exist");
-        if (existingDraft.username !== username) throw new Error("unauthorized");
-        if (!existingDraft.draft) throw Error("Cannot edit a published post");
+    if (!existingDraft) throw Error("Draft does not exist");
+    if (existingDraft.username !== username) throw new Error("unauthorized");
+    if (!existingDraft.draft) throw Error("Cannot edit a published post");
 
-        if (newMedia && newMedia.length > 0) {
-            const deleteOldMediaPromises = (existingDraft.media || []).map(async (file) => {
-                try {
-                    console.log(`Deleting media: ${file.public_id}, type: ${file.type}`);
-                    const result = await cloudinary.uploader.destroy(file.public_id, {
-                        resource_type: file.type === "video" ? "video" : "image",
-                    });
-                    console.log(`Deletion result for ${file.public_id}:`, result);
-                    return result;
-                } catch (err) {
-                    console.error(`Error deleting media ${file.public_id}:`, err);
-                    // Continue with other deletions without throwing:
-                    return null;
-                }
-            });
-            await Promise.all(deleteOldMediaPromises);
-        }
+    const currentMedia = existingDraft.media || [];
+    const toRemoveSet = new Set(mediaToRemove || []);
+    const mediaToDelete = currentMedia.filter(m => toRemoveSet.has(m.public_id));
 
-        const mediaToSave = newMedia && newMedia.length > 0 ? newMedia : existingDraft.media
-        const existingEditedDraft = await Post.findOneAndUpdate({ postId }, { title: title, content: content, tags: Array.isArray(tags) ? tags : [], createdAt: Date.now(), edited: true, draft: draft, media: mediaToSave }, { new: true })
-        if (!existingEditedDraft) {
-            throw Error("Post does not exist!")
-        }
+    // Measure Cloudinary deletion time
+    console.time("Cloudinary Deletion");
+    const deletePromises = mediaToDelete.map(async (file) => {
+      try {
+        console.log(`Deleting media: ${file.public_id}`);
+        return await cloudinary.uploader.destroy(file.public_id, {
+          resource_type: file.type === "video" ? "video" : "image",
+        });
+      } catch (err) {
+        console.error(`Error deleting media ${file.public_id}:`, err);
+        return null;
+      }
+    });
+    await Promise.all(deletePromises);
+    console.timeEnd("Cloudinary Deletion");
 
-        if (existingEditedDraft.media && existingEditedDraft.media.length > 0) {
-            existingEditedDraft.media = existingEditedDraft.media.map(file => ({
-                ...file,
-                url: addCacheBuster(file.url),
-            }));
-        }
-        return existingEditedDraft
+    const updatedMedia = [
+      ...currentMedia.filter(m => !toRemoveSet.has(m.public_id)),
+      ...(newMedia || []),
+    ];
 
-    } catch (error) {
-        throw error
-    }
-}
+    existingDraft.title = title;
+    existingDraft.content = content;
+    existingDraft.tags = tags;
+    existingDraft.media = updatedMedia;
+    existingDraft.edited = true;
+    existingDraft.draft = draft;
+
+    // Measure DB save time
+    console.time("Draft Save");
+    await existingDraft.save();
+    console.timeEnd("Draft Save");
+
+    return existingDraft;
+  } catch (err) {
+    throw err;
+  }
+};
 
 const deletePost = async (data) => {
     try {

@@ -73,7 +73,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
       mediaToRemove.forEach((id) => {
         formData.append("mediaToRemove[]", id);
       });
-
+      
       let response;
 
       if (isDraft && draftPostId) {
