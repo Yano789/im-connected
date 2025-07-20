@@ -14,5 +14,5 @@ router.use("/email_verification",EmailVerificationRoutes);
 router.use("/forgot_password",ForgotPasswordRoutes);
 router.use("/post",postRoutes);
 router.use("/:post/comment",commentRoutes);
-router.use("/:username/saved",savedPostRoutes);
+router.use("/saved",savedPostRoutes);
 module.exports = router;
