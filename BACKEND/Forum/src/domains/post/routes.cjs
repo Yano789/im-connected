@@ -137,30 +137,38 @@ router.delete("/myDrafts/:post/delete",auth,validateParams(paramsSchema),async(r
 
 //edit draft via postId
 router.put("/myDrafts/:post/edit", auth, validateParams(paramsSchema), upload.array("media", 5), normalizeTagsMiddleware, validateBody(postDraftSchema), async (req, res) => {
-  try {
-    const postId = req.params.post;
-    const { title, content, tags, draft = true } = req.body;
-    const username = req.currentUser.username;
+    try {
+        const postId = req.params.post;
+        const { title, content, tags, draft = true } = req.body;
+        const username = req.currentUser.username;
 
+        let mediaToRemove = [];
 
-    let newMedia = [];
-    if (req.files && req.files.length > 0) {
-      newMedia = req.files.map(file => ({
-        url: file.path,
-        type: file.mimetype.startsWith("video") ? "video" : "image",
-        public_id: file.filename,
-      }));
-    }
+        if (req.body.mediaToRemove) {
+            const raw = req.body.mediaToRemove;
+            mediaToRemove = Array.isArray(raw) ? raw : [raw];
+        }
 
-    const existingEditedDraft = await editDraft({ postId, content, title, tags, username, draft, newMedia });
-    res.status(200).json(existingEditedDraft);
-  } catch (error) {
-      if (req.files && req.files.length > 0) {
-        await Promise.all(
-          req.files.map(file => cloudinary.uploader.destroy(file.filename, { resource_type: "auto" }))
-        );
-      }
-      res.status(400).send(error.message);
+        console.log("Parsed mediaToRemove:", mediaToRemove);
+
+        let newMedia = [];
+        if (req.files && req.files.length > 0) {
+            newMedia = req.files.map(file => ({
+                url: file.path,
+                type: file.mimetype.startsWith("video") ? "video" : "image",
+                public_id: file.filename,
+            }));
+        }
+
+        const updatedDraft = await editDraft({ postId, content, title, tags, username, draft, newMedia, mediaToRemove });
+        res.status(200).json(updatedDraft);
+    } catch (error) {
+        if (req.files && req.files.length > 0) {
+            await Promise.all(
+                req.files.map(file => cloudinary.uploader.destroy(file.filename, { resource_type: "auto" }))
+            );
+        }
+        res.status(400).send(error.message);
     }
 });
 
