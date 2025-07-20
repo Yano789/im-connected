@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Header from "../../TopHeader/Header/Header";
+import { motion, AnimatePresence } from 'framer-motion'; // <-- Import animation components
 import './MedicationsPage.css';
 import CareRecipientList from '../CareRecipientList/CareRecipientList';
 import MedicationLogging from '../MedicationLogging/MedicationLogging';
@@ -7,17 +8,61 @@ import MedicationDetails from '../MedicationDetails/MedicationDetails';
 import MedicationForm from '../MedicationForm/MedicationForm';
 
 // ---- Dummy Data ----
+// New format lol
 const initialCareRecipientsData = [
     {
         id: 1, name: 'James Tan', medications: [
-            { id: 'med1', name: 'Metformin XR 500mg', dosages: [{ time: '1st pill @ 10am', taken: true }, { time: '2nd pill @ 12pm', taken: false }, { time: '3rd pill @ 6pm', taken: true }], usedTo: 'Manages Type 2 Diabetes Mellitus.', sideEffects: 'May cause Drowsiness', image: 'https://i.imgur.com/8m2bAOr.jpeg' },
-            { id: 'med2', name: 'Glucosamine Sulfate 500 mg', dosages: [{ time: '1st pill @ 10am', taken: true }], usedTo: 'Treats osteoarthritis.', sideEffects: 'Nausea, heartburn.', image: 'https://i.imgur.com/8m2bAOr.jpeg' },
-            { id: 'med3', name: 'Gliclazide (Diamicron) 30 mg', dosages: [{ time: '1st pill @ 10am', taken: true }, { time: '2nd pill @ 12pm', taken: false }, { time: '3rd pill @ 6pm', taken: false }, { time: '4th pill @ 10pm', taken: false }], usedTo: 'Controls blood sugar.', sideEffects: 'Hypoglycemia.', image: 'https://i.imgur.com/8m2bAOr.jpeg' },
+            { 
+                id: 'med1', 
+                name: 'Metformin XR 500mg', 
+                dosages: [
+                    { period: 'Morning', time: '10:00', taken: true },
+                    { period: 'Afternoon', time: '12:00', taken: false },
+                    { period: 'Evening', time: '18:00', taken: true }
+                ], 
+                usedTo: 'Manages Type 2 Diabetes Mellitus.', 
+                sideEffects: 'May cause Drowsiness', 
+                image: 'https://i.imgur.com/8m2bAOr.jpeg' 
+            },
+            { 
+                id: 'med2', 
+                name: 'Glucosamine Sulfate 500 mg', 
+                dosages: [
+                    { period: 'Morning', time: '10:00', taken: true }
+                ], 
+                usedTo: 'Treats osteoarthritis.', 
+                sideEffects: 'Nausea, heartburn.', 
+                image: 'https://i.imgur.com/8m2bAOr.jpeg' 
+            },
+            { 
+                id: 'med3', 
+                name: 'Gliclazide (Diamicron) 30 mg', 
+                dosages: [
+                    { period: 'Morning', time: '10:00', taken: true },
+                    { period: 'Afternoon', time: '12:00', taken: false },
+                    { period: 'Evening', time: '18:00', taken: false },
+                    { period: 'Night', time: '22:00', taken: false }
+                ], 
+                usedTo: 'Controls blood sugar.', 
+                sideEffects: 'Hypoglycemia.', 
+                image: 'https://i.imgur.com/8m2bAOr.jpeg' 
+            },
         ]
     },
-    { id: 2, name: 'Amelia Tan', medications: [
-        { id: 'med4', name: 'Aspirin 100mg', dosages: [{ time: '1st pill @ 8am', taken: false }], usedTo: 'Pain relief, blood thinner.', sideEffects: 'Upset stomach.', image: 'https://i.imgur.com/8m2bAOr.jpeg' }
-    ]}
+    { 
+        id: 2, name: 'Amelia Tan', medications: [
+            { 
+                id: 'med4', 
+                name: 'Aspirin 100mg', 
+                dosages: [
+                    { period: 'Morning', time: '08:00', taken: false }
+                ], 
+                usedTo: 'Pain relief, blood thinner.', 
+                sideEffects: 'Upset stomach.', 
+                image: 'https://i.imgur.com/8m2bAOr.jpeg' 
+            }
+        ]
+    }
 ];
 
 function MedicationsPage() {
@@ -121,20 +166,39 @@ function MedicationsPage() {
                         onAddNew={handleAddNewClick}
                     />
                 </div>
+                
                 <div className="grid-item-details">
-                    {mode === 'view' ? (
-                        <MedicationDetails 
-                            medication={selectedMedication} 
-                            onEdit={handleEditClick}
-                        />
-                    ) : (
-                        <MedicationForm 
-                            medication={selectedMedication} 
-                            onSave={handleSave}
-                            onCancel={handleCancel}
-                            onDelete={handleDelete}
-                        />
-                    )}
+                    <AnimatePresence mode="wait">
+                        {mode === 'view' ? (
+                            <motion.div
+                                key={selectedMedication ? selectedMedication.id : 'details'}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <MedicationDetails 
+                                    medication={selectedMedication} 
+                                    onEdit={handleEditClick}
+                                />
+                            </motion.div>
+                        ) : (
+                            <motion.div
+                                key="form" // A static key for the form component
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.2 }}
+                            >
+                                <MedicationForm 
+                                    medication={selectedMedication} 
+                                    onSave={handleSave}
+                                    onCancel={handleCancel}
+                                    onDelete={handleDelete}
+                                />
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </div>
         </>

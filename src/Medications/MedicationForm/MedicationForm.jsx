@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import './MedicationForm.css';
 
+const getPeriodFromTime = (time) => {
+    if (!time) return 'Morning';
+    const hour = parseInt(time.split(':')[0], 10);
+    if (hour >= 5 && hour < 12) return 'Morning';
+    if (hour >= 12 && hour < 17) return 'Afternoon';
+    if (hour >= 17 && hour < 21) return 'Evening';
+    return 'Night';
+};
+
+
 function MedicationForm({ medication, onSave, onCancel, onDelete }) {
     const isEditing = medication !== null;
 
@@ -38,16 +48,19 @@ function MedicationForm({ medication, onSave, onCancel, onDelete }) {
     };
 
 
-    const handleDosageChange = (index, event) => {
+    const handleDosageChange = (index, field, value) => {
         const newDosages = [...formData.dosages];
-        newDosages[index].time = event.target.value;
+        newDosages[index][field] = value;
+        if (field === 'time') {
+            newDosages[index].period = getPeriodFromTime(value);
+        }
         setFormData(prev => ({ ...prev, dosages: newDosages }));
     };
 
     const handleAddDosage = () => {
         setFormData(prev => ({
             ...prev,
-            dosages: [...prev.dosages, { time: '', taken: false }]
+            dosages: [...prev.dosages, { period: 'Morning', time: '09:00', taken: false }]
         }));
     };
 
@@ -103,10 +116,9 @@ function MedicationForm({ medication, onSave, onCancel, onDelete }) {
                 {formData.dosages.map((dosage, index) => (
                     <div key={index} className="dosage-input-row">
                         <input
-                            type="text"
+                            type="time"
                             value={dosage.time}
-                            onChange={(e) => handleDosageChange(index, e)}
-                            placeholder="e.g., 1st pill @ 10am"
+                            onChange={(e) => handleDosageChange(index, 'time', e.target.value)}
                         />
                         <button type="button" onClick={() => handleRemoveDosage(index)} className="remove-dosage-button">&times;</button>
                     </div>

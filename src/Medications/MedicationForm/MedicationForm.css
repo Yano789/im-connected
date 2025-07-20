@@ -1,5 +1,5 @@
 .form-card {
-    box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.3) !important;
+    box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.3);
 }
 
 /* Styles for the header container (title + delete button) */
@@ -137,4 +137,11 @@
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
+}
+
+.dosage-input-row select, .dosage-input-row input {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
 }
