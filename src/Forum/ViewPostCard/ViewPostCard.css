@@ -35,7 +35,7 @@
     @apply self-stretch flex flex-col items-start justify-start text-2xl text-[#2b2b2b];
     }
     .viewPostDescription {
-    @apply flex-1 relative leading-4;
+    @apply w-full h-fit flex-1 relative;
     }
     .viewPostDescriptionDiv {
     @apply self-stretch bg-[#fff2f0] flex flex-row items-center justify-center p-2.5 rounded-[5px];

@@ -1,20 +1,26 @@
-import "./ForumBody.css";
+import "./MyPostBody.css";
 import ForumCard from "../ForumCard/ForumCard";
 import Filter from "../Filter/Filter";
 import ToPost from "../ToPost/ToPost";
 import TopicSelector from "../TopicSelector/TopicSelector";
-import Bookmark from "../Bookmark/Bookmark";
+import Delete from "../Delete/Delete";
 import { useState, useEffect } from "react";
 
-function ForumBody() {
-  const [posts, setPosts] = useState([]);
+function MyPostBody() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [myPosts, setMyPosts] = useState([]);
 
+  const removePost = (id) => {
+    setMyPosts((prev) => prev.filter((post) => post.postId !== id));
+  };
+
+  // ✅ Add `source: "personalised"` to query
   const [query, setQuery] = useState({
     filter: "default",
     mode: "default",
     sort: "latest",
+    source: "personalized",
   });
 
   const updateQuery = (newParams) => {
@@ -24,7 +30,31 @@ function ForumBody() {
     }));
   };
 
-  // Handler for tag filter from TopicSelector
+  useEffect(() => {
+    const fetchMyPosts = async () => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams(query).toString();
+        const response = await fetch(
+          `http://localhost:5000/api/v1/post/?${params}`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        if (!response.ok) throw new Error("Failed to fetch your posts");
+        const data = await response.json();
+        setMyPosts(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMyPosts();
+  }, [query]);
+
+  // ✅ Optional: hook TopicSelector into updateQuery if you want tag filtering
   const handleTagFilterChange = (filterString) => {
     if (!filterString || filterString === "") {
       updateQuery({ filter: "default" });
@@ -32,27 +62,6 @@ function ForumBody() {
       updateQuery({ filter: filterString });
     }
   };
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true);
-      try {
-        const params = new URLSearchParams(query).toString();
-        const response = await fetch(`http://localhost:5000/api/v1/post/?${params}`, {
-          method: "GET",
-          credentials: "include",
-        });
-        if (!response.ok) throw new Error("Failed to fetch posts");
-        const data = await response.json();
-        setPosts(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPosts();
-  }, [query]);
 
   return (
     <div className="forumMain">
@@ -66,8 +75,8 @@ function ForumBody() {
           <p>Loading...</p>
         ) : error ? (
           <p>Error: {error}</p>
-        ) : posts.length > 0 ? (
-          posts.map((post) => (
+        ) : myPosts.length > 0 ? (
+          myPosts.map((post) => (
             <ForumCard
               key={post.postId}
               postId={post.postId}
@@ -76,20 +85,24 @@ function ForumBody() {
               postTitle={post.title}
               postTags={post.tags}
               postDescription={post.content}
-              ActionButton={() => <Bookmark/>}
+              ActionButton={() => (
+                <Delete
+                  postToDelete={post.postId}
+                  onDelete={() => removePost(post.postId)}
+                />
+              )}
             />
           ))
         ) : (
-          <p>No posts available.</p>
+          <p>You haven’t posted anything yet.</p>
         )}
       </div>
 
       <div className="forumRightBar">
-        <TopicSelector 
-        onTagFilterChange={handleTagFilterChange} />
+        <TopicSelector onTagFilterChange={handleTagFilterChange} />
       </div>
     </div>
   );
 }
 
-export default ForumBody;
+export default MyPostBody;

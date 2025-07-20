@@ -1,4 +1,8 @@
 import "./Filter.css";
+import LatestIcon from "../../assets/Latest.png";
+import EarliestIcon from "../../assets/Earliest.png";
+import CommentsIcon from "../../assets/Comments.png";
+import LikesIcon from "../../assets/Likes.png";
 import Topic from "../Topic/Topic";
 import { useState } from "react";
 
@@ -37,7 +41,7 @@ function Filter({ onFilter }) {
         <Topic
           topicId={1}
           topicName="Newest Post"
-          topicImage="src/assets/Latest.png"
+          topicImage={LatestIcon}
           clicked={clicked === 1}
           onClick={() => handleFilterClicked(1)}
         />
@@ -45,7 +49,7 @@ function Filter({ onFilter }) {
         <Topic
           topicId={2}
           topicName="Oldest Post"
-          topicImage="src/assets/Earliest.png"
+          topicImage={EarliestIcon}
           clicked={clicked === 2}
           onClick={() => handleFilterClicked(2)}
         />
@@ -53,7 +57,7 @@ function Filter({ onFilter }) {
         <Topic
           topicId={3}
           topicName="Highest Comments"
-          topicImage="src/assets/Comments.png"
+          topicImage={CommentsIcon}
           clicked={clicked === 3}
           onClick={() => handleFilterClicked(3)}
         />
@@ -61,7 +65,7 @@ function Filter({ onFilter }) {
         <Topic
           topicId={4}
           topicName="Highest Likes"
-          topicImage="src/assets/Likes.png"
+          topicImage={LikesIcon}
           clicked={clicked === 4}
           onClick={() => handleFilterClicked(4)}
         />

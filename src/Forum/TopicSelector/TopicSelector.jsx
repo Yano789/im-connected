@@ -1,26 +1,28 @@
 import "./TopicSelector.css";
+import AllIcon from "../../assets/Book.png";
+import WheelchairIcon from "../../assets/Wheelchair.png";
+import MentalHealthIcon from "../../assets/MentalHealth.png";
+import GovtIcon from "../../assets/Govt.png";
+import ChildrenIcon from "../../assets/Children.png";
+import ElderlyIcon from "../../assets/Elderly.png";
+import MoneyIcon from "../../assets/Money.png";
+import DepressionIcon from "../../assets/Depression.png";
+import HospitalIcon from "../../assets/Hospital.png";
+
 import Topic from "../Topic/Topic";
 import { useState } from "react";
-
 const TAGS = [
-  { id: 1, name: "All", image: "src/assets/Book.png" },
-  {
-    id: 2,
-    name: "Physical Disability & Chronic Illness",
-    image: "src/assets/Wheelchair.png",
-  },
-  {
-    id: 3,
-    name: "Personal Mental Health",
-    image: "src/assets/MentalHealth.png",
-  },
-  { id: 4, name: "Subsidies and Govt Support", image: "src/assets/Govt.png" },
-  { id: 5, name: "Pediatric Care", image: "src/assets/Children.png" },
-  { id: 6, name: "End of Life Care", image: "src/assets/Elderly.png" },
-  { id: 7, name: "Financial & Legal Help", image: "src/assets/Money.png" },
-  { id: 8, name: "Mental Disability", image: "src/assets/Depression.png" },
-  { id: 9, name: "Hospitals and Clinics", image: "src/assets/Hospital.png" },
+  { id: 1, name: "All", image: AllIcon },
+  { id: 2, name: "Physical Disability & Chronic Illness", image: WheelchairIcon },
+  { id: 3, name: "Personal Mental Health", image: MentalHealthIcon },
+  { id: 4, name: "Subsidies and Govt Support", image: GovtIcon },
+  { id: 5, name: "Pediatric Care", image: ChildrenIcon },
+  { id: 6, name: "End of Life Care", image: ElderlyIcon },
+  { id: 7, name: "Financial & Legal Help", image: MoneyIcon },
+  { id: 8, name: "Mental Disability", image: DepressionIcon },
+  { id: 9, name: "Hospitals and Clinics", image: HospitalIcon },
 ];
+
 
 function TopicSelector({ onTagFilterChange }) {
   const [clickedTopics, setClickedTopics] = useState([]);

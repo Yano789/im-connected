@@ -1,27 +1,27 @@
 import "./ForumCard.css";
-import BookmarkIcon from "../../assets/Bookmark.png";
 import CommentsIcon from "../../assets/Comments.png";
 import LikesIcon from "../../assets/Likes.png";
-import UnbookmarkIcon from "../../assets/Unbookmark.png";
-import UncommentsIcon from "../../assets/Uncomments.png";
 import UnlikesIcon from "../../assets/Unlikes.png";
+import Boo from "../../assets/Boo.jpg";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ForumCard(props) {
-  const { postId, postUser, postDate, postTitle, postTags, postDescription } = props;
-  
-  const [liked, setLiked] = useState(false);
-  const [bookmarked, setBookmarked] = useState(false);
+  const { postId, postUser, postDate, postTitle, postTags, postDescription, ActionButton } =
+    props;
 
-  const likeIcon = liked ? {LikesIcon} : {UnlikesIcon};
-  const bookmarkIcon = bookmarked ? {bookmarkIcon} : {UnbookmarkIcon};
+  const [liked, setLiked] = useState(false);
+
+  const likeIcon = liked ? LikesIcon : UnlikesIcon ;
 
   const navigate = useNavigate();
   const encodedPostId = encodeURIComponent(postId);
 
   return (
-    <div className="post" onClick={() => navigate(`/forum/viewpost?postId=${encodedPostId}`)}>
+    <div
+      className="post"
+      onClick={() => navigate(`/forum/viewpost?postId=${encodedPostId}`)}
+    >
       <div className="data">
         <div className="forumTitle">
           <div className="titleOfPostParent">
@@ -33,14 +33,7 @@ function ForumCard(props) {
           </div>
           <div className="nameParent">
             <div className="postUser">{postUser}</div>
-            {/* Toggle bookmark on click */}
-            <img
-              className="bookmarkIcon"
-              alt="bookmark"
-              src={bookmarkIcon}
-              onClick={() => setBookmarked(!bookmarked)}
-              style={{ cursor: "pointer" }}
-            />
+            <ActionButton/>
           </div>
           <div className="tags">
             {postTags && postTags.length > 0 ? (
@@ -64,22 +57,21 @@ function ForumCard(props) {
 
       <div className="images">
         <div className="rectangleParent">
-          <img className="postImage" src="src\assets\Boo.jpg" alt="post" />
+          <img className="postImage" src={Boo} alt="post" />
         </div>
       </div>
 
       <div className="stats">
         <div className="commentsNumber">
-          <img
-            className="commentsIcon"
-            alt="comments"
-            src={CommentsIcon}
-          />
+          <img className="commentsIcon" alt="comments" src={CommentsIcon} />
           <div className="name">0</div>
         </div>
         <div
           className="likesNumber"
-          onClick={() => setLiked(!liked)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setLiked(!liked);
+          }}
           style={{ cursor: "pointer" }}
         >
           <img className="likesIcon" alt="likes" src={likeIcon} />

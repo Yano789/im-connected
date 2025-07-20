@@ -7,12 +7,16 @@ function ToPost() {
   return (
     <div className="toPost">
       <div className="toPostMain">
-        <div className="toPostTitle" onClick={() => navigate("/forum/newpost")}>
+        <div className="toSavedPostDiv" onClick={() => navigate("/forum/newpost")}>
           <div className="postNow">Post Now</div>
-          <div className="postDrafts">Drafts</div>
+          <img className="postArrow" alt="" src={ArrowIcon} />
         </div>
-        <div className="toSavedPostDiv">
+        <div className="toSavedPostDiv" onClick={() => navigate("/forum/savedpost")}>
           <div className="postNow">Saved Posts</div>
+          <img className="postArrow" alt="" src={ArrowIcon} />
+        </div>
+        <div className="toSavedPostDiv" onClick={() => navigate("/forum/mypost")}>
+          <div className="postNow">My Posts</div>
           <img className="postArrow" alt="" src={ArrowIcon} />
         </div>
       </div>

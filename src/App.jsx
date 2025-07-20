@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Forum from "./Forum/Forum/Forum";
 import NewPost from "./Forum/NewPost/NewPost";
 import ViewPost from "./Forum/ViewPost/ViewPost";
+import MyPost from "./Forum/MyPost/MyPost";
+import SavedPost from "./Forum/SavedPost/SavedPost";
 import MedicationsPage from "./Medications/MedicationsPage/MedicationsPage";
 import LoginCard from "./Login/LoginCard";
 
@@ -26,6 +28,8 @@ function App() {
           <Route path="/forum" element={<Forum/>}/>
           <Route path="/forum/newpost" element={<NewPost/>}/>
           <Route path="/forum/viewpost" element={<ViewPost/>}/> 
+          <Route path="/forum/mypost" element={<MyPost/>}/>
+          <Route path="/forum/savedpost" element={<SavedPost/>}/>
           <Route path="/medication" element={<MedicationsPage/>}/>
           {/*
           <Route path="/profile" element={<Profile/>}/>
