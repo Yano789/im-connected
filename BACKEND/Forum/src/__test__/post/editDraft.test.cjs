@@ -1,115 +1,147 @@
-jest.mock("./../../domains/post/model.cjs")
+jest.mock("../../domains/post/model.cjs");
+jest.mock("cloudinary", () => ({
+  v2: {
+    uploader: {
+      destroy: jest.fn()
+    }
+  }
+}));
 
+const { Post, allowedTags } = require("../../domains/post/model.cjs");
+const { v2: cloudinary } = require("cloudinary");
+const { editDraft } = require("../../domains/post/controller.cjs");
 
+describe("editing drafts", () => {
+  const fixedTime = 1752934590239;
 
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers().setSystemTime(new Date(fixedTime));
+  });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
+  const baseData = {
+    postId: "post123",
+    title: "Updated Title",
+    content: "Updated Content",
+    tags: [allowedTags[0], allowedTags[1]],
+    username: "user1",
+    draft: true
+  };
 
+  test("successfully edits a draft", async () => {
+    const mockSave = jest.fn().mockResolvedValue(true);
 
-const {Post,allowedTags} = require("../../domains/post/model.cjs")
+    Post.findOne.mockResolvedValueOnce({
+      postId: "post123",
+      username: "user1",
+      draft: true,
+      media: [],
+      save: mockSave
+    });
 
-const {editDraft} = require("../../domains/post/controller.cjs")
+    const result = await editDraft({
+      ...baseData,
+      newMedia: [],
+      mediaToRemove: []
+    });
 
+    expect(Post.findOne).toHaveBeenCalledWith({ postId: "post123" });
+    expect(mockSave).toHaveBeenCalled();
+    expect(result.title).toBe(baseData.title);
+    expect(result.content).toBe(baseData.content);
+    expect(result.tags).toEqual(baseData.tags);
+    expect(result.edited).toBe(true);
+    expect(result.draft).toBe(true);
+  });
 
-describe("editing drafts",()=>{
-    const fixedTime = 1752934590239;
-    beforeEach(()=>{
-        jest.clearAllMocks()
-        jest.useFakeTimers().setSystemTime(new Date(fixedTime));
-    })
-    afterEach(() => {
-        jest.useRealTimers()
-    })
+  test("throws error if draft does not exist", async () => {
+    Post.findOne.mockResolvedValueOnce(null);
 
-    const baseData = {
-        postId: "post123",
-        title: "Updated Title",
-        content: "Updated Content",
-        tags: [allowedTags[0], allowedTags[1]], // ✅ valid tags
-        username: "user1",
-        draft: true
+    await expect(editDraft(baseData)).rejects.toThrow("Draft does not exist");
+  });
+
+  test("throws error if user is unauthorized", async () => {
+    Post.findOne.mockResolvedValueOnce({
+      postId: "post123",
+      username: "someoneElse",
+      draft: true
+    });
+
+    await expect(editDraft(baseData)).rejects.toThrow("unauthorized");
+  });
+
+  test("throws error if post is already published", async () => {
+    Post.findOne.mockResolvedValueOnce({
+      postId: "post123",
+      username: "user1",
+      draft: false
+    });
+
+    await expect(editDraft(baseData)).rejects.toThrow("Cannot edit a published post");
+  });
+
+  test("handles media removal and addition", async () => {
+    const mockSave = jest.fn().mockResolvedValue(true);
+
+    const mockDraft = {
+      postId: "post123",
+      username: "user1",
+      draft: true,
+      media: [
+        { public_id: "keep_me", type: "image" },
+        { public_id: "remove_me", type: "video" }
+      ],
+      save: mockSave
     };
-    test("successfully edits a draft", async () => {
-        // Simulate existing draft found
-        Post.findOne.mockResolvedValueOnce({
-            postId: "post123",
-            username: "user1",
-            draft: true
-        });
 
-        // Simulate successful update
-        Post.findOneAndUpdate.mockResolvedValueOnce({
-            postId: "post123",
-            title: baseData.title,
-            content: baseData.content,
-            tags: baseData.tags,
-            username: baseData.username,
-            createdAt: fixedTime,
-            edited: true,
-            draft: true,
-            comments: 0,
-            likes: 0
-        });
+    Post.findOne.mockResolvedValue(mockDraft);
+    cloudinary.uploader.destroy.mockResolvedValueOnce({ result: "ok" });
 
-        const result = await editDraft(baseData);
-
-        expect(Post.findOne).toHaveBeenCalledWith({ postId: "post123" });
-        expect(Post.findOneAndUpdate).toHaveBeenCalledWith(
-            { postId: "post123" },
-            {
-                title: baseData.title,
-                content: baseData.content,
-                tags: baseData.tags,
-                createdAt: fixedTime,
-                edited: true,
-                draft: true
-            },
-            { new: true }
-        );
-
-        expect(result.title).toBe(baseData.title);
-        expect(result.content).toBe(baseData.content);
-        expect(result.tags).toEqual(baseData.tags);
-        expect(result.createdAt).toBe(fixedTime);
-        expect(result.edited).toBe(true);
+    const result = await editDraft({
+      ...baseData,
+      mediaToRemove: ["remove_me"],
+      newMedia: [{ public_id: "new_file", type: "image" }]
     });
 
-    test("throws error if draft does not exist", async () => {
-        Post.findOne.mockResolvedValueOnce(null);
+    expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("remove_me", { resource_type: "video" });
+    expect(result.media).toEqual([
+      { public_id: "keep_me", type: "image" },
+      { public_id: "new_file", type: "image" }
+    ]);
+    expect(mockSave).toHaveBeenCalled();
+  });
 
-        await expect(editDraft(baseData)).rejects.toThrow("Draft does not exist");
+  test("measures time for cloudinary and save", async () => {
+    const mockSave = jest.fn().mockResolvedValue(true);
+    const mockDraft = {
+      postId: "post123",
+      username: "user1",
+      draft: true,
+      media: [],
+      save: mockSave
+    };
+    Post.findOne.mockResolvedValue(mockDraft);
+    cloudinary.uploader.destroy.mockResolvedValue({ result: "ok" });
+
+    const timeSpy = jest.spyOn(console, "time");
+    const timeEndSpy = jest.spyOn(console, "timeEnd");
+
+    await editDraft({
+      ...baseData,
+      mediaToRemove: [],
+      newMedia: []
     });
 
-    test("throws error if user is unauthorized", async () => {
-        Post.findOne.mockResolvedValueOnce({
-            postId: "post123",
-            username: "someoneElse",
-            draft: true
-        });
+    expect(timeSpy).toHaveBeenCalledWith("Cloudinary Deletion");
+    expect(timeEndSpy).toHaveBeenCalledWith("Cloudinary Deletion");
+    expect(timeSpy).toHaveBeenCalledWith("Draft Save");
+    expect(timeEndSpy).toHaveBeenCalledWith("Draft Save");
 
-        await expect(editDraft(baseData)).rejects.toThrow("unauthorized");
-    });
-
-    test("throws error if post is already published", async () => {
-        Post.findOne.mockResolvedValueOnce({
-            postId: "post123",
-            username: "user1",
-            draft: false
-        });
-
-        await expect(editDraft(baseData)).rejects.toThrow("Cannot edit a published post");
-    });
-
-    test("throws error if update fails", async () => {
-        Post.findOne.mockResolvedValueOnce({
-            postId: "post123",
-            username: "user1",
-            draft: true
-        });
-
-        Post.findOneAndUpdate.mockResolvedValueOnce(null);
-
-        await expect(editDraft(baseData)).rejects.toThrow("Post does not exist!");
-    });
-
-})
+    timeSpy.mockRestore();
+    timeEndSpy.mockRestore();
+  });
+});
