@@ -35,7 +35,9 @@ const postDraftSchema = Joi.object({
       type: Joi.string().valid('image', 'video').required(),
       url: Joi.string().uri().optional()
     })
-  ).optional()
+  ).optional(),
+  mediaToRemove: Joi.array().items(Joi.string()).optional(),
+
 });
 
 

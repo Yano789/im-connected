@@ -1,82 +1,99 @@
-import { useRef, useState } from "react";
-import UploadIcon from "../../assets/Upload.png";
-import "./mediaUploader.css";
+import { useRef } from "react";
+import "./MediaUploader.css";
 
-function MediaUploader() {
+function MediaUploader({
+  existingMedia = [],
+  onRemoveExistingMedia,
+  mediaFiles = [],
+  onMediaChange,
+  onRemoveNewFile,
+}) {
   const fileInputRef = useRef(null);
-  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
-    setSelectedFiles((prev) => [...prev, ...files]);
-  };
-
-  const handleRemoveFile = (indexToRemove) => {
-    setSelectedFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
+    onMediaChange([...mediaFiles, ...files]);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    setSelectedFiles((prev) => [...prev, ...files]);
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    onMediaChange([...mediaFiles, ...droppedFiles]);
   };
 
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
-  const openFileDialog = () => {
-    fileInputRef.current.click();
-  };
-
   return (
-    <div className="media-container">
-      <div className="media-label">Add Media (Optional)</div>
-
+    <div className="mediaUploader">
       <div
-        className="media-dropzone"
-        onClick={openFileDialog}
+        className="dropArea"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
+        onClick={() => fileInputRef.current.click()}
       >
-        <p className="text-gray-500">Click or Drag & Drop Media Here</p>
-        <img src={UploadIcon} alt="Upload" className="media-upload-icon" />
+        Drag and drop media here, or click to upload (max 5)
         <input
           type="file"
           accept="image/*,video/*"
           multiple
+          hidden
           ref={fileInputRef}
           onChange={handleFileChange}
-          className="hidden"
         />
       </div>
 
-      {selectedFiles.length > 0 && (
-        <div className="media-grid">
-          {selectedFiles.map((file, index) => {
-            const url = URL.createObjectURL(file);
-            const isImage = file.type.startsWith("image/");
-            const isVideo = file.type.startsWith("video/");
-
-            return (
-              <div key={index} className="media-preview">
+      {/* Existing media (from backend) */}
+      {existingMedia.length > 0 && (
+        <div className="existingMediaContainer">
+          <h4>Previously Uploaded:</h4>
+          <div className="mediaPreviewGrid">
+            {existingMedia.map((media, index) => (
+              <div className="mediaItem" key={index}>
+                {media.type.startsWith("image") ? (
+                  <img src={media.url} alt={`media-${index}`} />
+                ) : (
+                  <video src={media.url} controls />
+                )}
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRemoveFile(index);
-                  }}
-                  className="media-remove-button"
+                  type="button"
+                  className="removeMediaBtn"
+                  onClick={() => onRemoveExistingMedia(media.public_id)}
                 >
                   ✕
                 </button>
-
-                {isImage && <img src={url} alt="" className="media-thumb" />}
-                {isVideo && <video src={url} controls className="media-thumb" />}
-
-                <p className="media-filename">{file.name}</p>
               </div>
-            );
-          })}
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* New media (not uploaded yet) */}
+      {mediaFiles.length > 0 && (
+        <div className="newMediaContainer">
+          <h4>New Media:</h4>
+          <div className="mediaPreviewGrid">
+            {mediaFiles.map((file, index) => {
+              const previewURL = URL.createObjectURL(file);
+              return (
+                <div className="mediaItem" key={index}>
+                  {file.type.startsWith("image") ? (
+                    <img src={previewURL} alt={`new-${index}`} />
+                  ) : (
+                    <video src={previewURL} controls />
+                  )}
+                  <button
+                    type="button"
+                    className="removeMediaBtn"
+                    onClick={() => onRemoveNewFile(index)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -84,3 +101,4 @@ function MediaUploader() {
 }
 
 export default MediaUploader;
+

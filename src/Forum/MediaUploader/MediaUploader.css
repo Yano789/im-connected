@@ -1,39 +1,41 @@
 @import "tailwindcss";
 
 @layer components {
-  .media-container {
-    @apply w-full;
-  }
+  .mediaUploader {
+  @apply mt-6 space-y-4;
+}
 
-  .media-label {
-    @apply mb-2 text-sm font-medium text-gray-700;
-  }
+.dropArea {
+  @apply border-2 border-dashed border-gray-300 rounded-xl p-6 text-center 
+         text-sm text-gray-500 font-medium cursor-pointer 
+         hover:border-blue-400 hover:bg-blue-50 transition duration-200;
+}
 
-  .media-dropzone {
-    @apply flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl p-6 cursor-pointer hover:border-blue-400 transition duration-200;
-  }
+.existingMediaContainer {
+  @apply space-y-2;
+}
 
-  .media-upload-icon {
-    @apply mt-3 w-8 h-8;
-  }
+.newMediaContainer {
+  @apply space-y-2;
+}
 
-  .media-grid {
-    @apply mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4;
-  }
+.mediaPreviewGrid {
+  @apply grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4;
+}
 
-  .media-preview {
-    @apply relative flex flex-row;
-  }
+.mediaItem {
+  @apply relative rounded-md overflow-hidden shadow-md;
+}
 
-  .media-remove-button {
-    @apply absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition;
-  }
+.mediaItem img,
+.mediaItem video {
+  @apply w-full h-40 object-cover rounded-md;
+}
 
-  .media-thumb {
-    @apply w-full h-32 object-cover rounded-lg border;
-  }
+.removeMediaBtn {
+  @apply absolute top-1 right-1 bg-red-600 text-white w-6 h-6 rounded-full 
+         flex items-center justify-center text-xs font-bold z-10 
+         hover:bg-red-700 transition duration-150;
+}
 
-  .media-filename {
-    @apply mt-1 text-xs text-center truncate;
-  }
 }
