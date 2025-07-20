@@ -24,7 +24,6 @@ function MedicationForm({ medication, onSave, onCancel, onDelete }) {
 
     useEffect(() => {
         const isEditing = medication !== null;
-        // Resets the form's internal state with the new data
         setFormData({
             name: isEditing ? medication.name : '',
             usedTo: isEditing ? medication.usedTo : '',
@@ -41,7 +40,6 @@ function MedicationForm({ medication, onSave, onCancel, onDelete }) {
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
-            // Create a temporary URL for the selected image to show a preview
             const newImageUrl = URL.createObjectURL(e.target.files[0]);
             setFormData(prev => ({ ...prev, image: newImageUrl }));
         }
@@ -79,8 +77,13 @@ function MedicationForm({ medication, onSave, onCancel, onDelete }) {
             <div className="form-header">
                 <h2 className="medication-title">{isEditing ? 'Edit Medication' : 'Add New Medication'}</h2>
                 {isEditing && (
-                    <button type="button" onClick={onDelete} className="delete-button-top-right" title="Delete Medication">
-                        &times;
+                    <button 
+                        type="button" 
+                        onClick={onDelete} 
+                        className="delete-button-top-right" 
+                        title="Delete Medication"
+                    >
+                        Delete
                     </button>
                 )}
             </div>
@@ -120,8 +123,11 @@ function MedicationForm({ medication, onSave, onCancel, onDelete }) {
                             value={dosage.time}
                             onChange={(e) => handleDosageChange(index, 'time', e.target.value)}
                         />
-                        <button type="button" onClick={() => handleRemoveDosage(index)} className="remove-dosage-button">&times;</button>
-                    </div>
+                        <button 
+                                type="button" 
+                                onClick={() => handleRemoveDosage(index)} 
+                                className="remove-dosage-button">Remove</button>
+                        </div>
                 ))}
                 <button type="button" onClick={handleAddDosage} className="add-dosage-button">+ Add Dosage</button>
             </div>

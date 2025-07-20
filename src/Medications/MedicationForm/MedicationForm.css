@@ -14,25 +14,21 @@
     margin: 0;
 }
 
-/* Styles for the top-right delete button */
 .delete-button-top-right {
-    background: #fde2e4;
+    background: transparent;
     color: #c14a4e;
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    font-size: 1.75rem;
-    font-weight: 300;
-    line-height: 32px;
-    text-align: center;
+    border: 2px solid #fde2e4;
+    border-radius: 20px; 
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
-    padding: 0;
+    transition: all 0.2s ease;
 }
 
 .delete-button-top-right:hover {
-    background-color: #f8c2c2;
+    background-color: #fde2e4;
+    color: #a33a3e;
 }
 
 .form-group {
@@ -74,11 +70,20 @@
 }
 
 .remove-dosage-button {
-    background-color: #fde2e4;
+    background-color: transparent;
     color: #c74b50;
-    font-weight: bold;
-    font-size: 1.25rem;
-    padding: 0.25rem 0.75rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.remove-dosage-button:hover {
+    background-color: #fde2e4;
+    color: #a33a3e;
 }
 
 .add-dosage-button {

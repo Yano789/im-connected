@@ -166,39 +166,21 @@ function MedicationsPage() {
                         onAddNew={handleAddNewClick}
                     />
                 </div>
-                
+
                 <div className="grid-item-details">
-                    <AnimatePresence mode="wait">
-                        {mode === 'view' ? (
-                            <motion.div
-                                key={selectedMedication ? selectedMedication.id : 'details'}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <MedicationDetails 
-                                    medication={selectedMedication} 
-                                    onEdit={handleEditClick}
-                                />
-                            </motion.div>
+                    {mode === 'view' ? (
+                            <MedicationDetails 
+                                medication={selectedMedication} 
+                                onEdit={handleEditClick}
+                            />
                         ) : (
-                            <motion.div
-                                key="form" // A static key for the form component
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -10 }}
-                                transition={{ duration: 0.2 }}
-                            >
-                                <MedicationForm 
-                                    medication={selectedMedication} 
-                                    onSave={handleSave}
-                                    onCancel={handleCancel}
-                                    onDelete={handleDelete}
-                                />
-                            </motion.div>
+                            <MedicationForm 
+                                medication={selectedMedication} 
+                                onSave={handleSave}
+                                onCancel={handleCancel}
+                                onDelete={handleDelete}
+                            />
                         )}
-                    </AnimatePresence>
                 </div>
             </div>
         </>
