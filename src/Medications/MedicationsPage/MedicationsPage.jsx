@@ -66,6 +66,8 @@ const initialCareRecipientsData = [
 ];
 
 function MedicationsPage() {
+    const [isAddingRecipient, setIsAddingRecipient] = useState(false);
+    const [newRecipientName, setNewRecipientName] = useState("");
     const [careRecipients, setCareRecipients] = useState(initialCareRecipientsData);
     const [selectedRecipientId, setSelectedRecipientId] = useState(careRecipients[0].id);
     const selectedRecipient = careRecipients.find(r => r.id === selectedRecipientId);
@@ -73,6 +75,8 @@ function MedicationsPage() {
     const [mode, setMode] = useState('view');
 
     const handleRecipientSelect = (recipient) => {
+        setIsAddingRecipient(false);
+        setNewRecipientName("");
         setSelectedRecipientId(recipient.id);
         setSelectedMedication(recipient.medications[0] || null);
         setMode('view');
@@ -83,6 +87,26 @@ function MedicationsPage() {
         setMode('view');
     };
     
+    const handleAddRecipientClick = () => {
+        setIsAddingRecipient(true);
+        setSelectedMedication(null);
+    };
+
+    const handleSaveNewRecipient = () => {
+        if (!newRecipientName.trim()) return; // Don't save if the name is empty
+        const newRecipient = {
+            id: `recipient_${Date.now()}`,
+            name: newRecipientName,
+            medications: []
+        };
+                setCareRecipients(prev => [...prev, newRecipient]);
+        
+        setIsAddingRecipient(false);
+        setNewRecipientName("");
+        
+        setSelectedRecipientId(newRecipient.id);
+
+    };
     const handleAddNewClick = () => {
         setSelectedMedication(null);
         setMode('create');
@@ -150,11 +174,18 @@ function MedicationsPage() {
                         recipients={careRecipients} 
                         onSelect={handleRecipientSelect}
                         selectedRecipientId={selectedRecipient.id}
+                        isAdding={isAddingRecipient}
+                        onAdd={handleAddRecipientClick}
+                        onSaveNew={handleSaveNewRecipient}
+                        newName={newRecipientName}
+                        setNewName={setNewRecipientName}
                     />
                 </div>
                 <div className="grid-item-title">
                     <h1 className="page-title">
-                        Medications for <span className="recipient-name">{selectedRecipient.name.toUpperCase()}</span>
+                        Medications for <span className="recipient-name">
+                            {isAddingRecipient ? newRecipientName.toUpperCase() : selectedRecipient.name.toUpperCase()}
+                        </span>
                     </h1>
                 </div>
 
