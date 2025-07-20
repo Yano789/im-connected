@@ -73,6 +73,6 @@ describe("deleting post", () => {
 
         Post.findOne.mockResolvedValueOnce(mockPost);
 
-        await expect(deletePost(mockData)).rejects.toThrow("unauthorized");
+        await expect(deletePost(mockData)).rejects.toThrow("Unauthorized");
     })
 })

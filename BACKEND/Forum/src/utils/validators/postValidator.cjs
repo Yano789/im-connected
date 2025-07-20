@@ -3,32 +3,41 @@ const Joi = require("joi")
 const {allowedTags} = require("./../../domains/post/model.cjs");
 
 const postDraftSchema = Joi.object({
-    draft: Joi.boolean().default(false),
+  draft: Joi.boolean().truthy("true").falsy("false").default(false),
 
-    title: Joi.alternatives().conditional('draft', {
-        is: false,
-        then: Joi.string().min(1).max(200).required(),
-        otherwise: Joi.string().allow('').optional()
-    }),
+  title: Joi.alternatives().conditional('draft', {
+    is: false,
+    then: Joi.string().min(1).max(200).required(),
+    otherwise: Joi.string().allow('').optional()
+  }),
 
-    content: Joi.alternatives().conditional('draft', {
-        is: false,
-        then: Joi.string().min(1).required(),
-        otherwise: Joi.string().allow('').optional()
-    }),
-    tags: Joi.alternatives().conditional('draft', {
-        is: false,
-        then: Joi.array()
-            .items(Joi.string().valid(...allowedTags))
-            .min(1)
-            .max(2)
-            .required(),
-        otherwise: Joi.array()
-            .items(Joi.string().valid(...allowedTags))
-            .optional()
+  content: Joi.alternatives().conditional('draft', {
+    is: false,
+    then: Joi.string().min(1).required(),
+    otherwise: Joi.string().allow('').optional()
+  }),
+
+  tags: Joi.alternatives().conditional('draft', {
+    is: false,
+    then: Joi.array()
+      .items(Joi.string().valid(...allowedTags))
+      .min(1)
+      .max(2)
+      .required(),
+    otherwise: Joi.array()
+      .items(Joi.string().valid(...allowedTags))
+      .optional()
+  }),
+
+  media: Joi.array().items(
+    Joi.object({
+      public_id: Joi.string().required(),
+      type: Joi.string().valid('image', 'video').required(),
+      url: Joi.string().uri().optional()
     })
+  ).optional()
+});
 
-})
 
 const querySchema = Joi.object({
   filter: Joi.string()
@@ -52,7 +61,11 @@ const querySchema = Joi.object({
 
   sort: Joi.string()
     .valid('latest', 'most likes', 'most comments', 'earliest')
-    .default('latest')
+    .default('latest'),
+
+  source: Joi.string()
+    .valid('default', 'personalized')
+    .default('default')
 });
 
 
@@ -62,6 +75,7 @@ const paramsSchema = Joi.object({
     "string.empty": "Post ID cannot be empty",
   }),
 });
+
 
 
 module.exports = {postDraftSchema,querySchema,paramsSchema}

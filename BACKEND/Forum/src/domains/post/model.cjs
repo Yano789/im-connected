@@ -15,8 +15,12 @@ postId: { type: String, unique: true, index: true }, // index + unique
   edited: { type: Boolean, default: false },
   comments: { type: Number, default: 0 },
   likes: { type: Number, default: 0 },
-  draft:{type:Boolean,default:false}
-
+  draft:{type:Boolean,default:false},
+  media:[{
+    url:{type:String,required:true},
+    type:{type:String,required:true,enum:["image","video"]},
+    public_id:{type:String,required:true} //for deleting from cloudinary
+  }]
 });
 
 PostSchema.path('tags').validate(function (value) {

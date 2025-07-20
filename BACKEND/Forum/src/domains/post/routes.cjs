@@ -3,20 +3,35 @@ const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithCom
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
 const {postDraftSchema,querySchema,paramsSchema} = require("./../../utils/validators/postValidator.cjs")
+const upload = require("./../../config/storage.cjs");
+const normalizeTagsMiddleware = require("./../../middleware/normalizeTags.cjs");
+const {cloudinary} = require("./../../config/cloudinary.cjs");
 const router = express.Router();
 
 //create post/Draft
-router.post("/create",auth,validateBody(postDraftSchema),async (req,res)=>{
-    try {
-        const { title, content, tags ,draft = false} = req.body;
-        const username = req.currentUser.username;
-        const createdPost = await createPost({ title, content, tags, username ,draft})
-        res.status(200).json(createdPost);
+router.post("/create", auth, upload.array("media", 5), normalizeTagsMiddleware,validateBody(postDraftSchema), async (req, res) => {
+  try {
+    const { title, content, tags, draft = false } = req.body;
+    const username = req.currentUser.username;
 
-    } catch (error) {
-        res.status(400).send(error.message)
+    const media = req.files.map(file => ({
+      url: file.path,
+      type: file.mimetype.startsWith('video') ? 'video' : 'image',
+      public_id: file.filename // assuming filename is used as public_id in cloudinary
+    }));
+
+    const createdPost = await createPost({ title, content, tags, username, draft, media });
+    res.status(200).json(createdPost);
+
+  } catch (error) {
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        await cloudinary.uploader.destroy(file.filename, { resource_type: "auto" });
+      }
     }
-})
+    res.status(400).send(error.message);
+  }
+});
 
 
 //delete post via postId
@@ -24,9 +39,6 @@ router.delete("/:post/delete",auth,validateParams(paramsSchema),async(req,res)=>
     try {
         const postId = req.params.post
         const username = req.currentUser.username;
-        if(!postId){
-            throw Error("No PostId given")
-        }
         if(!username){
             throw Error("No Username given")
         }
@@ -38,15 +50,20 @@ router.delete("/:post/delete",auth,validateParams(paramsSchema),async(req,res)=>
 })
 
 //gets post based on the filter, display mode and sorting 
-router.get("/",validateQuery(querySchema),async(req,res)=>{
+router.get("/", auth, validateQuery(querySchema), async (req, res) => {
     try {
-        let { filter = "default", mode = "default", sort = "latest" } = req.query;
+        let { filter = "default", mode = "default", sort = "latest", source = "default" } = req.query;
         let tags = []
         if (filter !== "default") {
             tags = filter.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
         }
-        const post = await getFilteredPosts({tags,sort})
-        const limitedPosts = await modeLimit({post,mode})
+        const username = source !== "default" ? req.currentUser?.username : null;
+
+        if (source !== "default" && !username) {
+            throw new Error("No Username given for personalized filter");
+        }
+        const post = await getFilteredPosts({ tags, sort, source, username })
+        const limitedPosts = await modeLimit({ post, mode })
         res.status(200).json(limitedPosts)
     } catch (error) {
         res.status(400).send(error.message)
@@ -59,36 +76,17 @@ router.get("/",validateQuery(querySchema),async(req,res)=>{
 router.get("/getPost/:post", validateParams(paramsSchema),async (req, res) => {
     try {
         const postId = req.params.post
-        if (!postId) {
-            throw Error("No PostId given")
-        }
-
         const response = await getPostWithComment(postId)
         res.status(200).json(response);
     } catch (error) {
         res.status(400).send(error.message)
     }
 })
-router.get("/myPosts/", auth, async (req, res) => {
-    try {
-        const username = req.currentUser.username
-        if (!username) {
-            throw Error("No Username given")
-        }
-        const allMyPosts = await getAllMyPosts(username)
-        res.status(200).json(allMyPosts)
-    } catch (error) {
-        res.status(400).send(error.message)
-    }
-});
 
 //TODO, do a like counter
 router.put("/:post/like",auth,validateParams(paramsSchema),async(req,res)=>{
     try {
         const postId = req.params.post
-                if(!postId){
-            throw Error("No PostId given")
-        }
         const {like = "like"} = req.query 
         const updatedLikes = await likePosts({like,postId})
         res.status(200).json({ 
@@ -138,27 +136,32 @@ router.delete("/myDrafts/:post/delete",auth,validateParams(paramsSchema),async(r
 
 
 //edit draft via postId
-router.put("/myDrafts/:post/edit", auth ,validateParams(paramsSchema),validateBody(postDraftSchema),async (req, res) => {
-    try {
-        const postId = req.params.post
-        const {title,content,tags,draft = true} = req.body
-        const username = req.currentUser.username;
-        
-        if (!postId) {
-            throw Error("No PostId given")
-        }
-        if (!username) {
-            throw Error("No Username given")
-        }
-        const existingEditedDraft = await editDraft({ postId, content,title,tags,username,draft})
-        res.status(200).json(existingEditedDraft)
-    } catch (error) {
-        res.status(400).send(error.message)
+router.put("/myDrafts/:post/edit", auth, validateParams(paramsSchema), upload.array("media", 5), normalizeTagsMiddleware, validateBody(postDraftSchema), async (req, res) => {
+  try {
+    const postId = req.params.post;
+    const { title, content, tags, draft = true } = req.body;
+    const username = req.currentUser.username;
+
+
+    let newMedia = [];
+    if (req.files && req.files.length > 0) {
+      newMedia = req.files.map(file => ({
+        url: file.path,
+        type: file.mimetype.startsWith("video") ? "video" : "image",
+        public_id: file.filename,
+      }));
     }
-})
 
-
-
-
+    const existingEditedDraft = await editDraft({ postId, content, title, tags, username, draft, newMedia });
+    res.status(200).json(existingEditedDraft);
+  } catch (error) {
+      if (req.files && req.files.length > 0) {
+        await Promise.all(
+          req.files.map(file => cloudinary.uploader.destroy(file.filename, { resource_type: "auto" }))
+        );
+      }
+      res.status(400).send(error.message);
+    }
+});
 
 module.exports = router
