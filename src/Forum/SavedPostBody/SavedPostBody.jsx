@@ -13,13 +13,10 @@ function SavedPostBody() {
     const fetchSavedPosts = async () => {
       setLoading(true);
       try {
-        const response = await fetch(
-          `http://localhost:5000/api/v1/saved`,
-          {
-            method: "GET",
-            credentials: "include", // send cookies for auth
-          }
-        );
+        const response = await fetch(`http://localhost:5000/api/v1/saved`, {
+          method: "GET",
+          credentials: "include", // send cookies for auth
+        });
 
         if (!response.ok) throw new Error("Failed to fetch saved posts");
 
@@ -55,7 +52,17 @@ function SavedPostBody() {
               postTitle={post.title}
               postTags={post.tags}
               postDescription={post.content}
-              ActionButton={() => <Bookmark />}
+              ActionButton={() => (
+                <Bookmark
+                  postId={post.postId}
+                  initialBookmarked={true}
+                  onUnbookmark={() => {
+                    setPosts((prev) =>
+                      prev.filter((p) => p.postId !== post.postId)
+                    );
+                  }}
+                />
+              )}
             />
           ))
         ) : (

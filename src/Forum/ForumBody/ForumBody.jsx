@@ -8,6 +8,7 @@ import { useState, useEffect } from "react";
 
 function ForumBody() {
   const [posts, setPosts] = useState([]);
+  const [savedPostIds, setSavedPostIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -24,26 +25,22 @@ function ForumBody() {
     }));
   };
 
-  // Handler for tag filter from TopicSelector
   const handleTagFilterChange = (filterString) => {
-    if (!filterString || filterString === "") {
-      updateQuery({ filter: "default" });
-    } else {
-      updateQuery({ filter: filterString });
-    }
+    updateQuery({ filter: filterString || "default" });
   };
 
+  // Fetch posts
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
       try {
         const params = new URLSearchParams(query).toString();
-        const response = await fetch(`http://localhost:5000/api/v1/post/?${params}`, {
+        const res = await fetch(`http://localhost:5000/api/v1/post/?${params}`, {
           method: "GET",
           credentials: "include",
         });
-        if (!response.ok) throw new Error("Failed to fetch posts");
-        const data = await response.json();
+        if (!res.ok) throw new Error("Failed to fetch posts");
+        const data = await res.json();
         setPosts(data);
       } catch (err) {
         setError(err.message);
@@ -51,8 +48,28 @@ function ForumBody() {
         setLoading(false);
       }
     };
+
     fetchPosts();
   }, [query]);
+
+  // Fetch saved post IDs once
+  useEffect(() => {
+    const fetchSavedPosts = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/v1/saved", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to fetch saved posts");
+        const data = await res.json();
+        setSavedPostIds(new Set(data.map((p) => p.postId)));
+      } catch (err) {
+        console.error("Error fetching saved posts:", err.message);
+      }
+    };
+
+    fetchSavedPosts();
+  }, []);
 
   return (
     <div className="forumMain">
@@ -76,7 +93,12 @@ function ForumBody() {
               postTitle={post.title}
               postTags={post.tags}
               postDescription={post.content}
-              ActionButton={() => <Bookmark/>}
+              ActionButton={() => (
+                <Bookmark
+                  postId={post.postId}
+                  initialBookmarked={savedPostIds.has(post.postId)}
+                />
+              )}
             />
           ))
         ) : (
@@ -85,8 +107,7 @@ function ForumBody() {
       </div>
 
       <div className="forumRightBar">
-        <TopicSelector 
-        onTagFilterChange={handleTagFilterChange} />
+        <TopicSelector onTagFilterChange={handleTagFilterChange} />
       </div>
     </div>
   );
