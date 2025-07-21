@@ -10,7 +10,7 @@ function Bookmark({ postId, token, initialBookmarked, onUnbookmark }) {
   const handleBookmarkClick = async (e) => {
     e.stopPropagation();
 
-    const url = `http://localhost:5000/api/v1/saved/${encodeURIComponent(postId)}/${bookmarked ? "delete" : "save"}`;
+    const url = `http://localhost:5001/api/v1/saved/${encodeURIComponent(postId)}/${bookmarked ? "delete" : "save"}`;
     const method = bookmarked ? "DELETE" : "POST";
 
     try {

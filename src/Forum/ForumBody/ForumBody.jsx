@@ -35,7 +35,7 @@ function ForumBody() {
       setLoading(true);
       try {
         const params = new URLSearchParams(query).toString();
-        const res = await fetch(`http://localhost:5000/api/v1/post/?${params}`, {
+        const res = await fetch(`http://localhost:5001/api/v1/post/?${params}`, {
           method: "GET",
           credentials: "include",
         });
@@ -56,7 +56,7 @@ function ForumBody() {
   useEffect(() => {
     const fetchSavedPosts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/v1/saved", {
+        const res = await fetch("http://localhost:5001/api/v1/saved", {
           method: "GET",
           credentials: "include",
         });

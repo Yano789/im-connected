@@ -13,7 +13,7 @@ function Delete({ postToDelete, onDelete }) {
     try {
       setIsDeleting(true);
             const response = await fetch(
-        `http://localhost:5000/api/v1/post/${encodeURIComponent(postToDelete)}/delete`,
+        `http://localhost:5001/api/v1/post/${encodeURIComponent(postToDelete)}/delete`,
         {
           method: "DELETE",
           credentials: "include",
