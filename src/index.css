@@ -6,3 +6,8 @@
   --color-custom-purple-header: oklch(0.7091 0.0667 305.42);
   --color-custom-white: oklch(0.9945 0.0057 84.57);
 }
+
+p, div, span, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word;
+  word-wrap: break-word; /* For older browser compatibility */
+}
