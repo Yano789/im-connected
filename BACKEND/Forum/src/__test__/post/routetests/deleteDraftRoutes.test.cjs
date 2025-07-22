@@ -64,73 +64,73 @@ const express = require("express");
 const request = require("supertest");
 const cookieParser = require("cookie-parser");
 
-const { createPost} = require("./../../../domains/post/controller.cjs")
+const {deleteDrafts } = require("./../../../domains/post/controller.cjs")
 
 
 const postRoutes = require("../../../domains/post/routes.cjs");
 
 
-describe("create Post", () => {
+
+describe("DELETE /myDrafts/:post/delete", () => {
     let app;
 
     beforeAll(() => {
-        app = express()
-        app.use(express.json())
-        app.use(cookieParser())
-        app.use("/api/post", postRoutes)
-    })
+        app = express();
+        app.use(express.json());
+        app.use(cookieParser());
+        app.use("/api/post", postRoutes);
+    });
 
-    test("Should create a post", async () => {
-        const mockPost = {
-            postId:"post123",
-            title: "Test Title",
-            content: "Test Content",
-            tags: ["tag1", "tag2"],
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test("should delete a draft post successfully", async () => {
+        const postId = "draft123";
+
+        const mockDeletedDraft = {
+            postId: postId,
+            title: "Draft Title",
+            content: "Draft content",
             username: "testUser",
-            draft: false,
+            tags: ["Mental Disability"],
+            createdAt: new Date("2025-07-22T12:00:00Z"), // example date
+            edited: true,
+            comments: 0,     // default value
+            likes: 0,        // default value
+            draft: true,
             media: [
                 {
-                    url: "http://cloudinary.com/media/image1.jpg",
+                    url: "http://cloudinary.com/media/draft_image1.jpg",
                     type: "image",
-                    public_id: "image1",
-                },
-                {
-                    url: "http://cloudinary.com/media/video1.mp4",
-                    type: "video",
-                    public_id: "video1",
+                    public_id: "draft_image1"
                 }
             ]
         };
 
-        createPost.mockResolvedValueOnce(mockPost)
+        // Mock the deleteDrafts controller function to resolve with mockDeletedDraft
+        deleteDrafts.mockResolvedValueOnce(mockDeletedDraft);
 
-        const mockData = {
-            title: "Test Title",
-            content: "Test Content",
-            tags: ["tag1", "tag2"],
-            draft: false
-        }
+        const response = await request(app).delete(`/api/post/myDrafts/${postId}/delete`);
 
-        const response = await request(app).post("/api/post/create").send(mockData)
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(
+      expect.objectContaining({
+        ...mockDeletedDraft,
+        createdAt: mockDeletedDraft.createdAt.toISOString(),
+      }))
+        expect(deleteDrafts).toHaveBeenCalledWith({ username: "testUser", postId });
+    });
 
-        expect(response.status).toBe(200)
-        expect(response.body).toEqual(mockPost)
-        expect(createPost).toHaveBeenCalledWith({
-            ...mockData, username: "testUser", media: [
-                {
-                    url: "http://cloudinary.com/media/image.jpg",
-                    type: "image",
-                    public_id: "image1"
-                },
-                {
-                    url: "http://cloudinary.com/media/video.mp4",
-                    type: "video",
-                    public_id: "video1"
-                }
-            ]
-        })
+    test("should return 400 if deleteDrafts throws error", async () => {
+        const postId = "draft123";
 
-    })
-})
+        deleteDrafts.mockRejectedValueOnce(new Error("Failed to delete draft"));
 
+        const response = await request(app).delete(`/api/post/myDrafts/${postId}/delete`);
 
+        expect(response.status).toBe(400);
+        expect(response.text).toBe("Failed to delete draft");
+        expect(deleteDrafts).toHaveBeenCalledWith({ username: "testUser", postId });
+    });
+});

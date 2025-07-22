@@ -83,37 +83,6 @@ router.get("/getPost/:post", validateParams(paramsSchema),async (req, res) => {
     }
 })
 
-//TODO, do a like counter
-router.put("/:post/like",auth,validateParams(paramsSchema),async(req,res)=>{
-    try {
-        const postId = req.params.post
-        const username = req.currentUser.username
-        const updatedLikes = await likePosts({username,postId})
-        res.status(200).json({ 
-            likes: updatedLikes.likes,
-            message: "Like added successfully"
-        });
-    } catch (error) {
-        res.status(400).send(error.message)
-    }
-})
-
-router.put("/:post/unlike",auth,validateParams(paramsSchema),async(req,res)=>{
-    try {
-        const postId = req.params.post
-        const {like = "like"} = req.query 
-        const username = req.currentUser.username
-        const updatedLikes = await unlikePosts({like,postId})
-        res.status(200).json({ 
-            likes: updatedLikes.likes,
-            message: "Like added successfully"
-        });
-    } catch (error) {
-        res.status(400).send(error.message)
-    }
-})
-
-
 
 //displays all current draft by username
 router.get("/myDrafts",auth,async(req,res)=>{

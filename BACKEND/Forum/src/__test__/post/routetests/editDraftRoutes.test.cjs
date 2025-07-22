@@ -64,59 +64,75 @@ const express = require("express");
 const request = require("supertest");
 const cookieParser = require("cookie-parser");
 
-const { createPost} = require("./../../../domains/post/controller.cjs")
-
+const {editDraft} = require("./../../../domains/post/controller.cjs")
 
 const postRoutes = require("../../../domains/post/routes.cjs");
 
-
 describe("create Post", () => {
     let app;
+    const postId = "post123";
+
+    const updatedDraftMock = {
+        postId: "post123",
+        title: "Updated Title",
+        content: "Updated content for the draft.",
+        username: "testUser",
+        tags: ["Pediatric Care"],
+        createdAt: new Date("2025-07-22T14:44:57.451Z"),
+        edited: true,
+        comments: 0,
+        likes: 0,
+        draft: true,
+        media: [
+            {
+                url: "http://cloudinary.com/media/image.jpg",
+                type: "image",
+                public_id: "image1"
+            },
+            {
+                url: "http://cloudinary.com/media/video.mp4",
+                type: "video",
+                public_id: "video1"
+            }
+        ]
+    };
 
     beforeAll(() => {
-        app = express()
-        app.use(express.json())
-        app.use(cookieParser())
-        app.use("/api/post", postRoutes)
-    })
+        app = express();
+        app.use(express.json());
+        app.use(cookieParser());
+        app.use("/api/post", postRoutes);
+    });
 
-    test("Should create a post", async () => {
-        const mockPost = {
-            postId:"post123",
-            title: "Test Title",
-            content: "Test Content",
-            tags: ["tag1", "tag2"],
+    afterEach(() => {
+        jest.clearAllMocks();
+    });
+
+    test("should edit a draft successfully with media files and mediaToRemove", async () => {
+        editDraft.mockResolvedValueOnce({
+            ...updatedDraftMock,
+            createdAt: updatedDraftMock.createdAt.toISOString(), 
+        });
+
+        const response = await request(app)
+            .put(`/api/post/myDrafts/${postId}/edit`)
+            .send({
+                title: "Updated Title",
+                content: "Updated content for the draft.",
+                tags: ["Pediatric Care"],  
+                mediaToRemove: ["old_media_id_1"]
+            });
+
+        expect(response.status).toBe(200);
+        expect(editDraft).toHaveBeenCalledWith({
+            postId: "post123",
+            title: "Updated Title",
+            content: "Updated content for the draft.",
+            tags: ["Pediatric Care"],
             username: "testUser",
-            draft: false,
-            media: [
-                {
-                    url: "http://cloudinary.com/media/image1.jpg",
-                    type: "image",
-                    public_id: "image1",
-                },
-                {
-                    url: "http://cloudinary.com/media/video1.mp4",
-                    type: "video",
-                    public_id: "video1",
-                }
-            ]
-        };
-
-        createPost.mockResolvedValueOnce(mockPost)
-
-        const mockData = {
-            title: "Test Title",
-            content: "Test Content",
-            tags: ["tag1", "tag2"],
-            draft: false
-        }
-
-        const response = await request(app).post("/api/post/create").send(mockData)
-
-        expect(response.status).toBe(200)
-        expect(response.body).toEqual(mockPost)
-        expect(createPost).toHaveBeenCalledWith({
-            ...mockData, username: "testUser", media: [
+            draft: true,
+            mediaToRemove: ["old_media_id_1"],
+            newMedia: [
                 {
                     url: "http://cloudinary.com/media/image.jpg",
                     type: "image",
@@ -128,9 +144,11 @@ describe("create Post", () => {
                     public_id: "video1"
                 }
             ]
-        })
+        });
 
-    })
-})
-
-
+        expect(response.body).toEqual({
+            ...updatedDraftMock,
+            createdAt: updatedDraftMock.createdAt.toISOString()
+        });
+    });
+});

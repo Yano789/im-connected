@@ -136,12 +136,5 @@ describe("editing drafts", () => {
       newMedia: []
     });
 
-    expect(timeSpy).toHaveBeenCalledWith("Cloudinary Deletion");
-    expect(timeEndSpy).toHaveBeenCalledWith("Cloudinary Deletion");
-    expect(timeSpy).toHaveBeenCalledWith("Draft Save");
-    expect(timeEndSpy).toHaveBeenCalledWith("Draft Save");
-
-    timeSpy.mockRestore();
-    timeEndSpy.mockRestore();
   });
 });

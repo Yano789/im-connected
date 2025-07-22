@@ -64,73 +64,71 @@ const express = require("express");
 const request = require("supertest");
 const cookieParser = require("cookie-parser");
 
-const { createPost} = require("./../../../domains/post/controller.cjs")
+const {getMyDraft} = require("./../../../domains/post/controller.cjs")
 
 
 const postRoutes = require("../../../domains/post/routes.cjs");
 
 
-describe("create Post", () => {
-    let app;
+describe("GET /myDrafts/:post", () => {
+  let app;
 
-    beforeAll(() => {
-        app = express()
-        app.use(express.json())
-        app.use(cookieParser())
-        app.use("/api/post", postRoutes)
-    })
+  const mockMyDraft = {
+    postId: "draft123",
+    title: "My Draft Title",
+    content: "This is the content of my draft post.",
+    username: "testUser",
+    tags: ["Personal Mental Health", "Hospitals and Clinics"],
+    createdAt: new Date("2025-07-22T12:00:00Z"),
+    edited: false,
+    comments: 0,
+    likes: 0,
+    draft: true,
+    media: [
+      {
+        url: "http://cloudinary.com/media/mydraft_image1.jpg",
+        type: "image",
+        public_id: "mydraft_image1",
+      },
+    ],
+  };
 
-    test("Should create a post", async () => {
-        const mockPost = {
-            postId:"post123",
-            title: "Test Title",
-            content: "Test Content",
-            tags: ["tag1", "tag2"],
-            username: "testUser",
-            draft: false,
-            media: [
-                {
-                    url: "http://cloudinary.com/media/image1.jpg",
-                    type: "image",
-                    public_id: "image1",
-                },
-                {
-                    url: "http://cloudinary.com/media/video1.mp4",
-                    type: "video",
-                    public_id: "video1",
-                }
-            ]
-        };
+  beforeAll(() => {
+    app = express();
+    app.use(express.json());
+    app.use(cookieParser());
+    app.use("/api/post", postRoutes);
+  });
 
-        createPost.mockResolvedValueOnce(mockPost)
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
 
-        const mockData = {
-            title: "Test Title",
-            content: "Test Content",
-            tags: ["tag1", "tag2"],
-            draft: false
-        }
+  test("should return my draft post", async () => {
+    getMyDraft.mockResolvedValueOnce(mockMyDraft);
 
-        const response = await request(app).post("/api/post/create").send(mockData)
+    const response = await request(app).get("/api/post/myDrafts/draft123");
 
-        expect(response.status).toBe(200)
-        expect(response.body).toEqual(mockPost)
-        expect(createPost).toHaveBeenCalledWith({
-            ...mockData, username: "testUser", media: [
-                {
-                    url: "http://cloudinary.com/media/image.jpg",
-                    type: "image",
-                    public_id: "image1"
-                },
-                {
-                    url: "http://cloudinary.com/media/video.mp4",
-                    type: "video",
-                    public_id: "video1"
-                }
-            ]
-        })
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual(
+      expect.objectContaining({
+        ...mockMyDraft,
+        createdAt: mockMyDraft.createdAt.toISOString(),
+      })
+    );
 
-    })
-})
+    expect(getMyDraft).toHaveBeenCalledWith({
+      username: "testUser",
+      postId: "draft123",
+    });
+  });
 
+  test("should return 400 if error thrown", async () => {
+    getMyDraft.mockRejectedValueOnce(new Error("Draft not found"));
 
+    const response = await request(app).get("/api/post/myDrafts/nonexistent");
+
+    expect(response.status).toBe(400);
+    expect(response.text).toBe("Draft not found");
+  });
+});
