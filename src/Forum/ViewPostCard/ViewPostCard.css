@@ -55,20 +55,11 @@
     .viewPostButton {
     @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#c8b8db] border flex flex-row items-center justify-end p-2.5 rounded-2xl border-solid border-[#1e1e1e];
     }
-    .addComment {
-    @apply self-stretch shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border box-border h-[100px] flex flex-row items-end justify-end text-left text-[#333] p-2.5 rounded-[5px] border-solid border-[#1e1e1e];
-    }
-    .viewPostComment {
-    @apply relative text-left;
-    }
-    .viewPostCommentsDiv {
-    @apply self-stretch flex flex-col items-start justify-start gap-[15px];
-    }
     .viewPostBody {
     @apply self-stretch flex flex-col items-start justify-start gap-5 text-left text-base;
     }
     .viewPostDiv {
-    @apply w-full relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border h-[936px] flex flex-col items-start justify-start gap-2.5 text-center text-xl text-black p-5 rounded-[5px] border-solid border-[#1e1e1e];
+    @apply w-full h-fit relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border  flex flex-col items-start justify-start gap-2.5 text-center text-xl text-black p-5 rounded-[5px] border-solid border-[#1e1e1e];
     }
 
 }

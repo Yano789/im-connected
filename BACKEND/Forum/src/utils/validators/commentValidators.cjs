@@ -9,13 +9,6 @@ const postParamSchema = Joi.object({
 });
 
 
-const commentParamSchema = Joi.object({
-  comment: Joi.string().required().messages({
-    "any.required": "Comment ID is required",
-    "string.empty": "Comment ID cannot be empty",
-  }),
-});
-
 const postAndCommentParamsSchema  = Joi.object({
     post: Joi.string().required().messages({
     "any.required": "Post ID is required",
@@ -45,4 +38,4 @@ const editCommentBodySchema = Joi.object({
 });
 
 
-module.exports = {postParamSchema,commentParamSchema,createCommentBodySchema,editCommentBodySchema,postAndCommentParamsSchema}
+module.exports = {postParamSchema,createCommentBodySchema,editCommentBodySchema,postAndCommentParamsSchema}

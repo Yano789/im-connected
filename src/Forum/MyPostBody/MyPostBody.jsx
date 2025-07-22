@@ -85,6 +85,8 @@ function MyPostBody() {
               postTitle={post.title}
               postTags={post.tags}
               postDescription={post.content}
+              postComment={post.comments}
+              postLikes={post.likes}
               ActionButton={() => (
                 <Delete
                   postToDelete={post.postId}

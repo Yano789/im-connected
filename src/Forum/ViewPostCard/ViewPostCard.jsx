@@ -1,48 +1,52 @@
 import "./ViewPostCard.css";
-import CommentEntry from "../CommentEntry/CommentEntry";
+import CommentBody from "../CommentBody/CommentBody";
 import BookmarkIcon from "../../assets/Bookmark.png";
 import CommentsIcon from "../../assets/Comments.png";
 import LikesIcon from "../../assets/Likes.png";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 function ViewPostCard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const postId = searchParams.get("postId");
-
   const [postData, setPostData] = useState(null);
   const [error, setError] = useState("");
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     if (!postId) return;
-
     fetch(`http://localhost:5000/api/v1/post/getPost/${encodeURIComponent(postId)}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch post.");
         return res.json();
       })
-      .then((data) => {
-        setPostData(data);
-      })
+      .then((data) => setPostData(data))
       .catch((err) => {
         console.error(err);
         setError(err.message);
       });
   }, [postId]);
 
+  const fetchComments = useCallback(() => {
+    if (!postId) return;
+    fetch(`http://localhost:5000/api/v1/${encodeURIComponent(postId)}/comment/`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch comments.");
+        return res.json();
+      })
+      .then((data) => setComments(data))
+      .catch((err) => console.error("Comment fetch error:", err));
+  }, [postId]);
+
+  useEffect(() => {
+    fetchComments();
+  }, [fetchComments]);
+
   if (error) return <p>{error}</p>;
   if (!postData) return <p>Loading post...</p>;
 
-  const {
-    title,
-    content,
-    username,
-    createdAt,
-    tags = [],
-    likes,
-    comments = [],
-  } = postData;
+  const { title, content, username, createdAt, tags = [], likes } = postData;
 
   return (
     <div className="viewPostDiv">
@@ -86,28 +90,7 @@ function ViewPostCard() {
           </div>
         </div>
       </div>
-
-      <div className="viewPostTitleDiv">
-        <div className="addAComment">Add a Comment</div>
-        <textarea className="addComment" placeholder="Write something..." />
-        <button className="viewPostButton">Post</button>
-      </div>
-
-      <div className="viewPostCommentsDiv">
-        <div className="viewPostComment">Comments</div>
-        {comments.length > 0 ? (
-          comments.map((comment) => (
-            <CommentEntry
-              key={comment._id} // or comment.id
-              commentUsername={comment.username}
-              commentDate={new Date(comment.createdAt).toLocaleDateString()}
-              commentContent={comment.content}
-            />
-          ))
-        ) : (
-          <p>No comments yet.</p>
-        )}
-      </div>
+      <CommentBody comments={comments} postId={postId} refreshComments={fetchComments} />
     </div>
   );
 }

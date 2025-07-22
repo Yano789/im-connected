@@ -93,6 +93,8 @@ function ForumBody() {
               postTitle={post.title}
               postTags={post.tags}
               postDescription={post.content}
+              postComment={post.comments}
+              postLikes={post.likes}
               ActionButton={() => (
                 <Bookmark
                   postId={post.postId}

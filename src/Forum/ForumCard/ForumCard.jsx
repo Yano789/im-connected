@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ForumCard(props) {
-  const { postId, postUser, postDate, postTitle, postTags, postDescription, ActionButton } =
+  const { postId, postUser, postDate, postTitle, postTags, postDescription, ActionButton, postComment, postLikes } =
     props;
 
   const [liked, setLiked] = useState(false);
@@ -64,7 +64,7 @@ function ForumCard(props) {
       <div className="stats">
         <div className="commentsNumber">
           <img className="commentsIcon" alt="comments" src={CommentsIcon} />
-          <div className="name">0</div>
+          <div className="name">{postComment}</div>
         </div>
         <div
           className="likesNumber"
@@ -75,7 +75,7 @@ function ForumCard(props) {
           style={{ cursor: "pointer" }}
         >
           <img className="likesIcon" alt="likes" src={likeIcon} />
-          <div className="name">0</div>
+          <div className="name">{postLikes}</div>
         </div>
       </div>
     </div>

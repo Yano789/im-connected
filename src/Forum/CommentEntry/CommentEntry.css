@@ -14,6 +14,8 @@
   }
   .commentDiv {
     @apply w-full relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#c8b8db] flex flex-col items-start justify-start box-border gap-[5px] text-center text-xl text-black p-2.5 rounded-[5px];
-    font-family: Poppins;
+  }
+  .commentFunction{
+    @apply w-full h-fit flex flex-row gap-4 text-base justify-start items-center;
   }
 }

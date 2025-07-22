@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@layer components {
+  .addComment {
+    @apply self-stretch w-full shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border box-border h-[100px] text-base text-left text-[#333] p-2.5 rounded-[5px] border-solid border-[#1e1e1e];
+  }
+
+  .viewPostComment {
+    @apply relative text-left text-xl font-semibold;
+  }
+
+  .viewPostCommentsDiv {
+    @apply self-stretch flex flex-col items-start justify-start gap-[15px];
+  }
+
+  .commentSection {
+    @apply w-full h-fit flex flex-col gap-4 items-start justify-start;
+  }
+
+  .addAComment {
+    @apply text-left text-lg font-semibold;
+  }
+  .nestedComments {
+    @apply ml-4 mt-2 space-y-2;
+  }
+
+
+}
