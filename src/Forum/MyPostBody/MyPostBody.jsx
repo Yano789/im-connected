@@ -54,7 +54,7 @@ function MyPostBody() {
     fetchMyPosts();
   }, [query]);
 
-  // ✅ Optional: hook TopicSelector into updateQuery if you want tag filtering
+  
   const handleTagFilterChange = (filterString) => {
     if (!filterString || filterString === "") {
       updateQuery({ filter: "default" });

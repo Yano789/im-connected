@@ -13,7 +13,7 @@ function CommentEntry({ comment, postId, refreshComments, onDelete }) {
   const handleEdit = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/v1/${encodeURIComponent(postId)}/comment/${encodeURIComponent(commentId)}/edit`,
+        `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/${encodeURIComponent(commentId)}/edit`,
         {
           method: "PUT",
           credentials: "include",
@@ -36,7 +36,7 @@ function CommentEntry({ comment, postId, refreshComments, onDelete }) {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/v1/${encodeURIComponent(postId)}/comment/create`,
+        `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/create`,
         {
           method: "POST",
           credentials: "include",

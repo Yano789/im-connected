@@ -11,7 +11,7 @@ function CommentBody({ comments = [], postId, refreshComments }) {
 
     try {
       const res = await fetch(
-        `http://localhost:5000/api/v1/${encodeURIComponent(postId)}/comment/create`,
+        `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/create`,
         {
           method: "POST",
           credentials: "include",
@@ -36,7 +36,7 @@ function CommentBody({ comments = [], postId, refreshComments }) {
   const handleDeleteComment = async (commentIdToDelete) => {
     try {
       const res = await fetch(
-        `http://localhost:5000/api/v1/${encodeURIComponent(postId)}/comment/${encodeURIComponent(commentIdToDelete)}/delete`,
+        `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/${encodeURIComponent(commentIdToDelete)}/delete`,
         {
           method: "DELETE",
           credentials: "include",
