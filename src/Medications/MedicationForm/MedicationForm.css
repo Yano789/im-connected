@@ -1,5 +1,34 @@
 .form-card {
-    box-shadow: 0 10px 0px #a2d2ff, 0 12px 28px rgba(0, 0, 0, 0.12) !important;
+    box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.3);
+}
+
+/* Styles for the header container (title + delete button) */
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.medication-title {
+    margin: 0;
+}
+
+.delete-button-top-right {
+    background: transparent;
+    color: #c14a4e;
+    border: 2px solid #fde2e4;
+    border-radius: 20px; 
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.delete-button-top-right:hover {
+    background-color: #fde2e4;
+    color: #a33a3e;
 }
 
 .form-group {
@@ -19,8 +48,53 @@
     border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 1rem;
+    box-sizing: border-box; /* Important for sizing */
 }
 
+.dosage-input-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.dosage-input-row input {
+    flex-grow: 1;
+}
+
+.remove-dosage-button, .add-dosage-button {
+    border: none;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.remove-dosage-button {
+    background-color: transparent;
+    color: #c74b50;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.remove-dosage-button:hover {
+    background-color: #fde2e4;
+    color: #a33a3e;
+}
+
+.add-dosage-button {
+    background-color: #e9ecef;
+    color: #333;
+    width: 100%;
+    padding: 0.6rem;
+    margin-top: 0.5rem;
+}
+
+/* Styles for the bottom action buttons */
 .form-actions {
     display: flex;
     gap: 1rem;
@@ -43,6 +117,36 @@
 }
 
 .cancel-button {
-    background-color: #eee;
+    background-color: #f1f3f5;
     color: #333;
+    border: 1px solid #ddd;
+}
+
+.image-preview-container {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.image-preview {
+    max-width: 250px;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.upload-image-button {
+    display: inline-block;
+    padding: 0.6rem 1.2rem;
+    background-color: #e9ecef;
+    color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.dosage-input-row select, .dosage-input-row input {
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 1rem;
 }

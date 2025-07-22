@@ -3,6 +3,8 @@ import './MedicationLogging.css';
 import MedicationItem from '../MedicationItem/MedicationItem';
 
 function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddNew }) {
+    const isAddingNew = !selectedMedicationId;
+    
     return (
         <div className="card logging-card">
             <h2 className="card-header">Medication Logging</h2>
@@ -19,10 +21,10 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                 ))}
             </div>
 
-            <div className="add-medication-section">
-                <button className="add-button" onClick={onAddNew}>+</button>
+            <button className={isAddingNew ? "add-medication-button selected" : "add-medication-button"} onClick={onAddNew}>
+                <div className="add-icon">+</div>
                 <span>Add more medication</span>
-            </div>
+            </button>
             
             <div className="action-buttons">
                 <button className="upload-button">Upload Image</button>
