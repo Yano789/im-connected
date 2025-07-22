@@ -31,7 +31,7 @@ function ViewPostCard() {
 
   const fetchComments = useCallback(() => {
     if (!postId) return;
-    fetch(`http://localhost:5000/api/v1/${encodeURIComponent(postId)}/comment/`)
+    fetch(`http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch comments.");
         return res.json();

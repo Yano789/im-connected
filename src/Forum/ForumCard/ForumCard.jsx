@@ -7,15 +7,48 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ForumCard(props) {
-  const { postId, postUser, postDate, postTitle, postTags, postDescription, ActionButton, postComment, postLikes } =
-    props;
+  const {
+    postId,
+    postUser,
+    postDate,
+    postTitle,
+    postTags,
+    postDescription,
+    ActionButton,
+    postComment,
+    postLikes,
+  } = props;
 
   const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(postLikes);
 
-  const likeIcon = liked ? LikesIcon : UnlikesIcon ;
-
+  const likeIcon = liked ? LikesIcon : UnlikesIcon;
   const navigate = useNavigate();
   const encodedPostId = encodeURIComponent(postId);
+
+  const handleLikeClick = async (e) => {
+    e.stopPropagation();
+
+    if (liked) return; 
+
+    try {
+      const res = await fetch(
+        `http://localhost:5001/api/v1/post/${encodedPostId}/like`,
+        {
+          method: "PUT",
+          credentials: "include",
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to like the post");
+
+      const data = await res.json();
+      setLiked(true);
+      setLikeCount(data.likes);
+    } catch (err) {
+      console.error("Error liking post:", err.message);
+    }
+  };
 
   return (
     <div
@@ -33,7 +66,7 @@ function ForumCard(props) {
           </div>
           <div className="nameParent">
             <div className="postUser">{postUser}</div>
-            <ActionButton/>
+            <ActionButton />
           </div>
           <div className="tags">
             {postTags && postTags.length > 0 ? (
@@ -68,14 +101,11 @@ function ForumCard(props) {
         </div>
         <div
           className="likesNumber"
-          onClick={(e) => {
-            e.stopPropagation();
-            setLiked(!liked);
-          }}
-          style={{ cursor: "pointer" }}
+          onClick={handleLikeClick}
+          style={{ cursor: liked ? "not-allowed" : "pointer" }}
         >
           <img className="likesIcon" alt="likes" src={likeIcon} />
-          <div className="name">{postLikes}</div>
+          <div className="name">{likeCount}</div>
         </div>
       </div>
     </div>
