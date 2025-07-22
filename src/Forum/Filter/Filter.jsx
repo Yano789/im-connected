@@ -22,10 +22,10 @@ function Filter({ onFilter }) {
           onFilter({ sort: "earliest" });
           break;
         case 3:
-          onFilter({ sort: "comments" });
+          onFilter({ sort: "most comments" });
           break;
         case 4:
-          onFilter({ sort: "likes" });
+          onFilter({ sort: "most likes" });
           break;
         default:
           break;
