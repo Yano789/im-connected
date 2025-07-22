@@ -249,19 +249,6 @@ const getPostWithComment = async (data) => {
 }
 
 
-const likePosts = async (data) => {
-    const { like, postId } = data
-    try {
-        const query = (like && like === "like")
-            ? { likes: 1 }
-            : { likes: -1 };
-        await Post.updateOne({ postId: postId, draft: false }, { $inc: query })
-        const updatedLikes = await Post.findOne({ postId })
-        return updatedLikes
-    } catch (error) {
-        throw error
-    }
-}
 
 const getAllMyPosts = async (data) => {
     try {
@@ -338,4 +325,4 @@ const deleteDrafts = async (data) => {
     }
 }
 
-module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, likePosts, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts }
+module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts }

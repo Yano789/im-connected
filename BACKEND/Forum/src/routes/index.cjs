@@ -7,6 +7,7 @@ const ForgotPasswordRoutes = require("../domains/forgot_password/index.cjs");
 const postRoutes = require("../domains/post/index.cjs");
 const commentRoutes = require("../domains/comment/index.cjs");
 const savedPostRoutes = require("../domains/savedPosts/index.cjs");
+const likedPostRoutes = require("./../domains/likes/index.cjs")
 
 router.use("/user",userRoutes);
 router.use("/otp",OTPRoutes);
@@ -15,4 +16,5 @@ router.use("/forgot_password",ForgotPasswordRoutes);
 router.use("/post",postRoutes);
 router.use("/:post/comment",commentRoutes);
 router.use("/saved",savedPostRoutes);
+router.use("/like",likedPostRoutes);
 module.exports = router;

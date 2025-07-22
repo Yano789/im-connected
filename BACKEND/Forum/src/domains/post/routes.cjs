@@ -1,5 +1,5 @@
 const express = require("express");
-const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,likePosts,getAllMyPosts,getAllMyDrafts,getMyDraft,deleteDrafts} = require("./controller.cjs");
+const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,getAllMyDrafts,getMyDraft,deleteDrafts} = require("./controller.cjs");
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
 const {postDraftSchema,querySchema,paramsSchema} = require("./../../utils/validators/postValidator.cjs")
@@ -87,8 +87,23 @@ router.get("/getPost/:post", validateParams(paramsSchema),async (req, res) => {
 router.put("/:post/like",auth,validateParams(paramsSchema),async(req,res)=>{
     try {
         const postId = req.params.post
+        const username = req.currentUser.username
+        const updatedLikes = await likePosts({username,postId})
+        res.status(200).json({ 
+            likes: updatedLikes.likes,
+            message: "Like added successfully"
+        });
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+})
+
+router.put("/:post/unlike",auth,validateParams(paramsSchema),async(req,res)=>{
+    try {
+        const postId = req.params.post
         const {like = "like"} = req.query 
-        const updatedLikes = await likePosts({like,postId})
+        const username = req.currentUser.username
+        const updatedLikes = await unlikePosts({like,postId})
         res.status(200).json({ 
             likes: updatedLikes.likes,
             message: "Like added successfully"

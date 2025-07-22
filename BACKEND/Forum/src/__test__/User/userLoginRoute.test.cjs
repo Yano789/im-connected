@@ -20,7 +20,7 @@ const { createNewUser } = require("../../domains/user/controller.cjs");
 const { sendVerificationOTPEmail } = require("../../domains/email_verification/controller.cjs");
 const userRoutes = require("../../domains/user/routes.cjs");
 
-describe("User Routes", () => {
+describe("Login", () => {
   let app;
 
   beforeAll(() => {
