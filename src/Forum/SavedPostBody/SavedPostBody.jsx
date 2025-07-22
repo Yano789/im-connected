@@ -8,6 +8,7 @@ function SavedPostBody() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [likedPostIds, setLikedPostIds] = useState(new Set()); // Added liked posts state
 
   useEffect(() => {
     const fetchSavedPosts = async () => {
@@ -29,7 +30,22 @@ function SavedPostBody() {
       }
     };
 
+    const fetchLikedPosts = async () => {
+      try {
+        const likedRes = await fetch("http://localhost:5001/api/v1/like", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!likedRes.ok) throw new Error("Failed to fetch liked posts");
+        const likedData = await likedRes.json();
+        setLikedPostIds(new Set(likedData.map((p) => p.postId)));
+      } catch (err) {
+        console.error("Error fetching liked posts:", err.message);
+      }
+    };
+
     fetchSavedPosts();
+    fetchLikedPosts();
   }, []);
 
   return (
@@ -54,6 +70,7 @@ function SavedPostBody() {
               postDescription={post.content}
               postComment={post.comments}
               postLikes={post.likes}
+              initiallyLiked={likedPostIds.has(post.postId)} // <-- Pass liked state here
               ActionButton={() => (
                 <Bookmark
                   postId={post.postId}

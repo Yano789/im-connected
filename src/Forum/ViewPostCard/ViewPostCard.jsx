@@ -58,8 +58,8 @@ function ViewPostCard() {
               <div className="X" onClick={() => navigate("/forum")}>X</div>
               <div className="viewPostDetails">{title}</div>
               <div className="viewPostPostedDiv">
-                <div className="viewPostDetails">Posted:</div>
-                <div className="viewPostDetails">
+                <div className="viewDatePosted">Posted:</div>
+                <div className="viewDatePosted">
                   {new Date(createdAt).toLocaleDateString()}
                 </div>
               </div>

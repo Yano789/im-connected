@@ -3,7 +3,7 @@ import CommentsIcon from "../../assets/Comments.png";
 import LikesIcon from "../../assets/Likes.png";
 import UnlikesIcon from "../../assets/Unlikes.png";
 import Boo from "../../assets/Boo.jpg";
-import { useState } from "react";
+import { useState, useEffect } from "react";  // <-- add useEffect
 import { useNavigate } from "react-router-dom";
 
 function ForumCard(props) {
@@ -17,36 +17,38 @@ function ForumCard(props) {
     ActionButton,
     postComment,
     postLikes,
+    initiallyLiked = false,
   } = props;
 
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(initiallyLiked);
   const [likeCount, setLikeCount] = useState(postLikes);
-
-  const likeIcon = liked ? LikesIcon : UnlikesIcon;
   const navigate = useNavigate();
   const encodedPostId = encodeURIComponent(postId);
 
-  const handleLikeClick = async (e) => {
+  // Sync liked state if initiallyLiked prop changes (important for page navigation)
+  useEffect(() => {
+    setLiked(initiallyLiked);
+  }, [initiallyLiked]);
+
+  const handleLikeToggle = async (e) => {
     e.stopPropagation();
 
-    if (liked) return; 
-
     try {
-      const res = await fetch(
-        `http://localhost:5001/api/v1/post/${encodedPostId}/like`,
-        {
-          method: "PUT",
-          credentials: "include",
-        }
-      );
+      const url = `http://localhost:5001/api/v1/like/${encodedPostId}/${liked ? "unlike" : "like"}`;
+      const method = liked ? "DELETE" : "POST";
 
-      if (!res.ok) throw new Error("Failed to like the post");
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error(`Failed to ${liked ? "unlike" : "like"} post`);
 
       const data = await res.json();
-      setLiked(true);
+      setLiked(!liked);
       setLikeCount(data.likes);
     } catch (err) {
-      console.error("Error liking post:", err.message);
+      console.error("Error toggling like:", err.message);
     }
   };
 
@@ -101,10 +103,10 @@ function ForumCard(props) {
         </div>
         <div
           className="likesNumber"
-          onClick={handleLikeClick}
-          style={{ cursor: liked ? "not-allowed" : "pointer" }}
+          onClick={handleLikeToggle}
+          style={{ cursor: "pointer" }}
         >
-          <img className="likesIcon" alt="likes" src={likeIcon} />
+          <img className="likesIcon" alt="likes" src={liked ? LikesIcon : UnlikesIcon} />
           <div className="name">{likeCount}</div>
         </div>
       </div>

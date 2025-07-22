@@ -1,28 +1,48 @@
 @import "tailwindcss";
 
 @layer components {
-  .postNow,
-  .postDrafts {
-    @apply text-sm sm:text-base md:text-lg lg:text-xl leading-tight;
+  .toPost {
+    @apply w-full max-w-[250px] sm:max-w-full min-w-0 flex-shrink relative
+           shadow-[5px_5px_4px_rgba(0,0,0,0.25)]
+           bg-[#fffdf9] border border-black box-border
+           h-fit flex flex-col items-start justify-center
+           cursor-pointer text-left
+           text-sm sm:text-base md:text-lg
+           text-[#1e1e1e] p-5 rounded-[5px]
+           transition-shadow duration-300
+           hover:shadow-lg hover:border-[#7a7a7a]
+           focus:outline-none focus:ring-2 focus:ring-[#c8b8db] focus:border-transparent;
   }
 
   .toPostMain {
     @apply w-full max-w-[190px] sm:max-w-full min-w-0 flex-shrink flex flex-col items-start justify-start gap-5;
   }
 
-  .postArrow {
-    @apply w-4 h-4 sm:w-5 sm:h-5;
-  }
-
   .toSavedPostDiv {
-    @apply w-full flex flex-row flex-wrap items-center justify-between gap-2 text-sm sm:text-base text-[#2b2b2b];
+    @apply w-full flex flex-row flex-wrap items-center justify-between gap-2 p-2
+           text-sm sm:text-base text-[#2b2b2b]
+           cursor-pointer
+           rounded-md
+           transition-colors duration-200
+           hover:bg-[#c8b8db]
+           focus-visible:bg-[#ab97c3]
+           focus-visible:outline-none;
   }
 
-  .toPostTitle {
-    @apply w-full flex flex-col lg:flex-row items-start lg:items-center gap-2 sm:gap-5;
+  .postNow {
+    @apply text-sm sm:text-base md:text-lg lg:text-xl leading-tight select-none;
   }
 
-  .toPost {
-    @apply w-full max-w-[250px] sm:max-w-full min-w-0 flex-shrink relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border h-fit flex flex-col items-start justify-center cursor-pointer text-left text-sm sm:text-base md:text-lg text-[#1e1e1e] p-5 rounded-[5px] border-solid border-black;
+  .postArrow {
+    @apply w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300;
+  }
+
+  /* Slight arrow move on hover for a nice effect */
+  .toSavedPostDiv:hover .postArrow {
+    @apply translate-x-1;
+  }
+
+  .toSavedPostDiv:focus-visible {
+    @apply ring-2 ring-[#c8b8db] rounded-md outline-none;
   }
 }
