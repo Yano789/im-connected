@@ -13,7 +13,7 @@ function SavedPostBody() {
     const fetchSavedPosts = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5000/api/v1/saved`, {
+        const response = await fetch(`http://localhost:5001/api/v1/saved`, {
           method: "GET",
           credentials: "include", // send cookies for auth
         });

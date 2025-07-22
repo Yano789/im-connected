@@ -79,7 +79,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
       if (isDraft && draftPostId) {
         const encodedPostId = encodeURIComponent(draftPostId);
         response = await fetch(
-          `http://localhost:5000/api/v1/post/myDrafts/${encodedPostId}/edit`,
+          `http://localhost:5001/api/v1/post/myDrafts/${encodedPostId}/edit`,
           {
             method: "PUT", // confirm your backend supports this with multipart/form-data
             credentials: "include",
@@ -87,7 +87,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
           }
         );
       } else {
-        response = await fetch("http://localhost:5000/api/v1/post/create", {
+        response = await fetch("http://localhost:5001/api/v1/post/create", {
           method: "POST",
           credentials: "include",
           body: formData,

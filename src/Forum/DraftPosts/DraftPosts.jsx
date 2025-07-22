@@ -9,7 +9,7 @@ function DraftPosts({ refreshTrigger, onDraftSelected }) {
   const fetchDrafts = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/v1/post/myDrafts",
+        "http://localhost:5001/api/v1/post/myDrafts",
         {
           method: "GET",
           credentials: "include",
@@ -40,7 +40,7 @@ function DraftPosts({ refreshTrigger, onDraftSelected }) {
   const handleDeleteDraft = async (postId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/post/myDrafts/${encodeURIComponent(
+        `http://localhost:5001/api/v1/post/myDrafts/${encodeURIComponent(
           postId
         )}/delete`,
         {
@@ -62,7 +62,7 @@ function DraftPosts({ refreshTrigger, onDraftSelected }) {
   const handleOpenDraft = async (postId) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/api/v1/post/myDrafts/${encodeURIComponent(
+        `http://localhost:5001/api/v1/post/myDrafts/${encodeURIComponent(
           postId
         )}`,
         {

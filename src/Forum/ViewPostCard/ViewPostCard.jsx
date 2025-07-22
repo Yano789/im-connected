@@ -16,7 +16,8 @@ function ViewPostCard() {
 
   useEffect(() => {
     if (!postId) return;
-    fetch(`http://localhost:5000/api/v1/post/getPost/${encodeURIComponent(postId)}`)
+
+    fetch(`http://localhost:5001/api/v1/post/getPost/${encodeURIComponent(postId)}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch post.");
         return res.json();
