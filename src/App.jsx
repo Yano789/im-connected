@@ -6,6 +6,7 @@ import MyPost from "./Forum/MyPost/MyPost";
 import SavedPost from "./Forum/SavedPost/SavedPost";
 import MedicationsPage from "./Medications/MedicationsPage/MedicationsPage";
 import LoginCard from "./Login/LoginCard";
+import ProfilePage from './Profile/ProfilePage/ProfilePage';
 
 function App() {
   return (
@@ -31,9 +32,9 @@ function App() {
           <Route path="/forum/mypost" element={<MyPost/>}/>
           <Route path="/forum/savedpost" element={<SavedPost/>}/>
           <Route path="/medication" element={<MedicationsPage/>}/>
-          {/*
-          <Route path="/profile" element={<Profile/>}/>
-          <Route path="/chatbot" element={<Chatbot/>}/>
+          <Route path="/profile" element={<ProfilePage/>}/>
+          
+          {/* <Route path="/chatbot" element={<Chatbot/>}/>
           */}
         </Routes>
       </Router>
