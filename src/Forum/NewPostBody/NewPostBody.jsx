@@ -15,7 +15,7 @@ function NewPostBody() {
       updatedDraft &&
       updatedDraft._id === selectedDraft._id
     ) {
-      setSelectedDraft(updatedDraft); // 👈 update the draft that's currently loaded
+      setSelectedDraft(updatedDraft); 
     }
   };
 

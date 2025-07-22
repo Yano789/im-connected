@@ -54,7 +54,7 @@ function MyPostBody() {
     fetchMyPosts();
   }, [query]);
 
-  // ✅ Optional: hook TopicSelector into updateQuery if you want tag filtering
+  
   const handleTagFilterChange = (filterString) => {
     if (!filterString || filterString === "") {
       updateQuery({ filter: "default" });
@@ -85,6 +85,8 @@ function MyPostBody() {
               postTitle={post.title}
               postTags={post.tags}
               postDescription={post.content}
+              postComment={post.comments}
+              postLikes={post.likes}
               ActionButton={() => (
                 <Delete
                   postToDelete={post.postId}
