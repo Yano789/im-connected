@@ -6,7 +6,7 @@ const createToken = async (
     expiresIn = TOKEN_EXPIRY
 )=>{
     try {
-        const token = await jwt.sign(tokenData,tokenKey,{
+        const token = jwt.sign(tokenData,tokenKey,{
             expiresIn,
         });
         return token;

@@ -38,18 +38,18 @@ describe("ForumCard", () => {
     expect(screen.getByText("2025-07-23")).toBeInTheDocument();
     expect(screen.getByText("Alice")).toBeInTheDocument();
 
-    // Tags
+    
     expect(screen.getByText("tag1")).toBeInTheDocument();
     expect(screen.getByText("tag2")).toBeInTheDocument();
 
-    // Description
+    
     expect(screen.getByText(defaultProps.postDescription)).toBeInTheDocument();
 
-    // Comments and likes count
+    
     expect(screen.getByText("5")).toBeInTheDocument();
     expect(screen.getByText("10")).toBeInTheDocument();
 
-    // ActionButton rendered
+    
     expect(screen.getByTestId("action-button")).toBeInTheDocument();
   });
 
@@ -64,7 +64,7 @@ describe("ForumCard", () => {
   });
 
   it("navigates to correct URL on card click", () => {
-    // Mock window.location.assign or useNavigate is harder, so spy on useNavigate instead
+    
     const mockNavigate = vi.fn();
 
     // Mock react-router-dom's useNavigate
@@ -76,12 +76,11 @@ describe("ForumCard", () => {
       };
     });
 
-    // Because doMock must be called before import, we need a separate test file or manual test for this,
-    // so here just test clicking doesn't throw, or skip this navigation test for now.
+
   });
 
   it("toggles like on like icon click and updates like count", async () => {
-    // Mock fetch response for liking post
+
     fetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ likes: 11 }),
@@ -93,7 +92,7 @@ describe("ForumCard", () => {
       </MemoryRouter>
     );
 
-    const likeDiv = screen.getByText("10").parentElement; // the div with onClick
+    const likeDiv = screen.getByText("10").parentElement; 
 
     // Click to like
     fireEvent.click(likeDiv);
