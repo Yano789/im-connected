@@ -3,7 +3,6 @@ import { describe, it, expect, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import Forum from "../Forum/Forum/Forum";
 
-// ✅ Correct mock paths based on your folder structure
 vi.mock("../TopHeader/Header/Header", () => ({
   default: () => <div data-testid="mock-header">Mock Header</div>,
 }));
