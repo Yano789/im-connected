@@ -3,6 +3,8 @@
 
 ## About
 
+
+
 ## How to run
 1. `Clone this repository` and `navigate` to the the folder containing your local copy
 2. Change the .env to match your email address

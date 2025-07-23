@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Routes, Route } from "react-router-dom";
 import Forum from "./Forum/Forum/Forum";
 import NewPost from "./Forum/NewPost/NewPost";
 import ViewPost from "./Forum/ViewPost/ViewPost";
@@ -14,7 +14,6 @@ function App() {
         backgroundImage: "linear-gradient(to bottom, #FFFDF9 75%, #F1C5C0 100%)",
       }}
     >
-      <Router>
         <Routes>
           <Route path="/" element={<LoginCard/>}/>
           {/* 
@@ -36,7 +35,6 @@ function App() {
           <Route path="/chatbot" element={<Chatbot/>}/>
           */}
         </Routes>
-      </Router>
     </div>
   );
 }
