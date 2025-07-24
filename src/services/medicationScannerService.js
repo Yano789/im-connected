@@ -149,7 +149,9 @@ class MedicationService {
         throw new Error(`Failed to fetch care recipients: ${errorText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log('Scanner Service: getCareRecipients response:', data);
+      return data;
     } catch (error) {
       console.error('Error fetching care recipients:', error);
       throw error;
@@ -161,7 +163,7 @@ class MedicationService {
    * @param {string} name - Name of the care recipient
    * @returns {Promise<Object>} - Created care recipient
    */
-  async createCareRecipient(name) {
+  async createCareRecipient(recipientData) {
     try {
       const response = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients`, {
         method: 'POST',
@@ -169,7 +171,7 @@ class MedicationService {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify(recipientData),
       });
 
       if (!response.ok) {
@@ -281,6 +283,8 @@ class MedicationService {
    */
   async createMedication(medicationData) {
     try {
+      console.log('Scanner Service: Creating medication with data:', medicationData);
+      
       const response = await fetch(`${FORUM_API_BASE_URL}/medication/medications`, {
         method: 'POST',
         credentials: 'include',
@@ -290,8 +294,11 @@ class MedicationService {
         body: JSON.stringify(medicationData),
       });
 
+      console.log('Scanner Service: Create medication response status:', response.status);
+
       if (!response.ok) {
         const errorText = await response.text();
+        console.log('Scanner Service: Create medication error response:', errorText);
         throw new Error(`Failed to create medication: ${errorText}`);
       }
 
@@ -456,161 +463,38 @@ class MedicationService {
    * @param {string} userId - User ID
    * @returns {Promise<Object>} - Scan results with saved medication data
    */
-  async scanAndSaveMedication(imageFile, careRecipientId, userId) {
+  async scanAndSaveMedication(imageFile, careRecipientId) {
     try {
       console.log('Scanner Service: Starting scan and save with file:', imageFile);
       console.log('Scanner Service: Care recipient ID:', careRecipientId);
-      console.log('Scanner Service: User ID:', userId);
 
-      const formData = new FormData();
-      formData.append('medicationImage', imageFile);
-      formData.append('careRecipientId', careRecipientId);
-      formData.append('userId', userId);
-
-      console.log('Scanner Service: Sending save request to:', `${SCANNER_API_BASE_URL}/save-scanned-medication`);
-
-      const response = await fetch(`${SCANNER_API_BASE_URL}/save-scanned-medication`, {
-        method: 'POST',
-        body: formData,
-      });
-
-      console.log('Scanner Service: Save response received');
-      console.log('Scanner Service: Save response status:', response.status);
-
-      const contentType = response.headers.get('content-type');
-      console.log('Scanner Service: Save response headers:', {
-        'content-type': contentType,
-        'content-length': response.headers.get('content-length')
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Scanner Service: Save request failed:', errorText);
-        throw new Error(`Scanner service error: ${response.status} ${response.statusText}`);
+      // First, scan the medication image using Scanner API
+      console.log('Scanner Service: Scanning medication image...');
+      const scanResult = await this.scanMedicationImage(imageFile);
+      
+      if (!scanResult || !scanResult.success) {
+        throw new Error('Failed to scan medication image');
       }
 
-      const result = await response.json();
-      console.log('Scanner Service: Save success response:', result);
+      // Format the medication data
+      console.log('Scanner Service: Formatting medication data...');
+      const medicationData = this.formatMedicationData(scanResult);
+      
+      // Add the care recipient ID
+      medicationData.careRecipientId = careRecipientId;
 
-      return result;
+      // Save using Forum API (with JWT authentication)
+      console.log('Scanner Service: Saving scanned medication via Forum API');
+      const savedMedication = await this.createMedication(medicationData);
+      
+      console.log('Scanner Service: Successfully saved scanned medication');
+      return {
+        success: true,
+        medication: savedMedication,
+        scanData: scanResult
+      };
     } catch (error) {
       console.error('Scanner Service: Save error:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get care recipients for a user
-   * @param {string} userId - User ID
-   * @returns {Promise<Object>} - Care recipients data
-   */
-  async getCareRecipients(userId) {
-    try {
-      const response = await fetch(`${SCANNER_API_BASE_URL}/care-recipients/${userId}`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch care recipients: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Scanner Service: Error fetching care recipients:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Create a new care recipient
-   * @param {Object} recipientData - Care recipient data
-   * @returns {Promise<Object>} - Created care recipient
-   */
-  async createCareRecipient(recipientData) {
-    try {
-      const response = await fetch(`${SCANNER_API_BASE_URL}/care-recipients`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(recipientData),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to create care recipient: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Scanner Service: Error creating care recipient:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get medications for a care recipient
-   * @param {string} careRecipientId - Care recipient ID
-   * @returns {Promise<Object>} - Medications data
-   */
-  async getMedications(careRecipientId) {
-    try {
-      const response = await fetch(`${SCANNER_API_BASE_URL}/medications/${careRecipientId}`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to fetch medications: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Scanner Service: Error fetching medications:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete a medication from the database
-   * @param {string} medicationId - Medication ID to delete
-   * @returns {Promise<Object>} - Deletion result
-   */
-  async deleteMedication(medicationId) {
-    try {
-      const response = await fetch(`${SCANNER_API_BASE_URL}/medications/${medicationId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to delete medication: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Scanner Service: Error deleting medication:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Delete a care recipient and all their medications
-   * @param {string} careRecipientId - Care recipient ID to delete
-   * @returns {Promise<Object>} - Deletion result
-   */
-  async deleteCareRecipient(careRecipientId) {
-    try {
-      const response = await fetch(`${SCANNER_API_BASE_URL}/care-recipients/${careRecipientId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Failed to delete care recipient: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Scanner Service: Error deleting care recipient:', error);
       throw error;
     }
   }

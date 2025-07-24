@@ -19,8 +19,8 @@ function MedicationsPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // Generate a mock user ID - in production, this would come from authentication
-    const userId = '507f1f77bcf86cd799439011';
+    // Remove hardcoded user ID - let backend handle authentication via JWT
+    // const userId = '507f1f77bcf86cd799439011';
 
     const selectedRecipient = careRecipients.find(r => r.id === selectedRecipientId);
     const selectedMedication = selectedRecipient?.medications.find(m => m.id === selectedMedicationId);
@@ -35,17 +35,19 @@ function MedicationsPage() {
             setLoading(true);
             setError(null);
             
-            // Get care recipients from scanner database
-            const response = await medicationScannerService.getCareRecipients(userId);
+            // Get care recipients from Forum API
+            const recipients = await medicationScannerService.getCareRecipients();
+            console.log('MedicationsPage: Received recipients:', recipients);
             
-            if (response.success && response.careRecipients) {
-                // Transform scanner data to match frontend format
+            if (recipients && Array.isArray(recipients)) {
+                console.log('MedicationsPage: Processing', recipients.length, 'recipients');
+                // Transform Forum API data to match frontend format
                 const transformedRecipients = await Promise.all(
-                    response.careRecipients.map(async (recipient) => {
+                    recipients.map(async (recipient) => {
                         // Get medications for each recipient
-                        const medicationsResponse = await medicationScannerService.getMedications(recipient._id);
-                        const medications = medicationsResponse.success ? 
-                            medicationsResponse.medications.map(med => ({
+                        const medications = await medicationScannerService.getMedications(recipient._id);
+                        const medicationsList = Array.isArray(medications) ? 
+                            medications.map(med => ({
                                 id: med._id,
                                 name: med.name,
                                 dosage: med.dosage,
@@ -59,7 +61,7 @@ function MedicationsPage() {
                         return {
                             id: recipient._id,
                             name: recipient.name,
-                            medications: medications
+                            medications: medicationsList
                         };
                     })
                 );
@@ -98,8 +100,8 @@ function MedicationsPage() {
         
         try {
             const recipientData = {
-                name: newRecipientName,
-                userId: userId
+                name: newRecipientName
+                // userId removed - let backend handle authentication via JWT
             };
             const newRecipient = await medicationScannerService.createCareRecipient(recipientData);
             
@@ -160,17 +162,21 @@ function MedicationsPage() {
             };
 
             if (mode === 'create') {
-                // Save new medication to database
-                await medicationScannerService.scanAndSaveMedication(
-                    capturedFile, 
-                    selectedRecipientId,
-                    userId
-                );
+                // Check if we have a captured file from scanning
+                if (capturedFile) {
+                    // Save medication with image file (from scanning)
+                    await medicationScannerService.scanAndSaveMedication(
+                        capturedFile, 
+                        selectedRecipientId
+                        // userId removed - let backend handle authentication via JWT
+                    );
+                } else {
+                    // Save medication without scanning (manual entry)
+                    await medicationScannerService.createMedication(medicationData);
+                }
             } else {
-                // For editing existing medications, we would need an update endpoint
-                // For now, we'll create a new one and remove the old
-                console.log('Editing existing medication would require an update endpoint');
-                // This would need to be implemented in the backend
+                // For editing existing medications, use update endpoint
+                await medicationScannerService.updateMedication(selectedMedication.id, medicationData);
             }
 
             // Reload care recipients and medications from the database
