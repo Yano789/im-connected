@@ -1,0 +1,43 @@
+.profile-page-container {
+    padding: 2rem 4rem;
+}
+
+.profile-greeting h1 {
+    font-size: 3rem;
+    font-weight: 300;
+}
+
+.profile-greeting p {
+    font-size: 1.5rem;
+    color: #555;
+    margin-top: 0.5rem;
+    margin-bottom: 2rem;
+}
+
+.profile-layout {
+    display: flex;
+    gap: 2rem;
+    align-items: flex-start;
+}
+
+.profile-left-column {
+    flex: 1;
+}
+
+.profile-right-column {
+    flex: 2;
+}
+
+@media (max-width: 900px) {
+    .profile-page-container {
+        padding: 1rem 1.5rem;
+    }
+    .profile-layout {
+        flex-direction: column;
+    }
+}
+
+.profile-greeting .profile-name {
+    font-weight: 700; 
+    color: #79A86F;  
+}
