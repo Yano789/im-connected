@@ -1,7 +1,7 @@
 import React from 'react';
 import './CareRecipientList.css';
 
-function CareRecipientList({ recipients, onSelect, selectedRecipientId, isAdding, onAdd, onSaveNew, newName, setNewName  }) {
+function CareRecipientList({ recipients, onSelect, selectedRecipientId, onDelete, isAdding, onAdd, onSaveNew, newName, setNewName  }) {
     
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
@@ -23,9 +23,23 @@ function CareRecipientList({ recipients, onSelect, selectedRecipientId, isAdding
                             onClick={() => onSelect(recipient.id)}
                         >
                             <span>{recipient.name}</span>
-                            <button className={isSelected ? 'show-button' : 'switch-button'}>
-                                {isSelected ? 'Showing' : 'Switch'}
-                            </button>
+                            <div className="recipient-buttons">
+                                <button className={isSelected ? 'show-button' : 'switch-button'}>
+                                    {isSelected ? 'Showing' : 'Switch'}
+                                </button>
+                                {onDelete && (
+                                    <button 
+                                        className="delete-recipient-button"
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent selecting the recipient
+                                            onDelete(recipient.id);
+                                        }}
+                                        title="Delete care recipient"
+                                    >
+                                        ×
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     );
                 })}
