@@ -27,22 +27,25 @@ function AppContent() {
 
   const { user, loading } = useContext(AuthContext);
 
-  // // DEBUG LOGS
-  // console.log("[AppContent] user:", user);
-  // console.log("[AppContent] loading:", loading);
-  // console.log("[AppContent] pathname:", location.pathname);
-
   useEffect(() => {
     const canVerifyEmail = localStorage.getItem("canVerifyEmail") === "true";
     const pathname = location.pathname;
 
-    const loggedInPaths = ["/forum"];
+    const loggedInPaths = [
+      "/forum",
+      "/forum/newpost",
+      "/forum/viewpost",
+      "/forum/mypost",
+      "/forum/savedpost",
+      "/medication",
+      "/profile"
+    ];
     const canVerifyPaths = ["/auth", "/preferences"];
     const publicAuthPages = ["/login", "/signup"];
 
     if (!loading) {
       if (user) {
-        // If logged in, redirect away from login/signup/auth/preferences
+        //if user logged in, redirect away from login/signup/auth/preferences
         if ([...canVerifyPaths, ...publicAuthPages].includes(pathname)) {
           navigate("/forum", { replace: true });
         }
@@ -54,7 +57,7 @@ function AppContent() {
             navigate("/login", { replace: true });
           }
         }
-        // No redirect for /login or /signup if not logged in
+        //dont!! redirect for /login or /signup if not logged in
       }
     }
   }, [user, loading, location, navigate]);
@@ -76,21 +79,19 @@ function AppContent() {
         minHeight: "100vh"
       }}
     >
-      {/* <Router> */}
-        <Routes>
-          <Route path="/auth" element={<Authentication />}></Route>
-          <Route path="/signup" element={<SignUpCard />}></Route>
-          <Route path="/login" element={<LoginCard />} />
-          <Route path="/preferences" element={<UserPreferences />}></Route>
-          <Route path="/forum" element={<Forum />} />
-          <Route path="/forum/newpost" element={<NewPost />} />
-          <Route path="/forum/viewpost" element={<ViewPost />} />
-          <Route path="/forum/mypost" element={<MyPost />} />
-          <Route path="/forum/savedpost" element={<SavedPost />} />
-          <Route path="/medication" element={<MedicationsPage />} />
-          <Route path="/profile" element={< ProfilePage/>} />
-        </Routes>
-      {/* </Router> */}
+      <Routes>
+        <Route path="/auth" element={<Authentication />}></Route>
+        <Route path="/signup" element={<SignUpCard />}></Route>
+        <Route path="/login" element={<LoginCard />} />
+        <Route path="/preferences" element={<UserPreferences />}></Route>
+        <Route path="/forum" element={<Forum />} />
+        <Route path="/forum/newpost" element={<NewPost />} />
+        <Route path="/forum/viewpost" element={<ViewPost />} />
+        <Route path="/forum/mypost" element={<MyPost />} />
+        <Route path="/forum/savedpost" element={<SavedPost />} />
+        <Route path="/medication" element={<MedicationsPage />} />
+        <Route path="/profile" element={< ProfilePage />} />
+      </Routes>
     </div>
   );
 }
