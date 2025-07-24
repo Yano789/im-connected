@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './MedicationForm.css';
 import medicationScannerService from '../../services/medicationScannerService';
+import medicationCloudinaryService from '../../services/medicationCloudinaryService';
 
 const getPeriodFromTime = (time) => {
     if (!time) return 'Morning';
@@ -13,54 +14,78 @@ const getPeriodFromTime = (time) => {
 
 function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile = null }) {
     // Determine if we are editing an existing medication or creating a new one
-    const isEditing = medication !== null;
+    const isEditing = medication !== null && medication !== undefined;
 
     const [formData, setFormData] = useState({
-        name: isEditing ? medication.name : '',
-        usedTo: isEditing ? medication.usedTo : '',
-        sideEffects: isEditing ? medication.sideEffects : '',
-        dosage: isEditing ? medication.dosage : '',
-        schedule: isEditing ? medication.schedule : '',
-        warnings: isEditing ? medication.warnings : '',
-        dosages: isEditing ? JSON.parse(JSON.stringify(medication.dosages || [])) : [{ time: '', taken: false }],
-        image: isEditing ? medication.image : '',
+        name: '',
+        usedTo: '',
+        sideEffects: '',
+        dosage: '',
+        schedule: '',
+        warnings: '',
+        dosages: [{ time: '', taken: false }],
+        image: '',
     });
 
     // Scanner-related state
     const [isScanning, setIsScanning] = useState(false);
     const [scanError, setScanError] = useState('');
     const [scanSuccess, setScanSuccess] = useState('');
-    const [selectedFile, setSelectedFile] = useState(capturedFile);
-    const [previewUrl, setPreviewUrl] = useState(capturedFile ? URL.createObjectURL(capturedFile) : '');
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState('');
+    
+    // Image upload state
+    const [isUploading, setIsUploading] = useState(false);
+    const [uploadError, setUploadError] = useState('');
+    const [uploadSuccess, setUploadSuccess] = useState('');
 
     const fileInputRef = useRef(null);
 
     // Check for captured file from camera on component mount
     useEffect(() => {
-        if (capturedFile && !isEditing) {
-            console.log('Captured file received:', capturedFile);
-            setSelectedFile(capturedFile);
-            setPreviewUrl(URL.createObjectURL(capturedFile));
-            
-            // Auto-scan the captured image
-            setTimeout(() => {
-                handleScanMedication(capturedFile);
-            }, 500);
+        try {
+            console.log('Effect triggered - capturedFile:', capturedFile, 'isEditing:', isEditing);
+            if (capturedFile && !isEditing) {
+                console.log('Setting captured file as selected file:', capturedFile);
+                setSelectedFile(capturedFile);
+                setPreviewUrl(URL.createObjectURL(capturedFile));
+                console.log('Selected file state updated');
+            }
+        } catch (error) {
+            console.error('Error handling captured file:', error);
+            setScanError('Error processing captured file');
         }
-    }, [capturedFile]);
+    }, [capturedFile, isEditing]);
 
     useEffect(() => {
-        const isEditing = medication !== null;
-        setFormData({
-            name: isEditing ? medication.name : '',
-            usedTo: isEditing ? medication.usedTo : '',
-            sideEffects: isEditing ? medication.sideEffects : '',
-            dosage: isEditing ? medication.dosage : '',
-            schedule: isEditing ? medication.schedule : '',
-            warnings: isEditing ? medication.warnings : '',
-            dosages: isEditing ? JSON.parse(JSON.stringify(medication.dosages || [])) : [{ time: '', taken: false }],
-            image: isEditing ? medication.image : '' 
-        });
+        try {
+            const isEditing = medication !== null && medication !== undefined;
+            console.log('Setting form data. isEditing:', isEditing, 'medication:', medication);
+            
+            setFormData({
+                name: isEditing ? (medication?.name || '') : '',
+                usedTo: isEditing ? (medication?.usedTo || '') : '',
+                sideEffects: isEditing ? (medication?.sideEffects || '') : '',
+                dosage: isEditing ? (medication?.dosage || '') : '',
+                schedule: isEditing ? (medication?.schedule || '') : '',
+                warnings: isEditing ? (medication?.warnings || '') : '',
+                dosages: isEditing ? JSON.parse(JSON.stringify(medication?.dosages || [])) : [{ time: '', taken: false }],
+                image: isEditing ? (medication?.image || '') : '' 
+            });
+        } catch (error) {
+            console.error('Error setting form data:', error);
+            // Set default form data if there's an error
+            setFormData({
+                name: '',
+                usedTo: '',
+                sideEffects: '',
+                dosage: '',
+                schedule: '',
+                warnings: '',
+                dosages: [{ time: '', taken: false }],
+                image: ''
+            });
+        }
     }, [medication]);
     // A function to handle changes in any input field
     const handleChange = (e) => {
@@ -83,21 +108,37 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
     };
 
     // Handle medication scanning
-    const handleScanMedication = async (fileToScan = null) => {
-        const targetFile = fileToScan || selectedFile;
+    const handleScanMedication = async (event) => {
+        // Prevent default button behavior
+        if (event && event.preventDefault) {
+            event.preventDefault();
+        }
+        
+        console.log('handleScanMedication called with event:', event);
+        console.log('Current selectedFile state:', selectedFile);
+        
+        const targetFile = selectedFile;
         
         if (!targetFile) {
+            console.log('No file selected - selectedFile is:', selectedFile);
             setScanError('Please select an image file first');
             return;
         }
 
-        console.log('Starting medication scan with file:', targetFile);
+        console.log('Starting medication scan with file:', {
+            name: targetFile.name,
+            type: targetFile.type,
+            size: targetFile.size,
+            lastModified: targetFile.lastModified
+        });
+        
         setIsScanning(true);
         setScanError('');
         setScanSuccess('');
 
         try {
             // Check if scanner API is available
+            console.log('Checking scanner API health...');
             const isApiAvailable = await medicationScannerService.checkApiHealth();
             if (!isApiAvailable) {
                 throw new Error('Scanner service is not available. Please ensure the scanner server is running on port 3001.');
@@ -181,9 +222,41 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
         const newDosages = formData.dosages.filter((_, i) => i !== index);
         setFormData(prev => ({ ...prev, dosages: newDosages }));
     };
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        onSave(formData);
+        
+        let finalFormData = { ...formData };
+        
+        // If there's a selected file (captured or uploaded), upload it first
+        if (selectedFile && !formData.image) {
+            setIsUploading(true);
+            setUploadError('');
+            setUploadSuccess('');
+            
+            try {
+                console.log('Uploading medication image to Cloudinary...');
+                const uploadResult = await medicationCloudinaryService.uploadMedicationImage(selectedFile);
+                
+                if (uploadResult && uploadResult.url) {
+                    finalFormData.image = uploadResult.url;
+                    finalFormData.imagePublicId = uploadResult.public_id; // Store for potential deletion
+                    setUploadSuccess('Image uploaded successfully to cloud storage!');
+                    console.log('Image uploaded successfully:', uploadResult.url);
+                } else {
+                    throw new Error('Failed to upload image - no URL returned');
+                }
+            } catch (error) {
+                console.error('Error uploading image to Cloudinary:', error);
+                setUploadError(`Failed to upload image: ${error.message}`);
+                setIsUploading(false);
+                return; // Don't save if image upload fails
+            }
+            
+            setIsUploading(false);
+        }
+        
+        // Save the medication data with the uploaded image URL
+        onSave(finalFormData);
     };
 
     return (
@@ -234,6 +307,8 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                 {/* Scanner feedback */}
                 {scanError && <div className="scan-error">⚠️ {scanError}</div>}
                 {scanSuccess && <div className="scan-success">✅ {scanSuccess}</div>}
+                {uploadError && <div className="scan-error">⚠️ Upload Error: {uploadError}</div>}
+                {uploadSuccess && <div className="scan-success">✅ {uploadSuccess}</div>}
                 {isScanning && <div className="scan-progress">Processing image and extracting medication information...</div>}
                 
                 <div className="scanner-divider">
@@ -350,8 +425,8 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
 
             <div className="form-actions">
                 <button type="button" onClick={onCancel} className="cancel-button">Cancel</button>
-                <button type="submit" className="save-button" disabled={isScanning}>
-                    {isScanning ? 'Processing...' : 'Save Medicine'}
+                <button type="submit" className="save-button" disabled={isScanning || isUploading}>
+                    {isUploading ? 'Uploading Image...' : isScanning ? 'Processing...' : 'Save Medicine'}
                 </button>
             </div>
         </form>

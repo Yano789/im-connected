@@ -5,6 +5,7 @@ import MedicationItem from '../MedicationItem/MedicationItem';
 function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddNew }) {
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
+    const [capturedFile, setCapturedFile] = useState(null);
     const [cameraError, setCameraError] = useState('');
     const [isLoadingCamera, setIsLoadingCamera] = useState(false);
     const [debugInfo, setDebugInfo] = useState('');
@@ -28,6 +29,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
 
     // Start camera
     const startCamera = async () => {
+        console.log('Start camera button clicked');
         setCameraError('');
         setIsLoadingCamera(true);
         setDebugInfo('Requesting camera access...');
@@ -134,16 +136,34 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
         }
     };
 
-    // Stop camera
-    const stopCamera = () => {
+    // Cancel camera and clear everything
+    const cancelCamera = () => {
+        console.log('cancelCamera called - clearing all states');
         if (streamRef.current) {
             streamRef.current.getTracks().forEach(track => track.stop());
         }
         setIsCameraActive(false);
         setCapturedImage(null);
+        setCapturedFile(null);
         setCameraError('');
         setIsLoadingCamera(false);
         setDebugInfo('');
+        console.log('Camera canceled and all states cleared');
+    };
+
+    // Stop camera
+    const stopCamera = () => {
+        console.log('stopCamera called');
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+        }
+        setIsCameraActive(false);
+        // Don't clear captured image here - let user decide what to do with it
+        // setCapturedImage(null); // REMOVED - this was clearing the captured photo!
+        setCameraError('');
+        setIsLoadingCamera(false);
+        setDebugInfo('');
+        console.log('Camera stopped, captured image preserved');
     };
 
     // Test video element manually
@@ -194,12 +214,21 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
 
     // Capture photo
     const capturePhoto = () => {
+        console.log('Capture photo button clicked');
+        
         if (videoRef.current && canvasRef.current) {
             const canvas = canvasRef.current;
             const video = videoRef.current;
             
+            console.log('Video and canvas elements found', {
+                videoReadyState: video.readyState,
+                videoWidth: video.videoWidth,
+                videoHeight: video.videoHeight
+            });
+            
             // Check if video is ready
             if (video.readyState !== 4) {
+                console.error('Video not ready, readyState:', video.readyState);
                 setCameraError('Video is not ready yet. Please wait a moment and try again.');
                 return;
             }
@@ -218,26 +247,75 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
             
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Convert to blob and trigger add new medication with photo
+            console.log('Image drawn to canvas, converting to blob...');
+            
+            // Convert to blob and show captured image
             canvas.toBlob((blob) => {
                 if (blob) {
-                    setCapturedImage(URL.createObjectURL(blob));
-                    stopCamera();
+                    console.log('Blob created successfully:', {
+                        size: blob.size,
+                        type: blob.type
+                    });
                     
-                    // Create a File object from the blob for compatibility with the scanner service
+                    const imageUrl = URL.createObjectURL(blob);
+                    console.log('Created image URL:', imageUrl);
+                    setCapturedImage(imageUrl);
+                    console.log('Set capturedImage state');
+                    
+                    // Store the file for later use
                     const file = new File([blob], `medication-${Date.now()}.jpg`, { type: 'image/jpeg' });
+                    setCapturedFile(file);
+                    console.log('Set capturedFile state');
                     
-                    console.log('Captured medication photo:', file);
+                    console.log('Photo captured successfully:', file);
+                    setDebugInfo('Photo captured! Choose an option below.');
                     
-                    // Trigger add new medication and pass the captured image
-                    onAddNew(file);
+                    // Stop the camera after capture
+                    console.log('Stopping camera...');
+                    stopCamera();
+                    console.log('Camera stopped, captured image should now be visible');
                 } else {
+                    console.error('Failed to create blob from canvas');
                     setCameraError('Failed to capture photo. Please try again.');
                 }
-            }, 'image/jpeg', 0.9); // Increased quality for better OCR
+            }, 'image/jpeg', 0.9);
         } else {
+            console.error('Video or canvas element not found', {
+                video: !!videoRef.current,
+                canvas: !!canvasRef.current
+            });
             setCameraError('Camera not available. Please try again.');
         }
+    };
+
+    // Use captured photo to add new medication
+    const useCapturedPhoto = () => {
+        console.log('useCapturedPhoto clicked!');
+        console.log('capturedFile state:', capturedFile);
+        if (capturedFile) {
+            console.log('Using captured photo for new medication:', capturedFile);
+            onAddNew(capturedFile);
+            // Clear captured state
+            setCapturedImage(null);
+            setCapturedFile(null);
+            console.log('Cleared captured states and called onAddNew');
+        } else {
+            console.error('No captured file available!');
+        }
+    };
+
+    // Retake photo
+    const retakePhoto = () => {
+        setCapturedImage(null);
+        setCapturedFile(null);
+        startCamera();
+    };
+
+    // Discard captured photo
+    const discardPhoto = () => {
+        setCapturedImage(null);
+        setCapturedFile(null);
+        setDebugInfo('');
     };
 
     // Handle file upload
@@ -248,14 +326,24 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
         input.onchange = (e) => {
             const file = e.target.files[0];
             if (file) {
-                // Validate the file using the scanner service
+                console.log('File selected:', file);
+                
+                // Import and validate using the scanner service
                 import('../../services/medicationScannerService').then(({ default: scannerService }) => {
                     if (scannerService.validateImageFile(file)) {
+                        console.log('File validation passed, calling onAddNew');
                         onAddNew(file);
                     } else {
-                        alert('Please select a valid image file (JPEG, PNG, WebP) under 10MB');
+                        console.error('File validation failed');
+                        setCameraError('Please select a valid image file (JPEG, PNG, WebP) under 10MB');
                     }
+                }).catch(error => {
+                    console.error('Error importing scanner service:', error);
+                    setCameraError('Error validating file. Please try again.');
                 });
+            } else {
+                console.log('No file selected');
+                setCameraError('No file was selected. Please try again.');
             }
         };
         input.click();
@@ -433,8 +521,45 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                         >
                             🔧 Test
                         </button>
-                        <button className="cancel-camera-button" onClick={stopCamera}>❌ Cancel</button>
+                        <button className="cancel-camera-button" onClick={cancelCamera}>❌ Cancel</button>
                     </div>
+                </div>
+            )}
+            
+            {/* Captured Image Preview */}
+            {capturedImage && (
+                <div className="captured-image-container">
+                    <h3>📸 Photo Captured</h3>
+                    <div className="captured-image-preview">
+                        <img src={capturedImage} alt="Captured medication" className="captured-image" />
+                    </div>
+                    <div className="captured-image-actions">
+                        <button 
+                            className="use-photo-button" 
+                            onClick={useCapturedPhoto}
+                        >
+                            ✅ Use This Photo
+                        </button>
+                        <button 
+                            className="retake-button" 
+                            onClick={retakePhoto}
+                        >
+                            🔄 Retake
+                        </button>
+                        <button 
+                            className="discard-button" 
+                            onClick={discardPhoto}
+                        >
+                            ❌ Discard
+                        </button>
+                    </div>
+                </div>
+            )}
+            
+            {/* Debug info */}
+            {process.env.NODE_ENV === 'development' && (
+                <div style={{ fontSize: '12px', color: '#666', marginTop: '10px' }}>
+                    Debug: isCameraActive={String(isCameraActive)}, capturedImage={capturedImage ? 'set' : 'null'}, capturedFile={capturedFile ? 'set' : 'null'}
                 </div>
             )}
         </div>

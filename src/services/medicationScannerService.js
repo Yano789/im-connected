@@ -13,23 +13,63 @@ class MedicationScannerService {
    */
   async scanMedicationImage(imageFile) {
     try {
+      console.log('Scanner Service: Starting scan with file:', imageFile);
+      console.log('Scanner Service: File details:', {
+        name: imageFile.name,
+        type: imageFile.type,
+        size: imageFile.size,
+        lastModified: imageFile.lastModified,
+        constructor: imageFile.constructor.name
+      });
+
       const formData = new FormData();
       formData.append('medicationImage', imageFile);
+
+      // Log FormData contents
+      console.log('Scanner Service: FormData created');
+      for (let [key, value] of formData.entries()) {
+        console.log('Scanner Service: FormData entry:', key, value);
+        if (value instanceof File) {
+          console.log('Scanner Service: FormData file details:', {
+            name: value.name,
+            type: value.type,
+            size: value.size
+          });
+        }
+      }
+
+      console.log('Scanner Service: Sending request to:', `${SCANNER_API_BASE_URL}/scan-medication`);
 
       const response = await fetch(`${SCANNER_API_BASE_URL}/scan-medication`, {
         method: 'POST',
         body: formData,
       });
 
+      console.log('Scanner Service: Response received');
+      console.log('Scanner Service: Response status:', response.status);
+      console.log('Scanner Service: Response statusText:', response.statusText);
+      console.log('Scanner Service: Response headers:', Object.fromEntries(response.headers.entries()));
+
+      // Always get response text first to see what we're dealing with
+      const responseText = await response.text();
+      console.log('Scanner Service: Raw response text:', responseText);
+
       if (!response.ok) {
-        const errorData = await response.json();
+        let errorData;
+        try {
+          errorData = JSON.parse(responseText);
+        } catch (e) {
+          errorData = { error: responseText || `HTTP ${response.status}: ${response.statusText}` };
+        }
+        console.error('Scanner Service: Error response:', errorData);
         throw new Error(errorData.error || 'Failed to scan medication image');
       }
 
-      const result = await response.json();
+      const result = JSON.parse(responseText);
+      console.log('Scanner Service: Success response:', result);
       return result;
     } catch (error) {
-      console.error('Error scanning medication:', error);
+      console.error('Scanner Service: Error scanning medication:', error);
       throw error;
     }
   }

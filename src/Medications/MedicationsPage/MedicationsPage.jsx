@@ -218,11 +218,7 @@ function MedicationsPage() {
                     <CareRecipientList 
                         recipients={careRecipients}
                         selectedRecipientId={selectedRecipientId}
-                        onSelect={(recipientId) => {
-                            setSelectedRecipientId(recipientId);
-                            setSelectedMedicationId(null); // Clear medication selection when changing recipients
-                            setMode('view');
-                        }}
+                        onSelect={(recipientId) => setSelectedRecipientId(recipientId)}
                         isAdding={isAddingRecipient}
                         newName={newRecipientName}
                         setNewName={setNewRecipientName}

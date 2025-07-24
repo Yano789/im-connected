@@ -1014,7 +1014,14 @@ const ocrService = new OCRService();
  */
 app.post('/scan-medication', upload.single('medicationImage'), async (req, res) => {
   try {
+    console.log('=== SCAN MEDICATION REQUEST ===');
+    console.log('Request headers:', req.headers);
+    console.log('Request body keys:', Object.keys(req.body));
+    console.log('File received:', req.file);
+    console.log('Multer error:', req.multerError);
+    
     if (!req.file) {
+      console.log('ERROR: No file received in request');
       return res.status(400).json({ 
         success: false, 
         error: 'No image file provided' 
@@ -1022,6 +1029,13 @@ app.post('/scan-medication', upload.single('medicationImage'), async (req, res) 
     }
 
     console.log(`Processing medication image: ${req.file.filename}`);
+    console.log(`File details:`, {
+      filename: req.file.filename,
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+      path: req.file.path
+    });
     const startTime = Date.now();
 
     // Preprocess image with multiple variants
