@@ -96,11 +96,12 @@ function ViewPostCard() {
           <div className="viewPostImagesDiv">
             <div className="viewPostImages">
               {media.map((m, index) => (
-                <img key={index} className="postImage" src={m.url} alt="post" />
+                <img key={index} className="viewPostImage" src={m.url} alt="post" />
               ))}
             </div>
           </div>
         )}
+
         <div className="viewPostStatsDiv">
           <div className="commentsNumber">
             <img className="commentsIcon" alt="Comments" src={CommentsIcon} />

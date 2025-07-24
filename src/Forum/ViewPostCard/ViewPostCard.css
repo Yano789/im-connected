@@ -95,10 +95,16 @@
   .likesNumber {
     @apply text-base sm:text-sm md:text-base;
   }
-  .viewPostImagesDiv {
-    @apply flex flex-row w-full h-fit items-center justify-center;
-  }
-  .viewPostImages {
-    @apply w-1/5 h-fit bg-gray-200 rounded overflow-hidden;
-  }
+.viewPostImagesDiv {
+  @apply w-full overflow-x-auto;
+}
+
+.viewPostImages {
+  @apply flex flex-row gap-3;
+}
+
+.viewPostImage {
+  @apply w-1/3 h-auto object-cover rounded shrink-0;
+}
+
 }

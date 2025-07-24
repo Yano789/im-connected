@@ -17,7 +17,7 @@ const storage = new CloudinaryStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-  const allowedMimeTypes = ['image/jpeg', 'image/png', 'video/mp4'];
+  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp','video/mp4', 'video/webm'];
   if (!allowedMimeTypes.includes(file.mimetype)) {
     return cb(new Error('Only JPG, PNG, and MP4 files are allowed'), false);
   }
