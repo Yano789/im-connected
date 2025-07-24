@@ -67,7 +67,7 @@ const initialCareRecipientsData = [
 
 function MedicationsPage() {
     const [careRecipients, setCareRecipients] = useState(initialCareRecipientsData);
-    const [selectedRecipientId, setSelectedRecipientId] = useState(initialCareRecipientsData[0]?.id);
+    const [selectedRecipientId, setSelectedRecipientId] = useState(careRecipients[0]?.id);
     const [selectedMedicationId, setSelectedMedicationId] = useState(null);
     const [mode, setMode] = useState('view'); // 'view', 'edit', 'create'
     const [capturedFile, setCapturedFile] = useState(null); // For camera capture functionality
@@ -213,18 +213,18 @@ function MedicationsPage() {
     return (
         <>
             <Header />
-            <div className="medications-grid-layout">
+            <div className="medications-page">
                 <div className="grid-item-recipients">
                     <CareRecipientList 
-                        recipients={careRecipients}
+                        careRecipients={careRecipients}
                         selectedRecipientId={selectedRecipientId}
-                        onSelect={(recipientId) => setSelectedRecipientId(recipientId)}
-                        isAdding={isAddingRecipient}
-                        newName={newRecipientName}
-                        setNewName={setNewRecipientName}
-                        onAdd={handleAddRecipientClick}
-                        onSaveNew={handleSaveNewRecipient}
-                        onCancel={() => setIsAddingRecipient(false)}
+                        onRecipientSelect={setSelectedRecipientId}
+                        isAddingRecipient={isAddingRecipient}
+                        newRecipientName={newRecipientName}
+                        setNewRecipientName={setNewRecipientName}
+                        onAddRecipientClick={handleAddRecipientClick}
+                        onSaveNewRecipient={handleSaveNewRecipient}
+                        onCancelNewRecipient={() => setIsAddingRecipient(false)}
                     />
                 </div>
 
@@ -234,6 +234,7 @@ function MedicationsPage() {
                         onSelect={handleMedicationSelect}
                         selectedMedicationId={selectedMedicationId}
                         onAddNew={handleAddNewClick}
+                        onToggle={handleMedicationToggle}
                     />
                 </div>
 

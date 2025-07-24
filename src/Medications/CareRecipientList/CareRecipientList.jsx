@@ -20,7 +20,7 @@ function CareRecipientList({ recipients, onSelect, selectedRecipientId, isAdding
                         <div 
                             key={recipient.id} 
                             className={`recipient-item ${isSelected ? 'selected' : ''} ${isLastItem ? 'last-item' : ''}`}
-                            onClick={() => onSelect(recipient)}
+                            onClick={() => onSelect(recipient.id)}
                         >
                             <span>{recipient.name}</span>
                             <button className={isSelected ? 'show-button' : 'switch-button'}>
