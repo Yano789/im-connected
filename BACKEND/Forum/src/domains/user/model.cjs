@@ -2,13 +2,19 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
-    firstName: String,
-    lastName: String,
+    name: String,
     username: {type: String,unique: true,index: true},
+    number: {type: String, unique: true},
     email: {type: String,unique: true},
     password: String,
     confirmPassword: String,
     verified: {type:Boolean,default:false}, //For authorisation purposes 
+    preferences: {
+    preferredLanguage: { type: String, default: "English" },
+    textSize: { type: String, default: "Medium" },
+    contentMode: { type: String, default: "Default" },
+    topics: { type: [String], default: [] },
+  },
 
 });
 

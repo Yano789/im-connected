@@ -1,4 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 @import "tailwindcss";
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
 
 @theme {
   --color-custom-pink: oklch(0.8604 0.0509 25.75);

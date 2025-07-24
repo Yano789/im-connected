@@ -2,6 +2,7 @@ const generateOTP = require("../../utils/generateOTP.cjs");
 const sendEmail = require("../../utils/sendEmail.cjs");
 const {hashData,verifyHashedData} = require("../../utils/hashData.cjs");
 const OTP = require("./model.cjs");
+const User = require("../user/model.cjs");
 const {AUTH_EMAIL} = process.env;
 
 const verifyOTP = async({email,otp})=>{
@@ -9,18 +10,27 @@ const verifyOTP = async({email,otp})=>{
         if(!(email&&otp)){
             throw Error("Provide values for email,otp");
         }
+
         const matchedOTPRecord = await OTP.findOne({email});
         if(!(matchedOTPRecord)){
             throw Error("No otp records found.");
         }
+
         const {expiresAt} = matchedOTPRecord;
         if(expiresAt < Date.now()){
             await OTP.deleteOne({email});
             throw Error("Code has expired. REquest for a new one.");
         }
+
         const hashedOTP = matchedOTPRecord.otp;
         const validOTP = await verifyHashedData(otp,hashedOTP);
-        if(!validOTP) throw new Error("Invalid OTP!")
+        if(!validOTP) throw new Error("Invalid OTP!");
+
+        await User.updateOne(
+            { email },
+            { $set: { verified: true } } 
+        );
+
         return validOTP;
     } catch (error) {
         throw error;

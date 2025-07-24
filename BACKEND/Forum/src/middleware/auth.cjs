@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const {TOKEN_KEY} = process.env;
 
-const verifyToken = async(req,res,next)=>{
+const verifyToken = (req,res,next) => {
     //const token = req?.body?.token || req?.query?.token || req?.headers?.["x-access-token"];
     
     const token = req.cookies.token
@@ -13,8 +13,9 @@ const verifyToken = async(req,res,next)=>{
 
     //verify token
     try {
-        const decodedToken = await jwt.verify(token,TOKEN_KEY);
+        const decodedToken = jwt.verify(token,TOKEN_KEY);
         req.currentUser = decodedToken;
+        next();
     } catch (error) {
         return res.status(401).send("Invalid Token provided!");
     }
