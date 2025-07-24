@@ -12,7 +12,7 @@ const getPeriodFromTime = (time) => {
     return 'Night';
 };
 
-function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile = null }) {
+function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile = null, selectedRecipient = null }) {
     // Determine if we are editing an existing medication or creating a new one
     const isEditing = medication !== null && medication !== undefined;
 
@@ -107,7 +107,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
         }
     };
 
-    // Handle medication scanning
+    // Handle medication scanning - PREVIEW ONLY, no database saving
     const handleScanMedication = async (event) => {
         // Prevent default button behavior
         if (event && event.preventDefault) {
@@ -146,7 +146,9 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
 
             console.log('Scanner API is available, proceeding with scan...');
 
-            // Scan the medication image
+            // Always perform preview scan only - do not save to database from scan button
+            console.log('Performing preview scan only...');
+            
             const scanResult = await medicationScannerService.scanMedicationImage(targetFile);
             console.log('Scan result received:', scanResult);
             
@@ -154,7 +156,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
             console.log('Formatted medication data:', medicationData);
 
             if (medicationData && medicationData.name) {
-                // Update form data with scanned information
+                // Update form data with scanned information (auto-fill)
                 setFormData(prevData => ({
                     ...prevData,
                     name: medicationData.name || prevData.name,
@@ -166,7 +168,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                     image: medicationData.image || prevData.image,
                 }));
 
-                setScanSuccess(`Medication "${medicationData.name}" scanned successfully! Confidence: ${Math.round(medicationData.confidence * 100)}%`);
+                setScanSuccess(`Medication "${medicationData.name}" scanned successfully! Confidence: ${Math.round(medicationData.confidence * 100)}% - Form auto-filled. Click "Save Medicine" to store permanently.`);
                 
                 // Show additional info if available
                 if (medicationData.brandNames && medicationData.brandNames.length > 0) {
@@ -299,7 +301,8 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                             disabled={!selectedFile || isScanning}
                             className="scan-button"
                         >
-                            {isScanning ? '🔄 Scanning...' : '🔍 Scan Medication'}
+                            {isScanning ? '🔄 Scanning...' : 
+                             selectedRecipient ? '🔍 Scan & Save to Database' : '🔍 Scan Medication (Preview)'}
                         </button>
                     </div>
                 </div>

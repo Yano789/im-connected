@@ -260,6 +260,131 @@ router.delete('/delete-image', auth, async (req, res) => {
     }
 });
 
+// =============================================================================
+// ANALYTICS AND REPORTING ROUTES
+// =============================================================================
+
+// Get medication adherence analytics for a care recipient
+router.get('/care-recipients/:recipientId/analytics', async (req, res) => {
+    try {
+        const userId = req.user?.id || 'default_user_id';
+        const { recipientId } = req.params;
+        const { startDate, endDate } = req.query;
+
+        // Build date filter
+        const dateFilter = {};
+        if (startDate || endDate) {
+            dateFilter.createdAt = {};
+            if (startDate) dateFilter.createdAt.$gte = new Date(startDate);
+            if (endDate) dateFilter.createdAt.$lte = new Date(endDate);
+        }
+
+        // Get medication logs for analytics
+        const logs = await MedicationLog.find({
+            careRecipientId: recipientId,
+            userId: userId,
+            ...dateFilter
+        }).populate('medicationId', 'name');
+
+        // Calculate adherence statistics
+        const totalLogs = logs.length;
+        const takenLogs = logs.filter(log => log.taken).length;
+        const adherenceRate = totalLogs > 0 ? (takenLogs / totalLogs) * 100 : 0;
+
+        // Group by medication
+        const medicationStats = {};
+        logs.forEach(log => {
+            const medName = log.medicationId?.name || 'Unknown';
+            if (!medicationStats[medName]) {
+                medicationStats[medName] = { total: 0, taken: 0 };
+            }
+            medicationStats[medName].total++;
+            if (log.taken) medicationStats[medName].taken++;
+        });
+
+        // Calculate adherence rate per medication
+        Object.keys(medicationStats).forEach(medName => {
+            const stats = medicationStats[medName];
+            stats.adherenceRate = stats.total > 0 ? (stats.taken / stats.total) * 100 : 0;
+        });
+
+        res.status(200).json({
+            success: true,
+            data: {
+                overview: {
+                    totalLogs,
+                    takenLogs,
+                    missedLogs: totalLogs - takenLogs,
+                    adherenceRate: Math.round(adherenceRate * 100) / 100
+                },
+                medicationBreakdown: medicationStats,
+                period: {
+                    startDate: startDate || 'All time',
+                    endDate: endDate || 'Present'
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error fetching analytics:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to fetch analytics',
+            message: error.message
+        });
+    }
+});
+
+// =============================================================================
+// SCANNER INTEGRATION ROUTES
+// =============================================================================
+
+// Process scanned medication data (for future integration with Scanner service)
+router.post('/scan-medication', upload.single('image'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ 
+                success: false,
+                error: 'No image file provided for scanning' 
+            });
+        }
+
+        const userId = req.user?.id || 'default_user_id';
+        const { careRecipientId } = req.body;
+
+        // Upload image to Cloudinary first
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'scanned_medications',
+            resource_type: 'image'
+        });
+
+        // TODO: Integrate with Scanner service for OCR processing
+        // For now, return the uploaded image data
+        const scanData = {
+            imageUrl: result.secure_url,
+            publicId: result.public_id,
+            scanResults: {
+                text: "OCR processing not yet implemented",
+                medications: [],
+                confidence: 0
+            },
+            timestamp: new Date()
+        };
+
+        res.status(200).json({
+            success: true,
+            data: scanData,
+            message: 'Image uploaded successfully. OCR processing will be implemented in future updates.'
+        });
+    } catch (error) {
+        console.error('Error processing scanned medication:', error);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to process scanned medication',
+            message: error.message
+        });
+    }
+});
+
 // Health check endpoint
 router.get('/health', (req, res) => {
     res.status(200).json({

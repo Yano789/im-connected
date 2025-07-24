@@ -6,21 +6,21 @@ function Header() {
   const onFrameContainerClick = () => {};
 
   return (
-    <div class="header">
-      <div class="headerMain">
-        <div class="sitelogo">
-          <img class="applicationIcon" alt="" src={AppIcon} />
-          <div class="imconnected">
+    <div className="header">
+      <div className="headerMain">
+        <div className="sitelogo">
+          <img className="applicationIcon" alt="" src={AppIcon} />
+          <div className="imconnected">
             <i>im</i>
-            <span class="connected">Connected</span>
+            <span className="connected">Connected</span>
           </div>
         </div>
-        <div class="search">
-          <textarea class="typeHereTo">Type here to search...</textarea>
-          <img class="applicationIcon" alt="" src={SearchIcon} />
+        <div className="search">
+          <textarea className="typeHereTo" defaultValue="Type here to search..."></textarea>
+          <img className="applicationIcon" alt="" src={SearchIcon} />
         </div>
         <TabBar></TabBar>
-        <button class="buttonStyle1" onClick={onFrameContainerClick}>
+        <button className="buttonStyle1" onClick={onFrameContainerClick}>
           Sign Out
         </button>
       </div>
