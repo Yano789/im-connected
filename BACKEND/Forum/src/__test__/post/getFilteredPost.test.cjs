@@ -38,7 +38,7 @@ describe("getFilteredPosts", () => {
         const tags = ["Physical Disability & Chronic Illness", "Personal Mental Health"];
         const result = await getFilteredPosts({ tags, sort: "most likes" });
 
-        expect(Post.find).toHaveBeenCalledWith({ tags: { $all: tags, $size: 2 }, draft: false });
+        expect(Post.find).toHaveBeenCalledWith({ tags: { $in: tags, $size: 2 }, draft: false });
         expect(result).toEqual([samplePosts[2]]);
     });
 

@@ -15,12 +15,13 @@ const verifyToken = async (req, res, next) => {
     try {
         const decodedToken = jwt.verify(token, TOKEN_KEY);
         req.currentUser = decodedToken;
+        next();
     } catch (error) {
         return res.status(401).send("Invalid Token provided!");
     }
 
     //proceed with request
-    return next();
+    
 };
 
 module.exports = verifyToken;

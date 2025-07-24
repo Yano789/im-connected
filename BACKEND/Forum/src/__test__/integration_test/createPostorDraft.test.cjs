@@ -14,8 +14,7 @@ describe("Create Post", () => {
 
     // Create a JWT manually (skip login route)
     const jwt = require("jsonwebtoken");
-    console.log("TOKEN_KEY:", process.env.TOKEN_KEY);
-console.log("TOKEN_EXPIRY:", process.env.TOKEN_EXPIRY);
+
 
    token = jwt.sign(
   { userId: user._id, username: user.username }, 
@@ -38,7 +37,6 @@ console.log("TOKEN_EXPIRY:", process.env.TOKEN_EXPIRY);
       .set("Content-Type", "application/json");
     
       
-console.log("Errors:", response.body.errors ?? "No errors key");
 
     expect(response.statusCode).toBe(200); // or 201
     expect(response.body).toHaveProperty("title", "Test Post");

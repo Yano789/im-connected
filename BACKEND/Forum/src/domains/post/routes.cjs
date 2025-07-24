@@ -23,7 +23,7 @@ router.post("/create", auth, upload.array("media", 5), normalizeTagsMiddleware, 
 
 
         const createdPost = await createPost({ title, content, tags, username, draft, media });
-
+        console.log(createdPost)
         res.status(200).json(createdPost);
     } catch (error) {
         if (req.files && req.files.length > 0) {
@@ -60,12 +60,20 @@ router.get("/", auth, validateQuery(querySchema), async (req, res) => {
         if (filter !== "default") {
             tags = filter.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
         }
-        const username = source !== "default" ? req.currentUser?.username : null;
+
+        //TODO accomodate for preferences, when no filter tag is selected
+        // Do an else statement where if it is default, check currUser's perferences and 
+
+
+        const username = req.currentUser?.username
+
+
 
         if (source !== "default" && !username) {
             throw new Error("No Username given for personalized filter");
         }
         const post = await getFilteredPosts({ tags, sort, source, username })
+        console.log("Username passed to getFilteredPosts:", username);
         const limitedPosts = await modeLimit({ post, mode })
         res.status(200).json(limitedPosts)
     } catch (error) {

@@ -1,5 +1,5 @@
 const Joi = require("joi")
-
+const{allowedTags} = require("./../../domains/post/model.cjs");
 
 const loginSchema = Joi.object({
   username: Joi.string().required().messages({
@@ -10,29 +10,31 @@ const loginSchema = Joi.object({
     "any.required": "Password is required",
     "string.empty": "Password cannot be empty",
   }),
+  rememberMe: Joi.boolean().optional(),
 });
 
 // Signup validation schema
 const signupSchema = Joi.object({
-  firstName: Joi.string()
+  name: Joi.string()
     .pattern(/^[a-zA-Z]*$/)
     .required()
     .messages({
-      "any.required": "First name is required",
-      "string.pattern.base": "First name must contain only letters",
-      "string.empty": "First name cannot be empty",
-    }),
-  lastName: Joi.string()
-    .pattern(/^[a-zA-Z]*$/)
-    .required()
-    .messages({
-      "any.required": "Last name is required",
-      "string.pattern.base": "Last name must contain only letters",
-      "string.empty": "Last name cannot be empty",
+      "any.required": "Name is required",
+      "string.pattern.base": "Name must contain only letters",
+      "string.empty": "Name cannot be empty",
     }),
   username: Joi.string().required().messages({
     "any.required": "Username is required",
     "string.empty": "Username cannot be empty",
+  }),
+
+  number: Joi.string()
+  .pattern(/^\+[1-9]\d{6,14}$/)
+  .required()
+  .messages({
+    "any.required": "Phone number is required",
+    "string.empty": "Phone number cannot be empty",
+    "string.pattern.base": "Phone number must be valid (e.g. 91234567)",
   }),
   email: Joi.string()
     .email()
@@ -50,7 +52,27 @@ const signupSchema = Joi.object({
       "string.pattern.base": "Password must be at least 8 characters, contain one uppercase letter and one special character",
       "string.empty": "Password cannot be empty",
     }),
+    
+});
+
+const preferencesSchema = Joi.object({
+  username: Joi.string().required().messages({
+    "any.required": "Username is required",
+    "string.empty": "Username cannot be empty",
+  }),
+  language: Joi.string()
+    .valid("English", "Chinese", "Malay", "Tamil")
+    .default("English"),
+  textSize: Joi.string()
+    .valid("Small", "Medium", "Large")
+    .default("Medium"),
+  contentMode: Joi.string()
+    .valid("Default", "Easy Read")
+    .default("Default"),
+  topics: Joi.array()
+    .items(Joi.string().valid(...allowedTags))
+    .default([]),
 });
 
 
-module.exports = {loginSchema,signupSchema}
+module.exports = {loginSchema,signupSchema,preferencesSchema}

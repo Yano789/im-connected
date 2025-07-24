@@ -2,7 +2,7 @@ const User = require("./model.cjs");
 const {hashData,verifyHashedData} = require("../../utils/hashData.cjs");
 const createToken = require("../../utils/createToken.cjs");
 
-const authenticateUser = async(data)=>{
+const authenticateUser = async (data) => {
     try {
         const{username,password} = data;
         const fetchedUser = await User.findOne({username});
@@ -32,7 +32,7 @@ const authenticateUser = async(data)=>{
 
 const createNewUser = async(data) =>{
     try {
-        const {firstName,lastName,username,email,password} = data;
+        const { name, username, email, number, password, preferences = {} } = data;
         //Check if user already exists
         const existingUserEmail = await User.findOne({email});
         const existingUsername = await User.findOne({username});
@@ -48,11 +48,17 @@ const createNewUser = async(data) =>{
             //hash password
             const hashedPassword = await hashData(password);
             const newUser = new User({
-                firstName,
-                lastName,
+                name,
                 username,
                 email,
+                number,
                 password: hashedPassword,
+                preferences: {
+                    preferredLanguage: preferences.preferredLanguage || "English",
+                    textSize: preferences.textSize || "Medium",
+                    contentMode: preferences.contentMode || "Default",
+                    topics: preferences.topics || [],
+                },
             });
             const createdUser = await newUser.save();
             return createdUser;
@@ -63,4 +69,27 @@ const createNewUser = async(data) =>{
     }
 };
 
-module.exports = {createNewUser,authenticateUser}
+
+const updateUserPreferences = async ({ username, preferences }) => {
+  const updatedUser = await User.findOneAndUpdate(
+    { username },
+    { preferences },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+  return updatedUser;
+};
+
+const getUser = async (username)=>{
+    try {
+        const user = await User.findOne({username})
+        return user
+    } catch (error) {
+        throw error
+    }
+    
+}
+
+module.exports = {createNewUser,authenticateUser, updateUserPreferences,getUser}
