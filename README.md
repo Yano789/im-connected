@@ -1,5 +1,5 @@
 # Elements of Software Engineering 50.003 2025 Project
-## Group 2.4 Cohort 2
+## CT12
 
 ## About
 
