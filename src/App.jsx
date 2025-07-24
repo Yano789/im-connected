@@ -32,7 +32,7 @@
             <Route path="/forum/mypost" element={<MyPost/>}/>
             <Route path="/forum/savedpost" element={<SavedPost/>}/>
             <Route path="/medication" element={<MedicationsPage/>}/>
-            <Route path="/profile" element={<Profile/>}/>
+            <Route path="/profile" element={<ProfilePage/>}/>
             {/*
             <Route path="/chatbot" element={<Chatbot/>}/>
             */}
