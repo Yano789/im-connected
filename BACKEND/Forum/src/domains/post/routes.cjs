@@ -1,8 +1,8 @@
 const express = require("express");
-const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,getAllMyDrafts,getMyDraft,deleteDrafts} = require("./controller.cjs");
+const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,getAllMyDrafts,getMyDraft,deleteDrafts,getPostByTitle} = require("./controller.cjs");
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
-const {postDraftSchema,querySchema,paramsSchema} = require("./../../utils/validators/postValidator.cjs")
+const {postDraftSchema,querySchema,paramsSchema,postTitleParamSchema} = require("./../../utils/validators/postValidator.cjs")
 const upload = require("./../../config/storage.cjs");
 const normalizeTagsMiddleware = require("./../../middleware/normalizeTags.cjs");
 const {cloudinary} = require("./../../config/cloudinary.cjs");
@@ -84,11 +84,22 @@ router.get("/", auth, validateQuery(querySchema), async (req, res) => {
 //TODO GET POST WHEN WE CLICK ON A LINK, VIEW ONE POST WITH COMMENTS!
 // comment structure is top level commments are by earliest, nested levels are by earliest
 //reason is to show ordering in replies to post
-router.get("/getPost/:post", validateParams(paramsSchema),async (req, res) => {
+router.get("/getPost/:post", auth ,validateParams(paramsSchema),async (req, res) => {
     try {
         const postId = req.params.post
         const response = await getPostWithComment(postId)
         res.status(200).json(response);
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+})
+
+
+router.get("/getPost/title/:title",auth,validateParams(postTitleParamSchema),async(req,res)=>{
+    try {
+        const title = req.params.title
+        const post = await getPostByTitle(title)
+        res.status(200).json(post)
     } catch (error) {
         res.status(400).send(error.message)
     }
