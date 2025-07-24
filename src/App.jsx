@@ -7,6 +7,7 @@
   import MedicationsPage from "./Medications/MedicationsPage/MedicationsPage";
   import LoginCard from "./Login/LoginCard";
   import ProfilePage from './Profile/ProfilePage/ProfilePage';
+  import ChatPage from './Chatbot/Chat';
 
   function App() {
     return (
@@ -33,9 +34,7 @@
             <Route path="/forum/savedpost" element={<SavedPost/>}/>
             <Route path="/medication" element={<MedicationsPage/>}/>
             <Route path="/profile" element={<ProfilePage/>}/>
-            {/*
-            <Route path="/chatbot" element={<Chatbot/>}/>
-            */}
+            <Route path="/chatbot" element={<ChatPage />}/>
           </Routes>
         </BrowserRouter>
       </div>
