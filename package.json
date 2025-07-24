@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "start": "nodemon BACKEND/Forum/src/index.cjs",
-    "test": "jest",
+    "backendtest": "jest",
     "frontendtest": "vitest",
     "build": "vite build",
     "lint": "eslint .",
@@ -28,6 +28,7 @@
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.17.0",
+    "mongodb-memory-server": "^10.1.4",
     "mongoose": "^8.16.3",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",

@@ -19,14 +19,12 @@ describe("Bookmark component", () => {
     render(<Bookmark postId={postId} token={token} initialBookmarked={false} />);
     const img = screen.getByAltText("bookmark");
     expect(img).toBeInTheDocument();
-    // You can add expect(img.src).toContain("Unbookmark.png") if you want
   });
 
   test("renders with bookmarked icon initially", () => {
     render(<Bookmark postId={postId} token={token} initialBookmarked={true} />);
     const img = screen.getByAltText("bookmark");
     expect(img).toBeInTheDocument();
-    // expect(img.src).toContain("Bookmark.png")
   });
 
   test("clicking bookmark triggers save API call and changes icon", async () => {
@@ -39,7 +37,6 @@ describe("Bookmark component", () => {
     const img = screen.getByAltText("bookmark");
     await userEvent.click(img);
 
-    // Check fetch called with POST save url
     expect(fetch).toHaveBeenCalledWith(
       `http://localhost:5001/api/v1/saved/${encodeURIComponent(postId)}/save`,
       expect.objectContaining({
@@ -49,8 +46,6 @@ describe("Bookmark component", () => {
         }),
       })
     );
-
-    // Because setState flips bookmarked, the img src should change (optional to test)
   });
 
   test("clicking bookmark triggers delete API call and calls onUnbookmark callback", async () => {
@@ -79,17 +74,16 @@ describe("Bookmark component", () => {
       })
     );
 
-    // onUnbookmark should be called since we unbookmarked
     expect(onUnbookmark).toHaveBeenCalled();
   });
 
-  test("handles fetch error gracefully", async () => {
+  test("handles fetch error", async () => {
     fetch.mockResolvedValueOnce({
       ok: false,
       text: async () => "error message",
     });
 
-    console.error = vi.fn(); // mock console.error to suppress error logs in test output
+    console.error = vi.fn();
 
     render(<Bookmark postId={postId} token={token} initialBookmarked={false} />);
     const img = screen.getByAltText("bookmark");

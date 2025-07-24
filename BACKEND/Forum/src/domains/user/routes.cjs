@@ -18,15 +18,15 @@ const router  = express.Router();
 
 //login
 router.post("/", validateBody(loginSchema), async (req, res) => {
-  console.log("Login route hit");
+
   try {
     const { username, password } = req.body;
-    console.log("Received:", username, password);
+
 
     const isProduction = process.env.NODE_ENV === "production";
     const { token, authenticatedUser } = await authenticateUser({ username, password });
 
-    console.log("Authenticated user:", authenticatedUser);
+
 
     res.cookie("token", token, {
       httpOnly: true,
@@ -34,10 +34,10 @@ router.post("/", validateBody(loginSchema), async (req, res) => {
       sameSite: "Strict",
       maxAge: 24 * 60 * 60 * 1000,
     });
-    console.log("Sending response");
+
     res.status(200).json(authenticatedUser);
   } catch (error) {
-    console.error("Error in login route:", error);
+
     res.status(400).send(error.message);
   }
 });
