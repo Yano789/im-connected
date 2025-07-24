@@ -3,19 +3,54 @@ import CommentsIcon from "../../assets/Comments.png";
 import LikesIcon from "../../assets/Likes.png";
 import UnlikesIcon from "../../assets/Unlikes.png";
 import Boo from "../../assets/Boo.jpg";
-import { useState } from "react";
+import { useState, useEffect } from "react";  // <-- add useEffect
 import { useNavigate } from "react-router-dom";
 
 function ForumCard(props) {
-  const { postId, postUser, postDate, postTitle, postTags, postDescription, ActionButton } =
-    props;
+  const {
+    postId,
+    postUser,
+    postDate,
+    postTitle,
+    postTags,
+    postDescription,
+    ActionButton,
+    postComment,
+    postLikes,
+    initiallyLiked = false,
+  } = props;
 
-  const [liked, setLiked] = useState(false);
-
-  const likeIcon = liked ? LikesIcon : UnlikesIcon ;
-
+  const [liked, setLiked] = useState(initiallyLiked);
+  const [likeCount, setLikeCount] = useState(postLikes);
   const navigate = useNavigate();
   const encodedPostId = encodeURIComponent(postId);
+
+  // Sync liked state if initiallyLiked prop changes (important for page navigation)
+  useEffect(() => {
+    setLiked(initiallyLiked);
+  }, [initiallyLiked]);
+
+  const handleLikeToggle = async (e) => {
+    e.stopPropagation();
+
+    try {
+      const url = `http://localhost:5001/api/v1/like/${encodedPostId}/${liked ? "unlike" : "like"}`;
+      const method = liked ? "DELETE" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error(`Failed to ${liked ? "unlike" : "like"} post`);
+
+      const data = await res.json();
+      setLiked(!liked);
+      setLikeCount(data.likes);
+    } catch (err) {
+      console.error("Error toggling like:", err.message);
+    }
+  };
 
   return (
     <div
@@ -33,7 +68,7 @@ function ForumCard(props) {
           </div>
           <div className="nameParent">
             <div className="postUser">{postUser}</div>
-            <ActionButton/>
+            <ActionButton />
           </div>
           <div className="tags">
             {postTags && postTags.length > 0 ? (
@@ -64,18 +99,15 @@ function ForumCard(props) {
       <div className="stats">
         <div className="commentsNumber">
           <img className="commentsIcon" alt="comments" src={CommentsIcon} />
-          <div className="name">0</div>
+          <div className="name">{postComment}</div>
         </div>
         <div
           className="likesNumber"
-          onClick={(e) => {
-            e.stopPropagation();
-            setLiked(!liked);
-          }}
+          onClick={handleLikeToggle}
           style={{ cursor: "pointer" }}
         >
-          <img className="likesIcon" alt="likes" src={likeIcon} />
-          <div className="name">0</div>
+          <img className="likesIcon" alt="likes" src={liked ? LikesIcon : UnlikesIcon} />
+          <div className="name">{likeCount}</div>
         </div>
       </div>
     </div>

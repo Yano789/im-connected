@@ -1,12 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import './MedicationForm.css';
 import medicationScannerService from '../../services/medicationScannerService';
 
-function MedicationForm({ medication, onSave, onCancel, capturedFile = null }) {
+const getPeriodFromTime = (time) => {
+    if (!time) return 'Morning';
+    const hour = parseInt(time.split(':')[0], 10);
+    if (hour >= 5 && hour < 12) return 'Morning';
+    if (hour >= 12 && hour < 17) return 'Afternoon';
+    if (hour >= 17 && hour < 21) return 'Evening';
+    return 'Night';
+};
+
+function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile = null }) {
     // Determine if we are editing an existing medication or creating a new one
     const isEditing = medication !== null;
 
-    // Set up state to hold the form's data
     const [formData, setFormData] = useState({
         name: isEditing ? medication.name : '',
         usedTo: isEditing ? medication.usedTo : '',
@@ -14,18 +22,21 @@ function MedicationForm({ medication, onSave, onCancel, capturedFile = null }) {
         dosage: isEditing ? medication.dosage : '',
         schedule: isEditing ? medication.schedule : '',
         warnings: isEditing ? medication.warnings : '',
+        dosages: isEditing ? JSON.parse(JSON.stringify(medication.dosages || [])) : [{ time: '', taken: false }],
         image: isEditing ? medication.image : '',
     });
 
-        // Scanner-related state
+    // Scanner-related state
     const [isScanning, setIsScanning] = useState(false);
     const [scanError, setScanError] = useState('');
     const [scanSuccess, setScanSuccess] = useState('');
     const [selectedFile, setSelectedFile] = useState(capturedFile);
     const [previewUrl, setPreviewUrl] = useState(capturedFile ? URL.createObjectURL(capturedFile) : '');
 
+    const fileInputRef = useRef(null);
+
     // Check for captured file from camera on component mount
-    React.useEffect(() => {
+    useEffect(() => {
         if (capturedFile && !isEditing) {
             console.log('Captured file received:', capturedFile);
             setSelectedFile(capturedFile);
@@ -38,8 +49,19 @@ function MedicationForm({ medication, onSave, onCancel, capturedFile = null }) {
         }
     }, [capturedFile]);
 
-    const fileInputRef = useRef(null);
-
+    useEffect(() => {
+        const isEditing = medication !== null;
+        setFormData({
+            name: isEditing ? medication.name : '',
+            usedTo: isEditing ? medication.usedTo : '',
+            sideEffects: isEditing ? medication.sideEffects : '',
+            dosage: isEditing ? medication.dosage : '',
+            schedule: isEditing ? medication.schedule : '',
+            warnings: isEditing ? medication.warnings : '',
+            dosages: isEditing ? JSON.parse(JSON.stringify(medication.dosages || [])) : [{ time: '', taken: false }],
+            image: isEditing ? medication.image : '' 
+        });
+    }, [medication]);
     // A function to handle changes in any input field
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -132,15 +154,53 @@ function MedicationForm({ medication, onSave, onCancel, capturedFile = null }) {
         }
     };
 
-    // A function to handle the form submission
+    const handleImageChange = (e) => {
+        if (e.target.files && e.target.files[0]) {
+            const newImageUrl = URL.createObjectURL(e.target.files[0]);
+            setFormData(prev => ({ ...prev, image: newImageUrl }));
+        }
+    };
+
+    const handleDosageChange = (index, field, value) => {
+        const newDosages = [...formData.dosages];
+        newDosages[index][field] = value;
+        if (field === 'time') {
+            newDosages[index].period = getPeriodFromTime(value);
+        }
+        setFormData(prev => ({ ...prev, dosages: newDosages }));
+    };
+
+    const handleAddDosage = () => {
+        setFormData(prev => ({
+            ...prev,
+            dosages: [...prev.dosages, { period: 'Morning', time: '09:00', taken: false }]
+        }));
+    };
+
+    const handleRemoveDosage = (index) => {
+        const newDosages = formData.dosages.filter((_, i) => i !== index);
+        setFormData(prev => ({ ...prev, dosages: newDosages }));
+    };
     const handleSubmit = (e) => {
-        e.preventDefault(); // Prevents the page from reloading
-        onSave(formData); // Send the data back to the parent component
+        e.preventDefault();
+        onSave(formData);
     };
 
     return (
         <form className="details-card form-card" onSubmit={handleSubmit}>
-            <h2 className="medication-title">{isEditing ? 'Edit Medication' : 'Add New Medication'}</h2>
+            <div className="form-header">
+                <h2 className="medication-title">{isEditing ? 'Edit Medication' : 'Add New Medication'}</h2>
+                {isEditing && (
+                    <button 
+                        type="button" 
+                        onClick={onDelete} 
+                        className="delete-button-top-right" 
+                        title="Delete Medication"
+                    >
+                        Delete
+                    </button>
+                )}
+            </div>
 
             {/* Medication Scanner Section */}
             <div className="scanner-section">
@@ -256,6 +316,35 @@ function MedicationForm({ medication, onSave, onCancel, capturedFile = null }) {
                         placeholder="Important warnings and precautions"
                         rows="3"
                     />
+                </div>
+
+                <div className="form-group">
+                    <label>Image</label>
+                    <div className="image-preview-container">
+                        {formData.image && <img src={formData.image} alt="Medication Preview" className="image-preview" />}
+                    </div>
+                    <label htmlFor="image-upload" className="upload-image-button">
+                        {isEditing ? 'Upload New Image' : 'Upload Image'}
+                    </label>
+                    <input type="file" id="image-upload" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+                </div>
+
+                <div className="form-group">
+                    <label>Dosage Times</label>
+                    {formData.dosages.map((dosage, index) => (
+                        <div key={index} className="dosage-input-row">
+                            <input
+                                type="time"
+                                value={dosage.time}
+                                onChange={(e) => handleDosageChange(index, 'time', e.target.value)}
+                            />
+                            <button 
+                                    type="button" 
+                                    onClick={() => handleRemoveDosage(index)} 
+                                    className="remove-dosage-button">Remove</button>
+                            </div>
+                    ))}
+                    <button type="button" onClick={handleAddDosage} className="add-dosage-button">+ Add Dosage</button>
                 </div>
             </div>
 

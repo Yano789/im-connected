@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@layer components {
+  .commentSection {
+    @apply w-full h-fit flex flex-col gap-4 items-start justify-start p-2 sm:p-3;
+  }
+  .addAComment {
+    @apply text-base sm:text-lg font-semibold text-left text-[#2d2d2d];
+  }
+
+  .addComment {
+    @apply w-full min-h-[80px] sm:min-h-[100px] text-base sm:text-sm rounded-md p-3 sm:p-2 resize-y 
+           border border-[#1e1e1e] bg-[#fff2f0] shadow-[2px_2px_4px_rgba(0,0,0,0.15)] 
+           text-[#333] placeholder:text-gray-400 focus:outline-none 
+           focus:ring-2 focus:ring-[#c8b8db] focus:border-transparent transition;
+  }
+
+  .viewPostButton {
+    @apply px-4 py-2 text-base sm:text-sm rounded-md bg-[#c8b8db] hover:bg-[#ab97c3] 
+           text-black font-medium transition-colors duration-200;
+  }
+  .viewPostCommentsDiv {
+    @apply w-full flex flex-col items-start justify-start gap-4 sm:gap-3 mt-4;
+  }
+  .viewPostComment {
+    @apply text-base sm:text-sm font-semibold text-left text-[#2d2d2d];
+  }
+
+  .nestedComments {
+    @apply ml-3 sm:ml-4 mt-2 pl-2 border-l border-[#ccc] flex flex-col gap-2;
+  }
+}
+

@@ -2,7 +2,7 @@
 
 @layer components {
   .mediaUploader {
-  @apply mt-6 space-y-4;
+  @apply mt-6 space-y-4 w-full;
 }
 
 .dropArea {

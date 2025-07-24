@@ -30,13 +30,6 @@ const authenticateUser = async(data)=>{
 };
 
 
-
-
-
-
-
-
-
 const createNewUser = async(data) =>{
     try {
         const {firstName,lastName,username,email,password} = data;

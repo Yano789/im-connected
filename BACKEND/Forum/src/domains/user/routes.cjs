@@ -8,33 +8,40 @@ const router  = express.Router();
 
 
 //Protected Route
-router.get("/private_data",auth,(req,res)=>{
-    res.status(200).send(`You're in the private territory of ${req.currentUser.email}`);
-});
+//router.get("/private_data",auth,(req,res)=>{
+  //  res.status(200).send(`You're in the private territory of ${req.currentUser.email}`);
+//});
 
 
 
 
 
 //login
-router.post("/", validateBody(loginSchema),async (req, res) => {
-    try {
-        const { username, password } = req.body;
-        const isProduction = process.env.NODE_ENV === "production"
+router.post("/", validateBody(loginSchema), async (req, res) => {
 
-        const {token,authenticatedUser} = await authenticateUser({ username, password });
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: "Strict",
-            maxAge: 24 * 60 * 60 * 1000
-        });
-        res.status(200).json(authenticatedUser);
+  try {
+    const { username, password } = req.body;
 
-    } catch (error) {
-        res.status(400).send(error.message);
-    }
+
+    const isProduction = process.env.NODE_ENV === "production";
+    const { token, authenticatedUser } = await authenticateUser({ username, password });
+
+
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "Strict",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json(authenticatedUser);
+  } catch (error) {
+
+    res.status(400).send(error.message);
+  }
 });
+
 
 
 

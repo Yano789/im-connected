@@ -31,4 +31,6 @@ const connectToDB = async()=>{
     }
 };
 
-connectToDB();
+if (process.env.NODE_ENV !== "test") {
+    connectToDB();
+}

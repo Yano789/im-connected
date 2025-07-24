@@ -12,10 +12,17 @@ export default defineConfig([
       js.configs.recommended,
       reactHooks.configs['recommended-latest'],
       reactRefresh.configs.vite,
+      'plugin:vitest/recommended',      
+    ],
+    plugins: [
+      'vitest',                      
     ],
     languageOptions: {
       ecmaVersion: 2020,
-      globals: globals.browser,
+      globals: {
+        ...globals.browser,
+        ...globals['vitest/globals'],  
+      },
       parserOptions: {
         ecmaVersion: 'latest',
         ecmaFeatures: { jsx: true },
@@ -27,3 +34,4 @@ export default defineConfig([
     },
   },
 ])
+

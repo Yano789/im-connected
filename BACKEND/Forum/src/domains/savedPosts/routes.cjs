@@ -3,7 +3,7 @@ const {createSavedPost,deleteSavedPost,getAllSavedPosts} = require("./controller
 const auth = require("../../middleware/auth.cjs");
 const {validateParams} = require("../../middleware/validate.cjs")
 const paramsSchema = require("./../../utils/validators/savePostValidators.cjs")
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 
 //save a post
 router.post("/:post/save",auth,validateParams(paramsSchema),async(req,res)=>{

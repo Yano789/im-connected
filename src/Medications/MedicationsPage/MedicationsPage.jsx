@@ -1,47 +1,110 @@
 import React, { useState } from 'react';
+import Header from "../../TopHeader/Header/Header";
+import { motion, AnimatePresence } from 'framer-motion'; // <-- Import animation components
 import './MedicationsPage.css';
-import Header from '../../TopHeader/Header/Header';
 import CareRecipientList from '../CareRecipientList/CareRecipientList';
 import MedicationLogging from '../MedicationLogging/MedicationLogging';
 import MedicationDetails from '../MedicationDetails/MedicationDetails';
 import MedicationForm from '../MedicationForm/MedicationForm';
 
-
-// --- DUMMY DATA ---
-const careRecipientsData = [
+// ---- Dummy Data ----
+// New format lol
+const initialCareRecipientsData = [
     {
         id: 1, name: 'James Tan', medications: [
-            { id: 'med1', name: 'Metformin XR 500mg', dosages: [{ time: '1st pill @ 10am', taken: true }, { time: '2nd pill @ 12pm', taken: false }, { time: '3rd pill @ 6pm', taken: true }], usedTo: 'Manages Type 2 Diabetes Mellitus.', sideEffects: 'May cause Drowsiness', image: 'https://i.imgur.com/8m2bAOr.jpeg' },
-            { id: 'med2', name: 'Glucosamine Sulfate 500 mg', dosages: [{ time: '1st pill @ 10am', taken: true }], usedTo: 'Treats osteoarthritis.', sideEffects: 'Nausea, heartburn.', image: 'https://i.imgur.com/8m2bAOr.jpeg' },
-            { id: 'med3', name: 'Gliclazide (Diamicron) 30 mg', dosages: [{ time: '1st pill @ 10am', taken: true }, { time: '2nd pill @ 12pm', taken: false }, { time: '3rd pill @ 6pm', taken: false }, { time: '4th pill @ 10pm', taken: false }], usedTo: 'Controls blood sugar.', sideEffects: 'Hypoglycemia.', image: 'https://i.imgur.com/8m2bAOr.jpeg' },
+            { 
+                id: 'med1', 
+                name: 'Metformin XR 500mg', 
+                dosages: [
+                    { period: 'Morning', time: '10:00', taken: true },
+                    { period: 'Afternoon', time: '12:00', taken: false },
+                    { period: 'Evening', time: '18:00', taken: true }
+                ], 
+                usedTo: 'Manages Type 2 Diabetes Mellitus.', 
+                sideEffects: 'May cause Drowsiness', 
+                image: 'https://i.imgur.com/8m2bAOr.jpeg' 
+            },
+            { 
+                id: 'med2', 
+                name: 'Glucosamine Sulfate 500 mg', 
+                dosages: [
+                    { period: 'Morning', time: '10:00', taken: true }
+                ], 
+                usedTo: 'Treats osteoarthritis.', 
+                sideEffects: 'Nausea, heartburn.', 
+                image: 'https://i.imgur.com/8m2bAOr.jpeg' 
+            },
+            { 
+                id: 'med3', 
+                name: 'Gliclazide (Diamicron) 30 mg', 
+                dosages: [
+                    { period: 'Morning', time: '10:00', taken: true },
+                    { period: 'Afternoon', time: '12:00', taken: false },
+                    { period: 'Evening', time: '18:00', taken: false },
+                    { period: 'Night', time: '22:00', taken: false }
+                ], 
+                usedTo: 'Controls blood sugar.', 
+                sideEffects: 'Hypoglycemia.', 
+                image: 'https://i.imgur.com/8m2bAOr.jpeg' 
+            },
         ]
     },
-    { id: 2, name: 'Amelia Tan', medications: [
-        { id: 'med4', name: 'Aspirin 100mg', dosages: [{ time: '1st pill @ 8am', taken: false }], usedTo: 'Pain relief, blood thinner.', sideEffects: 'Upset stomach.', image: 'https://i.imgur.com/8m2bAOr.jpeg' }
-    ]}
+    {
+        id: 2, name: 'Mary Zhang', medications: [
+            { 
+                id: 'med4', 
+                name: 'Lisinopril 5mg', 
+                dosages: [
+                    { period: 'Morning', time: '08:00', taken: true }
+                ], 
+                usedTo: 'Treats high blood pressure', 
+                sideEffects: 'Cough, dizziness', 
+                image: 'https://i.imgur.com/8m2bAOr.jpeg' 
+            }
+        ]
+    }
 ];
 
 function MedicationsPage() {
-    const [selectedRecipient, setSelectedRecipient] = useState(careRecipientsData[0]);
-    const [selectedMedication, setSelectedMedication] = useState(selectedRecipient.medications[0]);
-    const [mode, setMode] = useState('view');
-    const [capturedFile, setCapturedFile] = useState(null);
+    const [careRecipients, setCareRecipients] = useState(initialCareRecipientsData);
+    const [selectedRecipientId, setSelectedRecipientId] = useState(initialCareRecipientsData[0]?.id);
+    const [selectedMedicationId, setSelectedMedicationId] = useState(null);
+    const [mode, setMode] = useState('view'); // 'view', 'edit', 'create'
+    const [capturedFile, setCapturedFile] = useState(null); // For camera capture functionality
+    const [isAddingRecipient, setIsAddingRecipient] = useState(false);
+    const [newRecipientName, setNewRecipientName] = useState("");
 
-    const handleRecipientSelect = (recipient) => {
-        setSelectedRecipient(recipient);
-        setSelectedMedication(recipient.medications[0] || null);
-        setMode('view');
-        setCapturedFile(null);
-    };
+    const selectedRecipient = careRecipients.find(r => r.id === selectedRecipientId);
+    const selectedMedication = selectedRecipient?.medications.find(m => m.id === selectedMedicationId);
 
-    const handleSelectMedication = (med) => {
-        setSelectedMedication(med);
+    const handleMedicationSelect = (medicationId) => {
+        setSelectedMedicationId(medicationId);
         setMode('view');
         setCapturedFile(null);
     };
     
-    const handleAddNewClick = (capturedFile = null) => {
+    const handleAddRecipientClick = () => {
+        setIsAddingRecipient(true);
         setSelectedMedication(null);
+    };
+
+    const handleSaveNewRecipient = () => {
+        if (!newRecipientName.trim()) return; // Don't save if the name is empty
+        const newRecipient = {
+            id: `recipient_${Date.now()}`,
+            name: newRecipientName,
+            medications: []
+        };
+        setCareRecipients(prev => [...prev, newRecipient]);
+        
+        setIsAddingRecipient(false);
+        setNewRecipientName("");
+        
+        setSelectedRecipientId(newRecipient.id);
+    };
+
+    const handleAddNewClick = (capturedFile = null) => {
+        setSelectedMedicationId(null);
         setMode('create');
         setCapturedFile(capturedFile);
         
@@ -54,7 +117,7 @@ function MedicationsPage() {
     
     const handleCancel = () => {
         if (mode === 'create') {
-            setSelectedMedication(selectedRecipient.medications[0]);
+            setSelectedMedicationId(selectedRecipient?.medications[0]?.id || null);
         }
         setMode('view');
         setCapturedFile(null);
@@ -73,80 +136,135 @@ function MedicationsPage() {
             sideEffects: medData.sideEffects || '',
             warnings: medData.warnings || '',
             image: medData.image || 'https://i.imgur.com/8m2bAOr.jpeg',
-            // Convert schedule to dosages array for compatibility with existing structure
-            dosages: medData.schedule ? 
-                [{ time: medData.schedule, taken: false }] : 
-                [{ time: 'As prescribed', taken: false }]
+            // Use dosages array from the form data, or convert schedule for compatibility
+            dosages: medData.dosages && medData.dosages.length > 0 ? 
+                medData.dosages : 
+                (medData.schedule ? 
+                    [{ time: medData.schedule, taken: false }] : 
+                    [{ time: 'As prescribed', taken: false }])
         };
 
-        // TODO: Here you would normally save to a database or API
-        // For now, we'll just update the local state
+        let updatedRecipients;
         if (mode === 'create') {
             // Add new medication to the selected recipient
-            const updatedRecipient = {
-                ...selectedRecipient,
-                medications: [...selectedRecipient.medications, newMedication]
-            };
-            setSelectedRecipient(updatedRecipient);
-            setSelectedMedication(newMedication);
+            updatedRecipients = careRecipients.map(recipient => {
+                if (recipient.id === selectedRecipientId) {
+                    return { ...recipient, medications: [...recipient.medications, newMedication] };
+                }
+                return recipient;
+            });
+            setSelectedMedicationId(newMedication.id);
         } else {
             // Update existing medication
-            const updatedMedications = selectedRecipient.medications.map(med =>
-                med.id === selectedMedication.id ? { ...med, ...newMedication } : med
-            );
-            const updatedRecipient = {
-                ...selectedRecipient,
-                medications: updatedMedications
-            };
-            setSelectedRecipient(updatedRecipient);
-            setSelectedMedication(newMedication);
+            updatedRecipients = careRecipients.map(recipient => {
+                if (recipient.id === selectedRecipientId) {
+                    const newMedications = recipient.medications.map(med => 
+                        med.id === selectedMedication.id ? { ...med, ...newMedication } : med
+                    );
+                    return { ...recipient, medications: newMedications };
+                }
+                return recipient;
+            });
         }
         
+        setCareRecipients(updatedRecipients);
+        setMode('view');
+        setCapturedFile(null);
+    };
+
+    const handleDelete = () => {
+        if (!selectedMedication) return;
+        
+        const updatedRecipients = careRecipients.map(recipient => {
+            if (recipient.id === selectedRecipientId) {
+                const filteredMedications = recipient.medications.filter(med => med.id !== selectedMedication.id);
+                return { ...recipient, medications: filteredMedications };
+            }
+            return recipient;
+        });
+        
+        setCareRecipients(updatedRecipients);
+        
+        // Select the first medication after deletion, or null if none exist
+        const updatedRecipient = updatedRecipients.find(r => r.id === selectedRecipientId);
+        setSelectedMedicationId(updatedRecipient?.medications[0]?.id || null);
         setMode('view');
     };
-    
+
+    const handleMedicationToggle = (medicationId, dosageIndex) => {
+        const updatedRecipients = careRecipients.map(recipient => {
+            if (recipient.id === selectedRecipientId) {
+                const updatedMedications = recipient.medications.map(med => {
+                    if (med.id === medicationId) {
+                        const updatedDosages = med.dosages.map((dosage, index) => 
+                            index === dosageIndex ? { ...dosage, taken: !dosage.taken } : dosage
+                        );
+                        return { ...med, dosages: updatedDosages };
+                    }
+                    return med;
+                });
+                return { ...recipient, medications: updatedMedications };
+            }
+            return recipient;
+        });
+        setCareRecipients(updatedRecipients);
+    };
+
     return (
-        <div>
-            <Header/>
+        <>
+            <Header />
             <div className="medications-grid-layout">
                 <div className="grid-item-recipients">
                     <CareRecipientList 
-                        recipients={careRecipientsData}
-                        onSelect={handleRecipientSelect}
-                        selectedRecipientId={selectedRecipient.id}
+                        recipients={careRecipients}
+                        selectedRecipientId={selectedRecipientId}
+                        onSelect={(recipientId) => {
+                            setSelectedRecipientId(recipientId);
+                            setSelectedMedicationId(null); // Clear medication selection when changing recipients
+                            setMode('view');
+                        }}
+                        isAdding={isAddingRecipient}
+                        newName={newRecipientName}
+                        setNewName={setNewRecipientName}
+                        onAdd={handleAddRecipientClick}
+                        onSaveNew={handleSaveNewRecipient}
+                        onCancel={() => setIsAddingRecipient(false)}
                     />
-                </div>
-                <div className="grid-item-title">
-                    <h1 className="page-title">
-                        Medications for <span className="recipient-name">{selectedRecipient.name.toUpperCase()}</span>
-                    </h1>
                 </div>
 
                 <div className="grid-item-logging">
-                    <MedicationLogging
-                        medications={selectedRecipient.medications}
-                        onSelect={handleSelectMedication} 
-                        selectedMedicationId={selectedMedication ? selectedMedication.id : null}
+                    <MedicationLogging 
+                        medications={selectedRecipient?.medications || []}
+                        onSelect={handleMedicationSelect}
+                        selectedMedicationId={selectedMedicationId}
                         onAddNew={handleAddNewClick}
                     />
                 </div>
+
                 <div className="grid-item-details">
                     {mode === 'view' ? (
-                        <MedicationDetails 
-                            medication={selectedMedication} 
-                            onEdit={handleEditClick}
-                        />
+                        selectedMedication ? (
+                            <MedicationDetails 
+                                medication={selectedMedication} 
+                                onEdit={handleEditClick}
+                            />
+                        ) : (
+                            <div className="no-medication-selected">
+                                <p>Select a medication to view details, or add a new one</p>
+                            </div>
+                        )
                     ) : (
                         <MedicationForm 
                             medication={selectedMedication} 
                             onSave={handleSave}
                             onCancel={handleCancel}
+                            onDelete={handleDelete}
                             capturedFile={capturedFile}
                         />
                     )}
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 

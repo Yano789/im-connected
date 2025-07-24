@@ -2,7 +2,7 @@ const express = require("express");
 const { createComment, editComment, deleteComment, getAllComments,getComment } = require("./controller.cjs")
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams} = require("./../../middleware/validate.cjs")
-const {postParamSchema,commentParamSchema,createCommentBodySchema,editCommentBodySchema,postAndCommentParamsSchema} = require("./../../utils/validators/commentValidators.cjs")
+const {postParamSchema,createCommentBodySchema,editCommentBodySchema,postAndCommentParamsSchema} = require("./../../utils/validators/commentValidators.cjs")
 const router = express.Router({ mergeParams: true });
 
 //create comment
@@ -22,7 +22,7 @@ router.post("/create", auth ,validateParams(postParamSchema),validateBody(create
 
 
 //edit comment via commentId
-router.put("/:comment/edit",auth,validateParams(commentParamSchema),validateBody(editCommentBodySchema),async (req, res) => {
+router.put("/:comment/edit",auth,validateParams(postAndCommentParamsSchema),validateBody(editCommentBodySchema),async (req, res) => {
     try {
         const commentId = req.params.comment
         const username = req.currentUser.username;
