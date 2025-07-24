@@ -10,4 +10,13 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  test: {
+    globals: true,
+    environment: "jsdom",
+    include: ['src/__test__/**/*.test.{js,jsx,ts,tsx}'],  // ONLY frontend tests here
+    setupFiles: "./src/__test__/setupTests.js", // optional for jest-dom or other setup
+    coverage: {
+      reporter: ["text", "json", "html"],
+    },
+  },
 });

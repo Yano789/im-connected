@@ -64,11 +64,10 @@ const editDraft = async (data) => {
     const toRemoveSet = new Set(mediaToRemove || []);
     const mediaToDelete = currentMedia.filter(m => toRemoveSet.has(m.public_id));
 
-    // Measure Cloudinary deletion time
-    console.time("Cloudinary Deletion");
+   
     const deletePromises = mediaToDelete.map(async (file) => {
       try {
-        console.log(`Deleting media: ${file.public_id}`);
+        
         return await cloudinary.uploader.destroy(file.public_id, {
           resource_type: file.type === "video" ? "video" : "image",
         });
@@ -78,7 +77,7 @@ const editDraft = async (data) => {
       }
     });
     await Promise.all(deletePromises);
-    console.timeEnd("Cloudinary Deletion");
+    
 
     const updatedMedia = [
       ...currentMedia.filter(m => !toRemoveSet.has(m.public_id)),
@@ -92,10 +91,10 @@ const editDraft = async (data) => {
     existingDraft.edited = true;
     existingDraft.draft = draft;
 
-    // Measure DB save time
-    console.time("Draft Save");
+
+    
     await existingDraft.save();
-    console.timeEnd("Draft Save");
+  
 
     return existingDraft;
   } catch (err) {
@@ -123,18 +122,18 @@ const deletePost = async (data) => {
                     const result = await cloudinary.uploader.destroy(file.public_id, {
                         resource_type: file.type === "video" ? "video" : "image",
                     });
-                    console.log(`Deleted media result for ${file.public_id}:`, result);
+                    
                     return result;
                 } catch (err) {
-                    console.error(`Error deleting media ${file.public_id}:`, err);
-                    throw err; // optionally handle without throwing if you want to continue deleting others
+                    
+                    throw err; 
                 }
             });
 
             await Promise.all(deletionPromises);
         }
 
-        // Make sure savedPost model is correctly named (capitalize if needed)
+        
         await Promise.all([
             Post.deleteOne({ postId: postId, draft: false }),
             Comment.deleteMany({ postId: postId }),
@@ -143,7 +142,7 @@ const deletePost = async (data) => {
 
         return existingPost;
     } catch (error) {
-        console.error("deletePost error:", error);
+        
         throw error;
     }
 };
@@ -151,14 +150,14 @@ const deletePost = async (data) => {
 
 const getFilteredPosts = async ({ tags = [], sort = "latest",source= "default",username }) => {
     try {
-        // Determine sort order for MongoDB
+       
         let filter = {};
 
         if (tags.length === 1) {
-            // Match posts that contain the single tag, even with other tags
+           
             filter.tags = tags[0];
         } else if (tags.length === 2) {
-            // Match posts with *exactly* those two tags (no more, no less)
+           
             filter.tags = { $all: tags, $size: 2 };
         }
 
@@ -183,7 +182,7 @@ const getFilteredPosts = async ({ tags = [], sort = "latest",source= "default",u
             filter.username = username
         }
 
-        // Fetch posts with filter and sort directly in DB
+
         const posts = await Post.find({ ...filter, draft: false }).sort(sortOptions);
         posts.forEach(post => {
             if (post.media && post.media.length > 0) {
@@ -249,19 +248,6 @@ const getPostWithComment = async (data) => {
 }
 
 
-const likePosts = async (data) => {
-    const { like, postId } = data
-    try {
-        const query = (like && like === "like")
-            ? { likes: 1 }
-            : { likes: -1 };
-        await Post.updateOne({ postId: postId, draft: false }, { $inc: query })
-        const updatedLikes = await Post.findOne({ postId })
-        return updatedLikes
-    } catch (error) {
-        throw error
-    }
-}
 
 const getAllMyPosts = async (data) => {
     try {
@@ -338,4 +324,4 @@ const deleteDrafts = async (data) => {
     }
 }
 
-module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, likePosts, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts }
+module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts }

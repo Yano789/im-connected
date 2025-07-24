@@ -10,6 +10,7 @@ import LoginCard from "./Login/LoginCard";
 import SignUpCard from "./SignUp/SignUpCard";
 import Authentication from "./Authentication/Authentication";
 import UserPreferences from "./Preferences/UserPreferences";
+import ProfilePage from './Profile/ProfilePage/ProfilePage';
 import { AuthContext } from "./AuthContext";
 import AuthProvider from "./AuthContext";
 import LoginSignUpBackground from "./assets/LoginSignUpBackground.jpg";
@@ -67,18 +68,20 @@ function AppContent() {
         minHeight: "100vh"
       }}
     >
-      <Routes>
-        <Route path="/auth" element={<Authentication />}></Route>
-        <Route path="/signup" element={<SignUpCard />}></Route>
-        <Route path="/login" element={<LoginCard />} />
-        <Route path="/preferences" element={<UserPreferences />}></Route>
-        <Route path="/forum" element={<Forum />} />
-        <Route path="/forum/newpost" element={<NewPost />} />
-        <Route path="/forum/viewpost" element={<ViewPost />} />
-        <Route path="/forum/mypost" element={<MyPost />} />
-        <Route path="/forum/savedpost" element={<SavedPost />} />
-        <Route path="/medication" element={<MedicationsPage />} />
-      </Routes>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/auth" element={<Authentication />}></Route>
+          <Route path="/signup" element={<SignUpCard />}></Route>
+          <Route path="/login" element={<LoginCard />} />
+          <Route path="/preferences" element={<UserPreferences />}></Route>
+          <Route path="/forum" element={<Forum />} />
+          <Route path="/forum/newpost" element={<NewPost />} />
+          <Route path="/forum/viewpost" element={<ViewPost />} />
+          <Route path="/forum/mypost" element={<MyPost />} />
+          <Route path="/forum/savedpost" element={<SavedPost />} />
+          <Route path="/medication" element={<MedicationsPage />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }
@@ -86,9 +89,9 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
-    <Router>
-      <AppContent />
-    </Router>
+      <Router>
+        <AppContent />
+      </Router>
     </AuthProvider>
   );
 }

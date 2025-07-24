@@ -7,7 +7,6 @@ const UserSchema = new Schema({
     number: {type: String, unique: true},
     email: {type: String,unique: true},
     password: String,
-    confirmPassword: String,
     verified: {type:Boolean,default:false}, //For authorisation purposes 
     preferences: {
     preferredLanguage: { type: String, default: "English" },

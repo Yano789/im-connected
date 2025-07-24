@@ -11,6 +11,7 @@ function ForumBody() {
   const [savedPostIds, setSavedPostIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [likedPostIds, setLikedPostIds] = useState(new Set());
 
   const [query, setQuery] = useState({
     filter: "default",
@@ -52,23 +53,32 @@ function ForumBody() {
     fetchPosts();
   }, [query]);
 
-  // Fetch saved post IDs once
   useEffect(() => {
-    const fetchSavedPosts = async () => {
+    const fetchSavedAndLiked = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/v1/saved", {
+        // Fetch saved posts
+        const savedRes = await fetch("http://localhost:5001/api/v1/saved", {
           method: "GET",
           credentials: "include",
         });
-        if (!res.ok) throw new Error("Failed to fetch saved posts");
-        const data = await res.json();
-        setSavedPostIds(new Set(data.map((p) => p.postId)));
+        if (!savedRes.ok) throw new Error("Failed to fetch saved posts");
+        const savedData = await savedRes.json();
+        setSavedPostIds(new Set(savedData.map((p) => p.postId)));
+
+        // Fetch liked posts
+        const likedRes = await fetch("http://localhost:5001/api/v1/like", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!likedRes.ok) throw new Error("Failed to fetch liked posts");
+        const likedData = await likedRes.json();
+        setLikedPostIds(new Set(likedData.map((p) => p.postId)));
       } catch (err) {
-        console.error("Error fetching saved posts:", err.message);
+        console.error("Error fetching saved/liked posts:", err.message);
       }
     };
 
-    fetchSavedPosts();
+    fetchSavedAndLiked();
   }, []);
 
   return (
@@ -93,6 +103,10 @@ function ForumBody() {
               postTitle={post.title}
               postTags={post.tags}
               postDescription={post.content}
+              postComment={post.comments}
+              postLikes={post.likes}
+              postMedia={post.media}
+              initiallyLiked={likedPostIds.has(post.postId)} // <-- important for sync
               ActionButton={() => (
                 <Bookmark
                   postId={post.postId}

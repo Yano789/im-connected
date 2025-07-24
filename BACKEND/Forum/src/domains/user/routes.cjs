@@ -8,9 +8,9 @@ const router = express.Router();
 
 
 //Protected Route
-router.get("/private_data", auth, (req, res) => {
-    res.status(200).send(`You're in the private territory of ${req.currentUser.email}`);
-});
+//router.get("/private_data", auth, (req, res) => {
+  //  res.status(200).send(`You're in the private territory of ${req.currentUser.email}`);
+//});
 
 router.get("/check-auth", auth, (req, res) => {
   res.status(200).json({ user: req.currentUser });

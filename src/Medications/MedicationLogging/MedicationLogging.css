@@ -18,30 +18,45 @@
     margin-bottom: 1.5rem;
 }
 
-.add-medication-section {
+.add-medication-button {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    padding-left: 1.5rem;
+    width: 100%;
+    background-color: transparent;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 1rem;
+    font-family: inherit;
+    padding: 0.5rem; 
+    border-radius: 12px; 
+    border: 2px solid transparent; 
+    transition: border-color 0.2s ease-in-out; 
 }
 
-.add-button {
+.add-medication-button:hover {
+    border-color: #e56b6f; 
+}
+
+.add-icon {
     background-color: #F87575;
     color: white;
-    border: none;
     border-radius: 50%;
     width: 28px;
     height: 28px;
     font-size: 1.5rem;
-    line-height: 28px;
-    text-align: center;
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
 }
 
-.add-medication-section span {
+.add-medication-button span {
     font-weight: 500;
+    font-size: 1rem;
+    color: #333;
 }
+
 
 .action-buttons {
     display: grid;
@@ -64,4 +79,370 @@
 
 .camera-button {
     background-color: #f0f0f0;
+}
+
+/* Camera functionality styles */
+.camera-container {
+    margin-top: 1rem;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: #000;
+    border: 2px solid #ddd;
+    position: relative;
+    min-height: 350px; /* Ensure minimum height */
+}
+
+.camera-video {
+    width: 100% !important;
+    height: 300px !important;
+    object-fit: cover;
+    display: block !important;
+    background-color: #000;
+    min-height: 300px;
+    border: none;
+    outline: none;
+    position: relative;
+    z-index: 1;
+}
+
+/* Add a pattern to show video area even when no stream */
+.camera-video::before {
+    content: 'Camera Preview Area';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #666;
+    font-size: 1.2rem;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Ensure video is visible on macOS Safari */
+.camera-video::-webkit-media-controls {
+    display: none !important;
+}
+
+.camera-video::-webkit-media-controls-enclosure {
+    display: none !important;
+}
+
+/* Debug overlay for video element status */
+.video-debug-overlay {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: #00ff00;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: monospace;
+    z-index: 10;
+    line-height: 1.4;
+}
+
+.video-debug-overlay div {
+    margin: 2px 0;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    background-color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.camera-controls {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.capture-button, .cancel-camera-button, .switch-camera-button, .test-button, .flip-button {
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    min-width: 80px;
+}
+
+.capture-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.capture-button:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.flip-button {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.flip-button:hover {
+    background-color: #138496;
+    transform: translateY(-1px);
+}
+
+/* Camera instructions overlay */
+.camera-instructions {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-align: center;
+    z-index: 5;
+    max-width: 90%;
+}
+
+.cancel-camera-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.cancel-camera-button:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+}
+
+.camera-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #f5c6cb;
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.camera-loading {
+    background-color: #cce7ff;
+    color: #004085;
+    padding: 0.75rem;
+    border-radius: 8px;
+    border: 1px solid #b3d7ff;
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    animation: pulse 1.5s ease-in-out infinite alternate;
+}
+
+.camera-loading-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 1rem;
+    border-radius: 8px;
+    z-index: 10;
+    font-weight: bold;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.force-continue-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: normal;
+}
+
+.force-continue-button:hover {
+    background-color: #218838;
+}
+
+.debug-info {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    opacity: 0.8;
+    font-weight: normal;
+}
+
+.no-stream-warning {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 193, 7, 0.9);
+    color: #856404;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    z-index: 5;
+}
+
+.video-wrapper {
+    position: relative;
+    background-color: #000;
+    min-height: 300px;
+}
+
+.stream-debug {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 255, 0, 0.8);
+    color: black;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    z-index: 10;
+}
+
+@keyframes pulse {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
+}
+
+.camera-button:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+.capture-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.switch-camera-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.switch-camera-button:hover:not(:disabled) {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.switch-camera-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.test-button {
+    background-color: #6f42c1;
+    color: white;
+}
+
+.test-button:hover:not(:disabled) {
+    background-color: #5a32a3;
+    transform: translateY(-1px);
+}
+
+.test-button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.add-medication-button.selected {
+    background-color: #fde2e4; 
+    border-color: #e56b6f; 
+}
+
+/* Captured Image Interface */
+.captured-image-container {
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1rem 0;
+    border: 2px solid #28a745;
+}
+
+.captured-image-container h3 {
+    margin: 0 0 1rem 0;
+    color: #28a745;
+    text-align: center;
+}
+
+.captured-image-preview {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.captured-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.captured-image-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.use-photo-button {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.use-photo-button:hover {
+    background-color: #218838;
+    transform: translateY(-1px);
+}
+
+.retake-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.retake-button:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.discard-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.discard-button:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
 }

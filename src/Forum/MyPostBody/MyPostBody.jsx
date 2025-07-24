@@ -10,12 +10,12 @@ function MyPostBody() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [myPosts, setMyPosts] = useState([]);
+  const [likedPostIds, setLikedPostIds] = useState(new Set());  // <-- Added liked posts state
 
   const removePost = (id) => {
     setMyPosts((prev) => prev.filter((post) => post.postId !== id));
   };
 
-  // ✅ Add `source: "personalised"` to query
   const [query, setQuery] = useState({
     filter: "default",
     mode: "default",
@@ -30,6 +30,7 @@ function MyPostBody() {
     }));
   };
 
+  // Fetch my posts on query change
   useEffect(() => {
     const fetchMyPosts = async () => {
       setLoading(true);
@@ -54,7 +55,25 @@ function MyPostBody() {
     fetchMyPosts();
   }, [query]);
 
-  // ✅ Optional: hook TopicSelector into updateQuery if you want tag filtering
+  // Fetch liked posts ONCE on mount
+  useEffect(() => {
+    const fetchLikedPosts = async () => {
+      try {
+        const likedRes = await fetch("http://localhost:5001/api/v1/like", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!likedRes.ok) throw new Error("Failed to fetch liked posts");
+        const likedData = await likedRes.json();
+        setLikedPostIds(new Set(likedData.map((p) => p.postId)));
+      } catch (err) {
+        console.error("Error fetching liked posts:", err.message);
+      }
+    };
+
+    fetchLikedPosts();
+  }, []);
+
   const handleTagFilterChange = (filterString) => {
     if (!filterString || filterString === "") {
       updateQuery({ filter: "default" });
@@ -85,6 +104,9 @@ function MyPostBody() {
               postTitle={post.title}
               postTags={post.tags}
               postDescription={post.content}
+              postComment={post.comments}
+              postLikes={post.likes}
+              initiallyLiked={likedPostIds.has(post.postId)}
               ActionButton={() => (
                 <Delete
                   postToDelete={post.postId}

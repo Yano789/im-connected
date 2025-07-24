@@ -1,19 +1,55 @@
 @import "tailwindcss";
+
 @layer components {
-  .commentUsername{
-    @apply relative;
+  .commentUsername {
+    @apply font-semibold text-lg sm:text-sm text-left text-[#2d2d2d];
   }
+
+
   .commentDate {
-    @apply relative text-base;
+    @apply text-base sm:text-sm text-gray-500;
   }
+
   .commentBody {
-    @apply self-stretch flex flex-row items-center justify-start gap-5;
+    @apply flex flex-row items-center justify-between gap-2 sm:gap-3;
   }
+
   .commentContent {
-    @apply self-stretch relative text-base text-left;
+    @apply text-base sm:text-sm text-left text-black whitespace-pre-wrap break-words;
   }
+
   .commentDiv {
-    @apply w-full relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#c8b8db] flex flex-col items-start justify-start box-border gap-[5px] text-center text-xl text-black p-2.5 rounded-[5px];
-    font-family: Poppins;
+    @apply w-full bg-[#f9f6fd] flex flex-col gap-2 text-base sm:text-sm text-black p-3 sm:p-2 rounded-md 
+           border border-[#ddd] transition-all duration-200 hover:shadow-sm hover:border-[#bbb];
+  }
+
+  .commentFunction {
+    @apply w-full flex flex-row gap-4 text-base sm:text-sm text-[#333] justify-start items-center;
+  }
+
+  .replySection {
+    @apply w-full flex flex-col gap-2 mt-2;
+  }
+
+  .replyInput {
+    @apply w-full p-2 text-base sm:text-sm rounded-md border border-gray-300 bg-white resize-y min-h-[60px]
+           focus:outline-none focus:ring-2 focus:ring-[#c8b8db] focus:border-transparent;
+  }
+
+
+  .replyButton {
+    @apply self-start px-3 py-1 text-base sm:text-sm rounded-md bg-[#c8b8db] hover:bg-[#ab97c3] text-black font-medium 
+           transition-colors duration-200;
+  }
+
+
+  .nestedComments {
+    @apply ml-3 sm:ml-2 mt-2 pl-2 border-l border-[#ccc] flex flex-col gap-2;
+  }
+
+
+  .editableTextarea {
+    @apply w-full p-2 text-base sm:text-sm rounded-md border border-gray-300 bg-[#f0e8fa] resize-y min-h-[60px]
+           focus:outline-none focus:ring-2 focus:ring-[#c8b8db] focus:border-transparent transition;
   }
 }

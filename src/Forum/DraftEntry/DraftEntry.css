@@ -1,22 +1,41 @@
 @import "tailwindcss";
-@layer components {
-    .draftTitle {
-    @apply relative text-xl leading-6;
-    }
-    .draftText {
-    @apply self-stretch relative leading-6 max-w-[500px] overflow-hidden text-ellipsis whitespace-normal line-clamp-5;
-    }
-    .draftDate {
-    @apply relative leading-6;
-    }
-    .draftDelete {
-    @apply w-10 relative h-10 object-cover;
-    }
-    .draftDateDiv {
-    @apply self-stretch flex flex-row items-center justify-between gap-0 ;
-    }
-    .draftEntryDiv {
-    @apply w-full relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] flex flex-col items-start justify-start box-border gap-2.5 text-left text-base text-black p-2.5 rounded-[5px];
-    }
 
+@layer components {
+  .draftEntryDiv {
+    @apply w-full relative
+           shadow-[5px_5px_4px_rgba(0,0,0,0.25)]
+           bg-[#fff2f0]
+           border border-[#1e1e1e]
+           flex flex-col items-start justify-start
+           box-border gap-2.5 text-left
+           text-base text-black p-3
+           rounded-[20px] 
+           cursor-pointer
+           transition-colors duration-200
+           hover:bg-[#ffdad3];
+  }
+
+  .draftTitle {
+    @apply relative text-xl leading-6 font-semibold text-[#2b2b2b] sm:text-lg md:text-xl;
+  }
+
+  .draftText {
+    @apply self-stretch relative leading-6 max-w-[500px] overflow-hidden text-ellipsis whitespace-normal line-clamp-5
+           text-sm sm:text-base
+           text-gray-800;
+  }
+
+  .draftDateDiv {
+    @apply self-stretch flex flex-row items-center justify-between gap-0;
+  }
+
+  .draftDate {
+    @apply relative leading-6 text-gray-600 text-sm sm:text-base;
+  }
+
+  .draftDelete {
+    @apply w-10 relative h-10 object-cover
+           cursor-pointer
+           hover:brightness-90 transition duration-200;
+  }
 }

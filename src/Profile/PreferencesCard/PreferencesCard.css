@@ -1,0 +1,49 @@
+.preferences-card {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 10px 0px #79A86F, 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.preference-group {
+    margin-bottom: 2rem;
+}
+
+.preference-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+}
+
+.preference-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.pref-button {
+    padding: 0.75rem 1.5rem;
+    border-radius: 12px;
+    border: 2px solid #eee;
+    background-color: #f9f9f9;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pref-button.selected {
+    background-color: #BFD8AF;
+    border-color: #79A86F;
+    color: #2b3d28;
+}
+
+.content-modes {
+    gap: 2rem;
+}
+
+.content-button {
+    flex: 1;
+    min-height: 100px;
+    font-size: 1.1rem;
+}

@@ -1,12 +1,32 @@
 .medications-grid-layout {
   display: grid;
-  /* Define two columns: the first takes 1 part of the space, the second takes 1.5 parts */
-  grid-template-columns: 1fr 1.5fr;
-  /* Define two rows that size automatically based on their content */
-  grid-template-rows: auto auto;
+  /* Define three columns: recipients, logging, details */
+  grid-template-columns: 300px 1fr 1fr;
+  /* Single row that sizes automatically based on content */
+  grid-template-rows: auto;
   gap: 2rem;
   padding: 2rem;
   align-items: start; /* Aligns items to the top of their grid cell */
+  min-height: calc(100vh - 120px); /* Account for header */
+}
+
+.grid-item-recipients {
+  min-height: 200px;
+}
+
+.grid-item-logging {
+  min-height: 200px;
+}
+
+.grid-item-details {
+  min-height: 200px;
+}
+
+.no-medication-selected {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-style: italic;
 }
 
 .grid-item-title {

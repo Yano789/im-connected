@@ -1,5 +1,5 @@
 const express = require("express");
-const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,likePosts,getAllMyPosts,getAllMyDrafts,getMyDraft,deleteDrafts} = require("./controller.cjs");
+const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,getAllMyDrafts,getMyDraft,deleteDrafts} = require("./controller.cjs");
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
 const {postDraftSchema,querySchema,paramsSchema} = require("./../../utils/validators/postValidator.cjs")
@@ -9,29 +9,32 @@ const {cloudinary} = require("./../../config/cloudinary.cjs");
 const router = express.Router();
 
 //create post/Draft
-router.post("/create", auth, upload.array("media", 5), normalizeTagsMiddleware,validateBody(postDraftSchema), async (req, res) => {
-  try {
-    const { title, content, tags, draft = false } = req.body;
-    const username = req.currentUser.username;
+router.post("/create", auth, upload.array("media", 5), normalizeTagsMiddleware, validateBody(postDraftSchema), async (req, res, next) => {
+    try {
+        const { title, content, tags, draft = false } = req.body;
+        const username = req.currentUser.username;
+        console.log("User:", username);
 
-    const media = req.files.map(file => ({
-      url: file.path,
-      type: file.mimetype.startsWith('video') ? 'video' : 'image',
-      public_id: file.filename // assuming filename is used as public_id in cloudinary
-    }));
+        const media = (req.files || []).map(file => ({
+            url: file.path,
+            type: file.mimetype.startsWith('video') ? 'video' : 'image',
+            public_id: file.filename
+        }));
 
-    const createdPost = await createPost({ title, content, tags, username, draft, media });
-    res.status(200).json(createdPost);
 
-  } catch (error) {
-    if (req.files && req.files.length > 0) {
-      for (const file of req.files) {
-        await cloudinary.uploader.destroy(file.filename, { resource_type: "auto" });
-      }
+        const createdPost = await createPost({ title, content, tags, username, draft, media });
+
+        res.status(200).json(createdPost);
+    } catch (error) {
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                await cloudinary.uploader.destroy(file.filename, { resource_type: "auto" });
+            }
+        }
+        res.status(400).send(error.message);
     }
-    res.status(400).send(error.message);
-  }
 });
+
 
 
 //delete post via postId
@@ -82,22 +85,6 @@ router.get("/getPost/:post", validateParams(paramsSchema),async (req, res) => {
         res.status(400).send(error.message)
     }
 })
-
-//TODO, do a like counter
-router.put("/:post/like",auth,validateParams(paramsSchema),async(req,res)=>{
-    try {
-        const postId = req.params.post
-        const {like = "like"} = req.query 
-        const updatedLikes = await likePosts({like,postId})
-        res.status(200).json({ 
-            likes: updatedLikes.likes,
-            message: "Like added successfully"
-        });
-    } catch (error) {
-        res.status(400).send(error.message)
-    }
-})
-
 
 
 //displays all current draft by username

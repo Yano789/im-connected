@@ -1,20 +1,16 @@
 .card {
     background-color: #fff;
-    border-radius: 16px; /* Slightly more rounded corners */
+    border-radius: 16px;
     padding: 1.5rem;
     position: relative;
-    /* Multiple Box Shadows */
-    /* 1. The pink layer (solid, offset down) */
-    /* 2. The subtle blur shadow (for depth) */
-    box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 0px #F87575, 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .card-header {
     font-size: 1.25rem;
     font-weight: bold;
     margin: 0;
-    padding-bottom: 1rem; /* Space for the line */
-    /* The line under the header */
+    padding-bottom: 1rem;
     border-bottom: 4px solid #F87575; 
 }
 
@@ -27,20 +23,13 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1rem 0.25rem; /* Vertical padding */
+    padding: 1rem 0.25rem;
     cursor: pointer;
-    /* The line between items */
     border-bottom: 4px solid #F87575;
-    
 }
 
-/* Remove the bottom border from the last item in the list */
-.recipient-item:last-of-type {
+.recipient-item.last-item {
     border-bottom: none;
-}
-
-.recipient-item span {
-    font-weight: 500;
 }
 
 .switch-button, .show-button {
@@ -50,11 +39,10 @@
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 500;
-    transition: background-color 0.2s;
 }
 
 .show-button {
-    background-color: #F87575; /* Pinkish color from Figma */
+    background-color: #F87575;
     color: white;
 }
 
@@ -63,7 +51,7 @@
     margin-top: 1rem;
     padding: 0.75rem;
     background-color: transparent;
-    border: none; /* No border in the design */
+    border: none;
     cursor: pointer;
     font-weight: 500;
     text-align: center;
@@ -71,6 +59,45 @@
     border-radius: 8px;
 }
 
-.add-recipient-button:hover {
-    background-color: #fafafa;
+/* --- Animation Logic is now ONLY for the line --- */
+.add-recipient-inline-form {
+    display: flex;
+    flex-wrap: wrap; 
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+}
+
+.animated-line {
+  width: 100%;
+  height: 4px;
+  background-color: #F87575;
+  margin-bottom: 0.5rem;
+  animation: spreadFromMiddle 0.2s ease-out forwards;
+}
+
+@keyframes spreadFromMiddle {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.add-recipient-inline-form input {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+}
+
+.save-new-button {
+    border: none;
+    background-color: #52b788;
+    color: white;
+    font-weight: bold;
+    padding: 0 1rem;
+    border-radius: 8px;
+    cursor: pointer;
 }

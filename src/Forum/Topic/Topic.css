@@ -8,13 +8,16 @@
   .topicName {
     @apply text-xs sm:text-sm md:text-base leading-snug break-words whitespace-normal;
   }
-  .topicMainDefault {
-  @apply flex flex-col xl:flex-row w-full max-w-[250px] items-center gap-2 p-2.5 rounded-md border border-[#2d2d2d] bg-[#FFF2F0];
-}
 
-.topicMainClicked {
-  @apply flex flex-col xl:flex-row w-full max-w-[250px] items-center gap-2 p-2.5 rounded-md border border-[#2d2d2d] bg-[#C8B8DB];
-}
+  .topicMainDefault {
+    @apply flex flex-col xl:flex-row w-full max-w-[250px] items-center gap-2 p-2.5 rounded-md border border-[#2d2d2d] bg-[#FFF2F0] 
+    transition duration-200 ease-in-out transform hover:scale-[1.02] hover:shadow-md hover:bg-[#ffe2de] active:scale-[0.98];
+  }
+
+  .topicMainClicked {
+    @apply flex flex-col xl:flex-row w-full max-w-[250px] items-center gap-2 p-2.5 rounded-md border border-[#2d2d2d] bg-[#FF7E7E] 
+    transition duration-200 ease-in-out transform hover:scale-[1.02] hover:shadow-md hover:bg-[#ff6e6e] active:scale-[0.98];
+  }
 
   .topicDiv {
     @apply w-full max-w-full flex-shrink text-left text-[#2d2d2d] cursor-pointer;

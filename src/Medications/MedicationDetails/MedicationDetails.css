@@ -3,16 +3,23 @@
     border-radius: 16px;
     padding: 2rem;
     box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.3);
-    height: 100%;
+    overflow: hidden; 
+    transition: all 0.3s ease-in-out; 
 }
 
-.details-card.placeholder {
+.details-content-wrapper {
+    width: 100%;
+}
+
+.placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
     color: #888;
     font-size: 1.2rem;
+    min-height: 400px; 
 }
+
 
 .medication-title {
     font-size: 1.5rem;
@@ -42,6 +49,7 @@
 .section-content {
     margin: 0;
     color: #333;
+    overflow-wrap: break-word;
 }
 
 .schedule-icons {
@@ -51,16 +59,25 @@
 }
 
 .icon-item {
+    border-radius: 12px;
+    padding: 0.5rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.25rem;
     font-size: 0.8rem;
     color: #555;
+    opacity: 0.5; 
+    transition: opacity 0.2s;
+}
+
+.icon-item.active {
+    opacity: 1; 
+    font-weight: bold;
 }
 
 .icon-item span {
-    font-size: 1.75rem; /* Emoji size */
+    font-size: 1.75rem;
 }
 
 .medication-image {
@@ -87,4 +104,13 @@
 
 .edit-button:hover {
     background-color: #e56b6f;
+}
+
+.warning-text {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 1rem;
+    color: #856404;
+    font-weight: 500;
 }

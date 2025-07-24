@@ -1,22 +1,26 @@
 import React from 'react';
 import './CareRecipientList.css';
 
-// This component receives data from its parent through "props"
-function CareRecipientList({ recipients, onSelect, selectedRecipientId }) {
+function CareRecipientList({ recipients, onSelect, selectedRecipientId, isAdding, onAdd, onSaveNew, newName, setNewName  }) {
+    
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            onSaveNew();
+        }
+    };
+    
     return (
         <div className="card">
             <h2 className="card-header">My Care Recipients</h2>
             <div className="recipient-list">
-                {recipients.map((recipient) => {
-                    // Check if the current recipient is the selected one
-                    const isSelected = recipient.id === selectedRecipientId;
+                {recipients.map((recipient, index) => {
+                    const isSelected = recipient.id === selectedRecipientId && !isAdding;
+                    const isLastItem = index === recipients.length - 1;
                     return (
                         <div 
                             key={recipient.id} 
-                            // Apply a 'selected' class for styling if it's the active one
-                            className={isSelected ? 'recipient-item selected' : 'recipient-item'}
-                            // When clicked, call the onSelect function from the parent
-                            onClick={() => onSelect(recipient)}
+                            className={`recipient-item ${isSelected ? 'selected' : ''} ${isLastItem ? 'last-item' : ''}`}
+                            onClick={() => onSelect(recipient.id)}
                         >
                             <span>{recipient.name}</span>
                             <button className={isSelected ? 'show-button' : 'switch-button'}>
@@ -25,8 +29,28 @@ function CareRecipientList({ recipients, onSelect, selectedRecipientId }) {
                         </div>
                     );
                 })}
+
+                {isAdding && (
+                    <div className="add-recipient-inline-form">
+                        <div className="animated-line"></div>
+                        <input
+                            type="text"
+                            autoFocus
+                            placeholder="New Recipient's Name..."
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                        />
+                        <button onClick={onSaveNew} className="save-new-button">Save</button>
+                    </div>
+                )}
             </div>
-            <button className="add-recipient-button">Add Care Recipient</button>
+            
+            {!isAdding && (
+                <button className="add-recipient-button" onClick={onAdd}>
+                    Add Care Recipient
+                </button>
+            )}       
         </div>
     );
 }
