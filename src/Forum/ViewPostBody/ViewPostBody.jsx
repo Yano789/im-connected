@@ -8,15 +8,7 @@ function ViewPostBody() {
         <ToPost />
       </div>
       <div className="forumBody">
-        <ViewPostCard
-          viewPostTitle="abc"
-          viewPostDate="1/1/1111"
-          viewPostUsername="insertName"
-          viewPostContents="blah blah"
-          viewPostTags={["tagies 1", "tagies 2"]}
-          viewPostLikes={0}
-          viewPostComments={0}
-        />
+        <ViewPostCard/>
       </div>
     </div>
   );

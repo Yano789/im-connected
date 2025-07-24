@@ -17,7 +17,9 @@ function ViewPostCard() {
   useEffect(() => {
     if (!postId) return;
 
-    fetch(`http://localhost:5001/api/v1/post/getPost/${encodeURIComponent(postId)}`)
+    fetch(
+      `http://localhost:5001/api/v1/post/getPost/${encodeURIComponent(postId)}`
+    )
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch post.");
         return res.json();
@@ -47,7 +49,15 @@ function ViewPostCard() {
   if (error) return <p>{error}</p>;
   if (!postData) return <p>Loading post...</p>;
 
-  const { title, content, username, createdAt, tags = [], likes } = postData;
+  const {
+    title,
+    content,
+    username,
+    createdAt,
+    tags = [],
+    likes,
+    media,
+  } = postData;
 
   return (
     <div className="viewPostDiv">
@@ -55,7 +65,9 @@ function ViewPostCard() {
         <div className="viewPostData">
           <div className="viewPostTitleDiv">
             <div className="viewPostTitleParent">
-              <div className="X" onClick={() => navigate("/forum")}>X</div>
+              <div className="X" onClick={() => navigate("/forum")}>
+                X
+              </div>
               <div className="viewPostDetails">{title}</div>
               <div className="viewPostPostedDiv">
                 <div className="viewDatePosted">Posted:</div>
@@ -80,6 +92,15 @@ function ViewPostCard() {
         <div className="viewPostDescriptionDiv">
           <div className="viewPostDescription">{content}</div>
         </div>
+        {media && media.length > 0 && (
+          <div className="viewPostImagesDiv">
+            <div className="viewPostImages">
+              {media.map((m, index) => (
+                <img key={index} className="postImage" src={m.url} alt="post" />
+              ))}
+            </div>
+          </div>
+        )}
         <div className="viewPostStatsDiv">
           <div className="commentsNumber">
             <img className="commentsIcon" alt="Comments" src={CommentsIcon} />
@@ -91,7 +112,11 @@ function ViewPostCard() {
           </div>
         </div>
       </div>
-      <CommentBody comments={comments} postId={postId} refreshComments={fetchComments} />
+      <CommentBody
+        comments={comments}
+        postId={postId}
+        refreshComments={fetchComments}
+      />
     </div>
   );
 }
