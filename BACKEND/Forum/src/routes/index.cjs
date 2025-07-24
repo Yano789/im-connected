@@ -8,6 +8,7 @@ const postRoutes = require("../domains/post/index.cjs");
 const commentRoutes = require("../domains/comment/index.cjs");
 const savedPostRoutes = require("../domains/savedPosts/index.cjs");
 const likedPostRoutes = require("./../domains/likes/index.cjs")
+const medicationRoutes = require("../domains/medication/index.cjs");
 
 router.use("/user",userRoutes);
 router.use("/otp",OTPRoutes);
@@ -17,4 +18,5 @@ router.use("/post",postRoutes);
 router.use("/:post/comment",commentRoutes);
 router.use("/saved",savedPostRoutes);
 router.use("/like",likedPostRoutes);
+router.use("/medication",medicationRoutes);
 module.exports = router;

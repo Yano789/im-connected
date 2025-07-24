@@ -18,7 +18,7 @@ function MedicationItem({ medication, onSelect, isSelected }) {
       <div 
         className={isSelected ? "med-item-layout selected" : "med-item-layout"}
       >
-        <div className="med-name-container" onClick={() => onSelect(medication)}>
+        <div className="med-name-container" onClick={() => onSelect(medication.id)}>
           <button className="med-name-button">{medication.name}</button>
         </div>
 

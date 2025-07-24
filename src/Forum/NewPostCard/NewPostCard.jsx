@@ -17,6 +17,8 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
 
   // New files user uploads (File objects)
   const [mediaFiles, setMediaFiles] = useState([]);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const tags = [
     "Physical Disability & Chronic Illness",
@@ -28,6 +30,16 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
     "Pediatric Care",
     "Subsidies and Govt Support",
   ];
+
+  const resetForm = () => {
+    setTitle("");
+    setContent("");
+    setSelectedTags([]);
+    setDraftPostId(null);
+    setExistingMedia([]);
+    setMediaFiles([]);
+    setMediaToRemove([]);
+  };
 
   const navigate = useNavigate();
 
@@ -58,6 +70,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
   };
 
   const handleSubmit = async (isDraft = true) => {
+    setLoading(true);
     try {
       const formData = new FormData();
 
@@ -73,7 +86,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
       mediaToRemove.forEach((id) => {
         formData.append("mediaToRemove[]", id);
       });
-      
+
       let response;
 
       if (isDraft && draftPostId) {
@@ -101,7 +114,6 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
 
       const data = await response.json();
       console.log("Success:", data);
-
       if (!draftPostId && data._id) {
         setDraftPostId(data._id);
       }
@@ -110,10 +122,19 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
         onDraftAdded(data);
       }
 
-      // Reset removed media list since changes saved successfully
+      resetForm();
+      setSuccessMessage(
+        isDraft ? "Draft saved successfully!" : "Post published successfully!"
+      );
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
+
       setMediaToRemove([]);
     } catch (error) {
       console.error("Error submitting post:", error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -139,6 +160,14 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
 
   return (
     <div className="postMain">
+      {loading && (
+        <div className="spinner-overlay">
+          <div className="spinner" />
+        </div>
+      )}
+
+      {successMessage && <div className="toast-message">{successMessage}</div>}
+
       <form
         className="postData"
         onSubmit={(e) => {

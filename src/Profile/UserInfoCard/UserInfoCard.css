@@ -1,0 +1,143 @@
+.user-card {
+    background-color: #fff;
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 10px 0px #79A86F, 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.user-avatar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center; 
+    margin-bottom: 2rem;
+    position: relative;
+    width: 150px;
+    margin-left: auto; 
+    margin-right: auto;
+}
+
+.user-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 5px solid white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    object-fit: cover;
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.detail-row {
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 0.25rem;
+}
+
+.detail-value {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #333;
+}
+
+.detail-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.edit-icon-button {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    opacity: 0.3;
+    transition: opacity 0.2s;
+}
+
+.detail-row:hover .edit-icon-button {
+    opacity: 1;
+}
+
+.detail-row.edit-mode {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.detail-row.edit-mode input {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 1.1rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-top: 0.25rem;
+}
+
+.save-profile-button {
+    width: 100%;
+    margin-top: 2rem;
+    background-color: #79A86F;
+    color: white;
+    border: none;
+    padding: 0.75rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.avatar-upload-button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+}
+
+.avatar-upload-button:hover {
+    background-color: #e0e0e0;
+}
+
+
+.avatar-edit-button {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: #f0f0f0;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: all 0.2s ease;
+}
+
+.avatar-edit-button:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.1);
+}
+
+
+.error-text {
+    color: #c74b50; 
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}

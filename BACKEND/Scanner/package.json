@@ -1,0 +1,29 @@
+{
+  "name": "medication-scanner-backend",
+  "version": "2.0.0",
+  "description": "Enhanced medication scanner with OCR and internet cross-referencing",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "medication",
+    "scanner",
+    "ocr",
+    "tesseract",
+    "healthcare"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "node-fetch": "^3.3.2",
+    "sharp": "^0.34.3",
+    "tesseract.js": "^6.0.1"
+  }
+}

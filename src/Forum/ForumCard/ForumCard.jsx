@@ -2,8 +2,7 @@ import "./ForumCard.css";
 import CommentsIcon from "../../assets/Comments.png";
 import LikesIcon from "../../assets/Likes.png";
 import UnlikesIcon from "../../assets/Unlikes.png";
-import Boo from "../../assets/Boo.jpg";
-import { useState, useEffect } from "react";  // <-- add useEffect
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function ForumCard(props) {
@@ -17,6 +16,7 @@ function ForumCard(props) {
     ActionButton,
     postComment,
     postLikes,
+    postMedia,
     initiallyLiked = false,
   } = props;
 
@@ -34,7 +34,9 @@ function ForumCard(props) {
     e.stopPropagation();
 
     try {
-      const url = `http://localhost:5001/api/v1/like/${encodedPostId}/${liked ? "unlike" : "like"}`;
+      const url = `http://localhost:5001/api/v1/like/${encodedPostId}/${
+        liked ? "unlike" : "like"
+      }`;
       const method = liked ? "DELETE" : "POST";
 
       const res = await fetch(url, {
@@ -42,7 +44,8 @@ function ForumCard(props) {
         credentials: "include",
       });
 
-      if (!res.ok) throw new Error(`Failed to ${liked ? "unlike" : "like"} post`);
+      if (!res.ok)
+        throw new Error(`Failed to ${liked ? "unlike" : "like"} post`);
 
       const data = await res.json();
       setLiked(!liked);
@@ -89,12 +92,20 @@ function ForumCard(props) {
       <div className="description">
         <p className="postDescription">{postDescription}</p>
       </div>
-
-      <div className="images">
-        <div className="rectangleParent">
-          <img className="postImage" src={Boo} alt="post" />
+      {postMedia && postMedia.length > 0 && (
+        <div className="images">
+          <div className="rectangleParent">
+            {postMedia.map((media, index) => (
+              <img
+                key={index}
+                className="postImage"
+                src={media.url}
+                alt="post"
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="stats">
         <div className="commentsNumber">
@@ -106,7 +117,11 @@ function ForumCard(props) {
           onClick={handleLikeToggle}
           style={{ cursor: "pointer" }}
         >
-          <img className="likesIcon" alt="likes" src={liked ? LikesIcon : UnlikesIcon} />
+          <img
+            className="likesIcon"
+            alt="likes"
+            src={liked ? LikesIcon : UnlikesIcon}
+          />
           <div className="name">{likeCount}</div>
         </div>
       </div>

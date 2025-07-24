@@ -9,7 +9,7 @@
            flex flex-col items-start justify-start
            box-border gap-2.5 text-left
            text-base text-black p-3
-           rounded-[20px]  /* same as your tags */
+           rounded-[20px] 
            cursor-pointer
            transition-colors duration-200
            hover:bg-[#ffdad3];
