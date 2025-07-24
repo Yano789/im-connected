@@ -2,7 +2,6 @@ const generateOTP = require("../../utils/generateOTP.cjs");
 const sendEmail = require("../../utils/sendEmail.cjs");
 const {hashData,verifyHashedData} = require("../../utils/hashData.cjs");
 const OTP = require("./model.cjs");
-const User = require("../user/model.cjs");
 const {AUTH_EMAIL} = process.env;
 
 const verifyOTP = async({email,otp})=>{
@@ -25,11 +24,6 @@ const verifyOTP = async({email,otp})=>{
         const hashedOTP = matchedOTPRecord.otp;
         const validOTP = await verifyHashedData(otp,hashedOTP);
         if(!validOTP) throw new Error("Invalid OTP!");
-
-        await User.updateOne(
-            { email },
-            { $set: { verified: true } } 
-        );
 
         return validOTP;
     } catch (error) {

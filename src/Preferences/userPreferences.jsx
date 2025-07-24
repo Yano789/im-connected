@@ -40,7 +40,7 @@ const UserPreferences = () => {
   ];
 
   const careRecipientTopics = [
-    { id: 'physical-disability', label: 'Physical Disability & Chronic Illness', icon: <img src={Wheelchair} alt="Wheelchair" />},
+    { id: 'physical-disability', label: 'Physical Disability & Chronic Illness', icon: <img src={Wheelchair} alt="Wheelchair" /> },
     { id: 'end-of-life', label: 'End of Life Care', icon: <img src={Elderly} alt="Elderly" /> },
     { id: 'mental-disability', label: 'Mental Disability', icon: <img src={Depression} alt="Depression" /> },
     { id: 'pediatric-care', label: 'Pediatric Care', icon: <img src={Children} alt="Children" /> }
@@ -53,12 +53,26 @@ const UserPreferences = () => {
     { id: 'subsidies-govt', label: 'Subsidies and Govt Support', icon: <img src={Govt} alt="Govt" /> }
   ];
 
+  // const handleTopicToggle = (topicId) => {
+  //   setSelectedTopics(prev => 
+  //     prev.includes(topicId) 
+  //       ? prev.filter(id => id !== topicId)
+  //       : [...prev, topicId]
+  //   );
+  // };
+
   const handleTopicToggle = (topicId) => {
-    setSelectedTopics(prev => 
-      prev.includes(topicId) 
-        ? prev.filter(id => id !== topicId)
-        : [...prev, topicId]
-    );
+    setSelectedTopics(prev => {
+      if (prev.includes(topicId)) {
+        // If already selected, remove it
+        return prev.filter(id => id !== topicId);
+      } else if (prev.length < 2) {
+        // If less than 2 selected, add it
+        return [...prev, topicId];
+      }
+      // If 2 are already selected and this isn't one of them, do nothing
+      return prev;
+    });
   };
 
   const handleContinue = async (e) => {
@@ -79,20 +93,20 @@ const UserPreferences = () => {
     };
 
     try {
-    const res = await fetch("http://localhost:5000/api/v1/user/preferences", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ username, ...preferences })
-    });
+      const res = await fetch("http://localhost:5000/api/v1/user/preferences", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, ...preferences })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    if (res.ok) {
+      if (res.ok) {
         console.log("Preference saved:", data);
         localStorage.setItem("preferences", JSON.stringify(preferences));
-        
+
         setUser(data);
         localStorage.removeItem("canVerifyEmail");
 
@@ -180,7 +194,7 @@ const UserPreferences = () => {
             <div className="right-column">
               <div className="preference-group">
                 <label className="preference-label">Topics Interested In</label>
-                
+
                 <div className="topics-header">
                   <span>For Care Recipient</span>
                   <span>For Caregiver</span>
@@ -188,29 +202,37 @@ const UserPreferences = () => {
 
                 <div className="topics-grid">
                   <div className="topics-column">
-                    {careRecipientTopics.map((topic) => (
-                      <button
-                        key={topic.id}
-                        className={`topic-btn ${selectedTopics.includes(topic.id) ? 'selected' : ''}`}
-                        onClick={() => handleTopicToggle(topic.id)}
-                      >
-                        <span className="topic-icon">{topic.icon}</span>
-                        <span className="topic-text">{topic.label}</span>
-                      </button>
-                    ))}
+                    {careRecipientTopics.map((topic) => {
+                      const isSelected = selectedTopics.includes(topic.id);
+                      const isDisabled = !isSelected && selectedTopics.length >= 2;
+                      return (
+                        <button
+                          key={topic.id}
+                          className={`topic-btn ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                          onClick={() => handleTopicToggle(topic.id)}>
+                          <span className="topic-icon">{topic.icon}</span>
+                          <span className="topic-text">{topic.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
-                  
+
                   <div className="topics-column">
-                    {caregiverTopics.map((topic) => (
-                      <button
-                        key={topic.id}
-                        className={`topic-btn ${selectedTopics.includes(topic.id) ? 'selected' : ''}`}
-                        onClick={() => handleTopicToggle(topic.id)}
-                      >
-                        <span className="topic-icon">{topic.icon}</span>
-                        <span className="topic-text">{topic.label}</span>
-                      </button>
-                    ))}
+                    {caregiverTopics.map((topic) => {
+                      const isSelected = selectedTopics.includes(topic.id);
+                      const isDisabled = !isSelected && selectedTopics.length >= 2;
+                      
+                      return (
+                        <button
+                          key={topic.id}
+                          className={`topic-btn ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
+                          onClick={() => handleTopicToggle(topic.id)}
+                          disabled={isDisabled}>
+                          <span className="topic-icon">{topic.icon}</span>
+                          <span className="topic-text">{topic.label}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               </div>

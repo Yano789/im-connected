@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useContext } from "react";
 import Forum from "./Forum/Forum/Forum";
 import NewPost from "./Forum/NewPost/NewPost";
@@ -9,7 +9,7 @@ import MedicationsPage from "./Medications/MedicationsPage/MedicationsPage";
 import LoginCard from "./Login/LoginCard";
 import SignUpCard from "./SignUp/SignUpCard";
 import Authentication from "./Authentication/Authentication";
-import UserPreferences from "./Preferences/userPreferences";
+import UserPreferences from "./Preferences/UserPreferences";
 import { AuthContext } from "./AuthContext";
 import AuthProvider from "./AuthContext";
 import LoginSignUpBackground from "./assets/LoginSignUpBackground.jpg";
@@ -31,7 +31,7 @@ function AppContent() {
     const pathname = location.pathname;
 
     const loggedInPaths = ["/forum"];
-    const canVerifyPaths = [isAuthPage, isPreferencePage];
+    const canVerifyPaths = ["/auth", "/preferences"];
 
     if (!loading) {
       if (user) {
@@ -55,16 +55,6 @@ function AppContent() {
     return <div>Loading...</div>;
   }
 
-  const EmailVerificationRoute = ({ children }) => {
-    const canVerifyEmail = localStorage.getItem('canVerifyEmail') === 'true';
-
-    if (!canVerifyEmail) {
-      return <Navigate to="/login" replace />;
-    }
-
-    return children;
-  };
-
   return (
     <div
       style={{
@@ -78,11 +68,7 @@ function AppContent() {
       }}
     >
       <Routes>
-        <Route path="/auth" element={
-          <EmailVerificationRoute>
-            <Authentication />
-          </EmailVerificationRoute>
-        }></Route>
+        <Route path="/auth" element={<Authentication />}></Route>
         <Route path="/signup" element={<SignUpCard />}></Route>
         <Route path="/login" element={<LoginCard />} />
         <Route path="/preferences" element={<UserPreferences />}></Route>

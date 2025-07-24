@@ -24,7 +24,6 @@ function LoginCard() {
     if (remember && savedUsername && savedPassword) {
       setUsername(savedUsername);
       setPassword(savedPassword);
-      setRememberMe(true);
     }
   }, []);
 

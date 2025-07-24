@@ -324,6 +324,20 @@
   align-items: center;
 }
 
+.topic-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.topic-btn.disabled .topic-icon img {
+  opacity: 0.5;
+}
+
+.topic-btn.disabled .topic-text {
+  color: #ccc;
+}
+
 /* Footer Section */
 .footer-section {
   height: 80px;

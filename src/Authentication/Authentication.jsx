@@ -36,7 +36,7 @@ function Auth() {
 
     const handleResend = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/v1/otp", {
+            const response = await fetch("http://localhost:5000/api/v1/email_verification/verify", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -81,7 +81,6 @@ function Auth() {
 
             if (res.ok) {
                 console.log("Authenticated User:", data);
-                localStorage.removeItem("canVerifyEmail", 'true');
                 navigate("/preferences");
             } else {
                 console.log(code);
