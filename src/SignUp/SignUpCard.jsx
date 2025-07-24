@@ -46,7 +46,7 @@ function SignUpCard() {
     const fullNumber = `${selectedCountry.dialCode}${number}`;
 
     try {
-      const res = await fetch("http://localhost:5000/api/v1/user/signup", {
+      const res = await fetch("http://localhost:5001/api/v1/user/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

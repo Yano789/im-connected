@@ -9,7 +9,7 @@ import MedicationsPage from "./Medications/MedicationsPage/MedicationsPage";
 import LoginCard from "./Login/LoginCard";
 import SignUpCard from "./SignUp/SignUpCard";
 import Authentication from "./Authentication/Authentication";
-import UserPreferences from "./Preferences/UserPreferences";
+import UserPreferences from "./Preferences/userPreferences";
 import ProfilePage from './Profile/ProfilePage/ProfilePage';
 import { AuthContext } from "./AuthContext";
 import AuthProvider from "./AuthContext";
@@ -27,16 +27,23 @@ function AppContent() {
 
   const { user, loading } = useContext(AuthContext);
 
+  // // DEBUG LOGS
+  // console.log("[AppContent] user:", user);
+  // console.log("[AppContent] loading:", loading);
+  // console.log("[AppContent] pathname:", location.pathname);
+
   useEffect(() => {
     const canVerifyEmail = localStorage.getItem("canVerifyEmail") === "true";
     const pathname = location.pathname;
 
     const loggedInPaths = ["/forum"];
     const canVerifyPaths = ["/auth", "/preferences"];
+    const publicAuthPages = ["/login", "/signup"];
 
     if (!loading) {
       if (user) {
-        if (canVerifyPaths.includes(pathname)) {
+        // If logged in, redirect away from login/signup/auth/preferences
+        if ([...canVerifyPaths, ...publicAuthPages].includes(pathname)) {
           navigate("/forum", { replace: true });
         }
       } else {
@@ -47,9 +54,10 @@ function AppContent() {
             navigate("/login", { replace: true });
           }
         }
+        // No redirect for /login or /signup if not logged in
       }
     }
-  }, [loading, user, location.pathname, navigate]);
+  }, [user, loading, location, navigate]);
 
 
   if (loading) {
@@ -68,7 +76,7 @@ function AppContent() {
         minHeight: "100vh"
       }}
     >
-      <BrowserRouter>
+      {/* <Router> */}
         <Routes>
           <Route path="/auth" element={<Authentication />}></Route>
           <Route path="/signup" element={<SignUpCard />}></Route>
@@ -80,8 +88,9 @@ function AppContent() {
           <Route path="/forum/mypost" element={<MyPost />} />
           <Route path="/forum/savedpost" element={<SavedPost />} />
           <Route path="/medication" element={<MedicationsPage />} />
+          <Route path="/profile" element={< ProfilePage/>} />
         </Routes>
-      </BrowserRouter>
+      {/* </Router> */}
     </div>
   );
 }

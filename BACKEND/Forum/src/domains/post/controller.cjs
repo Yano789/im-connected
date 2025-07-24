@@ -148,54 +148,73 @@ const deletePost = async (data) => {
 };
 
 
-const getFilteredPosts = async ({ tags = [], sort = "latest",source= "default",username }) => {
-    try {
-       
-        let filter = {};
+const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default", username }) => {
+  try {
+    let filter = {};
 
-        if (tags.length === 1) {
-           
-            filter.tags = tags[0];
-        } else if (tags.length === 2) {
-           
-            filter.tags = { $all: tags, $size: 2 };
-        }
+    if (tags.length === 0 && username) {
+      const user = await User.findOne({ username }).lean();
+      console.log(user)
+      const preferredTags = user?.preferences?.topics
+      console.log(preferredTags)
 
-        let sortOptions = {};
-        switch (sort.toLowerCase()) {
-            case "latest":
-                sortOptions.createdAt = -1;
-                break;
-            case "most likes":
-                sortOptions.likes = -1;
-                break;
-            case "most comments":
-                sortOptions.comments = -1;
-                break;
-            case "earliest":
-                sortOptions.createdAt = 1;
-                break;
-            default:
-                sortOptions.createdAt = -1;
-        }
-        if (source !== "default" && username) {
-            filter.username = username
-        }
-
-
-        const posts = await Post.find({ ...filter, draft: false }).sort(sortOptions);
-        posts.forEach(post => {
-            if (post.media && post.media.length > 0) {
-                post.media = post.media.map(file => ({
-                    ...file,
-                    url: addCacheBuster(file.url),
-                }));
-            }
-        });
-        return posts;
-    } catch (error) {
-        throw new Error("Failed to filter/sort posts: " + error.message);
+      if (Array.isArray(preferredTags) && preferredTags.length > 0) {
+        tags = preferredTags.map(tag => tag.trim()).filter(tag => tag.length > 0);
+      }
     }
+
+
+    if (tags.length === 1) {
+      filter.tags = tags[0];
+    } else if (tags.length > 1) {
+      filter.tags = { $in: tags ,$size:2 };
+    }
+
+    //console.log(filter)
+
+
+    let sortOptions = {};
+    switch (sort.toLowerCase()) {
+      case "latest":
+        sortOptions.createdAt = -1;
+        break;
+      case "most likes":
+        sortOptions.likes = -1;
+        break;
+      case "most comments":
+        sortOptions.comments = -1;
+        break;
+      case "earliest":
+        sortOptions.createdAt = 1;
+        break;
+      default:
+        sortOptions.createdAt = -1;
+    }
+
+
+    if (source !== "default") {
+      filter.username = username;
+    }
+
+    let posts = await Post.find({ ...filter, draft: false }).sort(sortOptions);
+    if(posts.length === 0 && source === "default"){
+        posts = await Post.find({draft: false }).sort(sortOptions);
+    }
+
+
+    posts.forEach(post => {
+      if (post.media && post.media.length > 0) {
+        post.media = post.media.map(file => ({
+          ...file,
+          url: addCacheBuster(file.url),
+        }));
+      }
+    });
+
+    return posts;
+  } catch (error) {
+    throw new Error("Failed to filter/sort posts: " + error.message);
+  }
 };
 
 

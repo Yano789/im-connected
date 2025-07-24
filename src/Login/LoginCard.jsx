@@ -31,7 +31,7 @@ function LoginCard() {
     e.preventDefault();
 
     try {
-      const res = await fetch("http://localhost:5000/api/v1/user", {
+      const res = await fetch("http://localhost:5001/api/v1/user", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

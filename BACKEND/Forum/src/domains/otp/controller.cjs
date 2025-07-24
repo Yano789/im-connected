@@ -2,6 +2,7 @@ const generateOTP = require("../../utils/generateOTP.cjs");
 const sendEmail = require("../../utils/sendEmail.cjs");
 const {hashData,verifyHashedData} = require("../../utils/hashData.cjs");
 const OTP = require("./model.cjs");
+
 const {AUTH_EMAIL} = process.env;
 
 const verifyOTP = async({email,otp})=>{

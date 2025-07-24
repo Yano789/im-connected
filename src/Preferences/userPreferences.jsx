@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
-import './UserPreferences.css';
+import './userPreferences.css';
 import Children from '../assets/Children.png';
 import Depression from '../assets/Depression.png';
 import Elderly from '../assets/Elderly.png';
@@ -14,7 +14,7 @@ import Wheelchair from '../assets/Wheelchair.png';
 const UserPreferences = () => {
   const [selectedLanguage, setSelectedLanguage] = useState('English');
   const [selectedTextSize, setSelectedTextSize] = useState('Medium');
-  const [selectedContentMode, setSelectedContentMode] = useState('Easy Reader Mode');
+  const [selectedContentMode, setSelectedContentMode] = useState('Easy Read');
   const [selectedTopics, setSelectedTopics] = useState([]);
 
   const username = localStorage.getItem("username");
@@ -35,8 +35,8 @@ const UserPreferences = () => {
   ];
 
   const contentModes = [
-    { id: 'Easy Reader Mode', label: 'Easy Reader Mode' },
-    { id: 'Default Mode', label: 'Default Mode' }
+    { id: 'Easy Read', label: 'Easy Reader Mode' },
+    { id: 'Default', label: 'Default Mode' }
   ];
 
   const careRecipientTopics = [
@@ -53,22 +53,14 @@ const UserPreferences = () => {
     { id: 'subsidies-govt', label: 'Subsidies and Govt Support', icon: <img src={Govt} alt="Govt" /> }
   ];
 
-  // const handleTopicToggle = (topicId) => {
-  //   setSelectedTopics(prev => 
-  //     prev.includes(topicId) 
-  //       ? prev.filter(id => id !== topicId)
-  //       : [...prev, topicId]
-  //   );
-  // };
-
-  const handleTopicToggle = (topicId) => {
+  const handleTopicToggle = (topicLabel) => {
     setSelectedTopics(prev => {
-      if (prev.includes(topicId)) {
+      if (prev.includes(topicLabel)) {
         // If already selected, remove it
-        return prev.filter(id => id !== topicId);
+        return prev.filter(label => label !== topicLabel);
       } else if (prev.length < 2) {
         // If less than 2 selected, add it
-        return [...prev, topicId];
+        return [...prev, topicLabel];
       }
       // If 2 are already selected and this isn't one of them, do nothing
       return prev;
@@ -93,7 +85,7 @@ const UserPreferences = () => {
     };
 
     try {
-      const res = await fetch("http://localhost:5000/api/v1/user/preferences", {
+      const res = await fetch("http://localhost:5001/api/v1/user/preferences", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -122,9 +114,8 @@ const UserPreferences = () => {
 
   return (
     <div className="preferences-container">
-      <div className="preferences-card">
+      <div className="signup-preferences-card">
         <div className="preferences-content">
-          {/* Header */}
           <div className="header-section">
             <h1 className="greeting">Hi {username}!</h1>
             <p className="subtitle">We want to get to know you better</p>
@@ -132,8 +123,8 @@ const UserPreferences = () => {
 
           <div className="main-content">
             <div className="left-column">
-              <div className="preference-group">
-                <label className="preference-label">Preferred Language</label>
+              <div className="signup-preference-group">
+                <label className="signup-preference-label">Preferred Language</label>
                 <div className="language-options">
                   {languages.map((lang) => (
                     <button
@@ -146,8 +137,8 @@ const UserPreferences = () => {
                 </div>
               </div>
 
-              <div className="preference-group">
-                <label className="preference-label">Text Size</label>
+              <div className="signup-preference-group">
+                <label className="signup-preference-label">Text Size</label>
                 <div className="text-size-options">
                   {textSizes.map((size) => (
                     <button
@@ -161,8 +152,8 @@ const UserPreferences = () => {
                 </div>
               </div>
 
-              <div className="preference-group">
-                <label className="preference-label">Content Mode</label>
+              <div className="signup-preference-group">
+                <label className="signup-preference-label">Content Mode</label>
                 <div className="content-mode-options">
                   {contentModes.map((mode) => (
                     <div
@@ -172,7 +163,7 @@ const UserPreferences = () => {
                     >
                       <div className="mode-preview">
                         <div className="preview-image"></div>
-                        {mode.id === 'Easy Reader Mode' && (
+                        {mode.id === 'Easy Read' && (
                           <>
                             <div className="preview-elements">
                               <div className="preview-bar"></div>
@@ -192,8 +183,8 @@ const UserPreferences = () => {
             </div>
 
             <div className="right-column">
-              <div className="preference-group">
-                <label className="preference-label">Topics Interested In</label>
+              <div className="signup-preference-group">
+                <label className="signup-preference-label">Topics Interested In</label>
 
                 <div className="topics-header">
                   <span>For Care Recipient</span>
@@ -203,13 +194,13 @@ const UserPreferences = () => {
                 <div className="topics-grid">
                   <div className="topics-column">
                     {careRecipientTopics.map((topic) => {
-                      const isSelected = selectedTopics.includes(topic.id);
+                      const isSelected = selectedTopics.includes(topic.label);
                       const isDisabled = !isSelected && selectedTopics.length >= 2;
                       return (
                         <button
                           key={topic.id}
                           className={`topic-btn ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
-                          onClick={() => handleTopicToggle(topic.id)}>
+                          onClick={() => handleTopicToggle(topic.label)}>
                           <span className="topic-icon">{topic.icon}</span>
                           <span className="topic-text">{topic.label}</span>
                         </button>
@@ -219,14 +210,14 @@ const UserPreferences = () => {
 
                   <div className="topics-column">
                     {caregiverTopics.map((topic) => {
-                      const isSelected = selectedTopics.includes(topic.id);
+                      const isSelected = selectedTopics.includes(topic.label);
                       const isDisabled = !isSelected && selectedTopics.length >= 2;
                       
                       return (
                         <button
                           key={topic.id}
                           className={`topic-btn ${isSelected ? 'selected' : ''} ${isDisabled ? 'disabled' : ''}`}
-                          onClick={() => handleTopicToggle(topic.id)}
+                          onClick={() => handleTopicToggle(topic.label)}
                           disabled={isDisabled}>
                           <span className="topic-icon">{topic.icon}</span>
                           <span className="topic-text">{topic.label}</span>

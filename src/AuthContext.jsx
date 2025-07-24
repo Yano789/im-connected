@@ -10,7 +10,7 @@ function AuthProvider({ children }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/v1/user/check-auth", {
+        const res = await fetch("http://localhost:5001/api/v1/user/check-auth", {
           method: "GET",
           credentials: "include",
         });

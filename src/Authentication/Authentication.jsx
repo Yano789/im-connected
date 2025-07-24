@@ -36,7 +36,7 @@ function Auth() {
 
     const handleResend = async () => {
         try {
-            const response = await fetch("http://localhost:5000/api/v1/email_verification/verify", {
+            const response = await fetch("http://localhost:5001/api/v1/email_verification/verify", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -68,7 +68,7 @@ function Auth() {
 
         const code = inputsRef.current.map((input) => input.value).join("");
         try {
-            const res = await fetch("http://localhost:5000/api/v1/otp/verify", {
+            const res = await fetch("http://localhost:5001/api/v1/otp/verify", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

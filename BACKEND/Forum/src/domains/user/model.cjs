@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-
+const {allowedTags} = require("./../post/model.cjs");
 const UserSchema = new Schema({
     name: String,
     username: {type: String,unique: true,index: true},
@@ -12,7 +12,11 @@ const UserSchema = new Schema({
     preferredLanguage: { type: String, default: "English" },
     textSize: { type: String, default: "Medium" },
     contentMode: { type: String, default: "Default" },
-    topics: { type: [String], default: [] },
+    topics: [{
+    type: String,
+    enum: allowedTags,
+    index: true
+  }],
   },
 
 });

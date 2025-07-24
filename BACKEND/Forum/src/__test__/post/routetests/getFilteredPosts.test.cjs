@@ -142,7 +142,7 @@ describe("get Filtered Posts)", () => {
             tags: [],
             sort: "latest",
             source: "default",
-            username: null
+            username: "testUser"
         });
         expect(modeLimit).toHaveBeenCalledWith({
             post: mockPosts,

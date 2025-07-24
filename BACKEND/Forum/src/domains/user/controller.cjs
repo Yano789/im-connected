@@ -48,10 +48,18 @@ const createNewUser = async (data) => {
             const hashedPassword = await hashData(password);
             const newUser = new User({
                 name,
+                name,
                 username,
                 email,
                 number,
+                number,
                 password: hashedPassword,
+                preferences: {
+                    preferredLanguage: preferences.preferredLanguage || "English",
+                    textSize: preferences.textSize || "Medium",
+                    contentMode: preferences.contentMode || "Default",
+                    topics: preferences.topics || [],
+                },
                 preferences: {
                     preferredLanguage: preferences.preferredLanguage || "English",
                     textSize: preferences.textSize || "Medium",
@@ -68,13 +76,27 @@ const createNewUser = async (data) => {
     }
 };
 
+
 const updateUserPreferences = async ({ username, preferences }) => {
   const updatedUser = await User.findOneAndUpdate(
     { username },
     { preferences },
-    { new: true }
+    {
+      new: true,
+      runValidators: true,
+    }
   );
   return updatedUser;
 };
 
-module.exports = { createNewUser, authenticateUser, updateUserPreferences };
+const getUser = async (username)=>{
+    try {
+        const user = await User.findOne({username})
+        return user
+    } catch (error) {
+        throw error
+    }
+    
+}
+
+module.exports = {createNewUser,authenticateUser, updateUserPreferences,getUser};

@@ -21,7 +21,7 @@ const verifyToken = async (req, res, next) => {
     }
 
     //proceed with request
-    return next();
+    
 };
 
 module.exports = verifyToken;

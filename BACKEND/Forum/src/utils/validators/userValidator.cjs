@@ -1,5 +1,5 @@
 const Joi = require("joi")
-
+const{allowedTags} = require("./../../domains/post/model.cjs");
 
 const loginSchema = Joi.object({
   username: Joi.string().required().messages({
@@ -27,6 +27,7 @@ const signupSchema = Joi.object({
     "any.required": "Username is required",
     "string.empty": "Username cannot be empty",
   }),
+
   number: Joi.string()
   .pattern(/^\+[1-9]\d{6,14}$/)
   .required()
@@ -51,7 +52,27 @@ const signupSchema = Joi.object({
       "string.pattern.base": "Password must be at least 8 characters, contain one uppercase letter and one special character",
       "string.empty": "Password cannot be empty",
     }),
+    
+});
+
+const preferencesSchema = Joi.object({
+  username: Joi.string().required().messages({
+    "any.required": "Username is required",
+    "string.empty": "Username cannot be empty",
+  }),
+  language: Joi.string()
+    .valid("English", "Chinese", "Malay", "Tamil")
+    .default("English"),
+  textSize: Joi.string()
+    .valid("Small", "Medium", "Large")
+    .default("Medium"),
+  contentMode: Joi.string()
+    .valid("Default", "Easy Read")
+    .default("Default"),
+  topics: Joi.array()
+    .items(Joi.string().valid(...allowedTags))
+    .default([]),
 });
 
 
-module.exports = {loginSchema,signupSchema}
+module.exports = {loginSchema,signupSchema,preferencesSchema}
