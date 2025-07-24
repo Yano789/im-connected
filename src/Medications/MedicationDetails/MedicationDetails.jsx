@@ -18,26 +18,37 @@ function MedicationDetails({ medication, onEdit }) {
       
       <div className="detail-section">
         <h3 className="section-header">Schedule</h3>
-        <div className="schedule-icons">
-          {/* For now, we'll show static icons. This could be made dynamic later. */}
-          <div className="icon-item">
-            <span role="img" aria-label="Morning">☀️</span>
-            Morning
+        {medication.schedule ? (
+          <p className="section-content">{medication.schedule}</p>
+        ) : (
+          <div className="schedule-icons">
+            {/* For now, we'll show static icons. This could be made dynamic later. */}
+            <div className="icon-item">
+              <span role="img" aria-label="Morning">☀️</span>
+              Morning
+            </div>
+            <div className="icon-item">
+              <span role="img" aria-label="Afternoon">🌤️</span>
+              Afternoon
+            </div>
+            <div className="icon-item">
+              <span role="img" aria-label="Evening">🌙</span>
+              Evening
+            </div>
+            <div className="icon-item">
+              <span role="img" aria-label="Night">🌃</span>
+              Night
+            </div>
           </div>
-          <div className="icon-item">
-            <span role="img" aria-label="Afternoon">🌤️</span>
-            Afternoon
-          </div>
-          <div className="icon-item">
-            <span role="img" aria-label="Evening">🌙</span>
-            Evening
-          </div>
-          <div className="icon-item">
-            <span role="img" aria-label="Night">🌃</span>
-            Night
-          </div>
-        </div>
+        )}
       </div>
+
+      {medication.dosage && (
+        <div className="detail-section">
+          <h3 className="section-header">Dosage</h3>
+          <p className="section-content">{medication.dosage}</p>
+        </div>
+      )}
 
       <div className="detail-section">
         <h3 className="section-header">Used to treat</h3>
@@ -48,6 +59,13 @@ function MedicationDetails({ medication, onEdit }) {
         <h3 className="section-header">Side Effects</h3>
         <p className="section-content">{medication.sideEffects}</p>
       </div>
+
+      {medication.warnings && (
+        <div className="detail-section">
+          <h3 className="section-header">⚠️ Warnings & Precautions</h3>
+          <p className="section-content warning-text">{medication.warnings}</p>
+        </div>
+      )}
       
       <div className="detail-section">
         <h3 className="section-header">Image</h3>
