@@ -77,7 +77,7 @@ const ChatWindow = ({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
   useEffect(() => {
-    //scrollToBottom();
+    scrollToBottom();
   }, [messages]);
 
   // create a new threadID when chat component created

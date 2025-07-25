@@ -14,18 +14,18 @@ export async function POST() {
         type: "function",
         function: {
           name: "summarize_text",
-          description: "Returns a fixed summary string from summarize_text() in utils/summary.ts.",
+          description: "When the user asks to summarize a post, input the post title word for word into summarize_text() in utils/summary.ts. Then summarize the content returned from summarize_text() for the user.",
           parameters: {
             type: "object",
             properties: {
-              post_url: {
-                type: "string",
-                description: "url of post to summarize"
+              "postTitle": {
+                "type": "string",
+                "description": "Title of the post to summarize information about"
               }
             },
-            required: ["post_url"],
-          }
-        },
+            required: ["postTitle"]
+          },
+        }
       },
       { type: "file_search" },
     ],

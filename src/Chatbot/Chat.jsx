@@ -11,12 +11,19 @@ const functionCallHandler = async (toolCall) => {
 
   // parse out the URL
   const args = JSON.parse(toolCall.function.arguments);
+  console.log('this is the args in Chat.jsx');
+  console.log(args);
 
   // run your summarizer
-  const summaryText = summarize_text(args.post_url);
+  let summaryText;
+  try {
+    summaryText = await summarize_text(args.postTitle);
+  } catch (err) {
+    summaryText = `Error: ${err.message}`;
+  }
 
   // return a JSON string matching the function schema
-  console.log(summaryText);
+  console.log(`This is what the Chat.jsx functionCallHanlder()sees at the end ${summaryText}`);
   return JSON.stringify(summaryText);
 };
 
