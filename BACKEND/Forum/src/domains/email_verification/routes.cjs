@@ -8,11 +8,31 @@ const {emailVerifySchema,emailOTPRequestSchema} = require("./../../utils/validat
 router.post("/verify",validateBody(emailVerifySchema),async(req,res)=>{
     try {
         const {email,otp} = req.body;
-        await verifyUserEmail({email,otp});
-        res.status(200).json({email,verified:true});
+        const verifiedUser = await verifyUserEmail({email,otp});
+        
+        //create login token for verified user
+        const createToken = require("../../utils/createToken.cjs");
+        const tokenData = { 
+            userId: verifiedUser._id, 
+            email: verifiedUser.email, 
+            username: verifiedUser.username 
+        };
+        const token = await createToken(tokenData);
+        
+        //set auth cookie
+        const isProduction = process.env.NODE_ENV === "production";
+        const cookieOptions = {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: "Strict",
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        };
+        
+        res.cookie("token", token, cookieOptions);
+        res.status(200).json({email, verified: true, user: verifiedUser});
 
     } catch (error) {
-        res.status(400).send(error.message);
+        res.status(400).json({ error: error.message });
     }
 });
 
@@ -25,7 +45,7 @@ router.post("/",validateBody(emailOTPRequestSchema),async(req,res)=>{
         const createdEmailVerificationOTP = await sendVerificationOTPEmail(email);
         res.status(200).json(createdEmailVerificationOTP);
     } catch (error) {
-        res.status(400).send(error.message);
+        res.status(400).json({ error: error.message });
     }
 });
 

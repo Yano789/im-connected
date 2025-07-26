@@ -32,7 +32,7 @@ router.post("/", validateBody(loginSchema), async (req, res) => {
     res.status(200).json(authenticatedUser);
   } catch (error) {
 
-    res.status(400).send(error.message);
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -49,7 +49,7 @@ router.post("/signup", validateBody(signupSchema), async (req, res) => {
     res.status(200).json(newUser);
 
   } catch (error) {
-    res.status(400).send(error.message);
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -82,14 +82,6 @@ router.post("/logout", (req, res) => {
     return res.status(200).send("Logged out successfully");
 });
 
-
-// router.get("/check-auth", auth, async (req, res) => {
-//   const username = req.currentUser
-//   const user = await getUser(username)
-//   res.status(200).json(user);
-// });
-
-// /check-auth route with improved error handling and debug logging
 router.get("/check-auth", auth, async (req, res) => {
   try {
     console.log("[check-auth] req.currentUser:", req.currentUser);

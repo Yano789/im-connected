@@ -9,7 +9,10 @@ const verifyUserEmail = async({email,otp})=>{
         //update user record to show that it is verified
         await User.updateOne({email},{verified:true});
         await deleteOTP(email);
-        return;
+        
+        //get verified user data
+        const verifiedUser = await User.findOne({email});
+        return verifiedUser;
     } catch (error) {
         throw error;
     }

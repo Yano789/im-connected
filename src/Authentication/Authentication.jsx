@@ -1,13 +1,15 @@
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useContext } from "react";
 import SignUpPeople from "../assets/SignUpPeople.png";
 import "./Authentication.css";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../AuthContext";
 
 function Auth() {
     const inputsRef = useRef([]);
     const [status, setStatus] = useState(null);
     const email = localStorage.getItem("email");
     const navigate = useNavigate();
+    const { setUser } = useContext(AuthContext);
 
     useEffect(() => {
         setTimeout(() => {
@@ -28,6 +30,21 @@ function Auth() {
         }
     };
 
+    const handlePaste = (e) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text');
+        const digits = pastedData.replace(/\D/g, '').slice(0, 6);
+        
+        if (digits.length === 6) {
+            inputsRef.current.forEach((input, index) => {
+                if (input) {
+                    input.value = digits[index];
+                }
+            });
+            inputsRef.current[5]?.focus();
+        }
+    };
+
     const handleKeyDown = (e, Index) => {
         if (e.key === "Backspace" && !e.target.value && Index > 0) {
             inputsRef.current[Index - 1]?.focus();
@@ -36,15 +53,13 @@ function Auth() {
 
     const handleResend = async () => {
         try {
-            const response = await fetch("http://localhost:5001/api/v1/email_verification/verify", {
+            const response = await fetch("http://localhost:5001/api/v1/email_verification", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    email: email,
-                    subject: "Email Verification",
-                    message: "Verify your email with the code below."
+                    email: email
                 }),
             });
 
@@ -55,7 +70,7 @@ function Auth() {
                 setStatus("OTP has been resent!");
             } else {
                 console.error("Failed to resend OTP:", data);
-                setStatus(`Resend failed: ${data.message || JSON.stringify(data)}`);
+                setStatus(`Resend failed: ${data.error || data.message || JSON.stringify(data)}`);
             }
         } catch (err) {
             console.error("Network error:", err);
@@ -68,7 +83,7 @@ function Auth() {
 
         const code = inputsRef.current.map((input) => input.value).join("");
         try {
-            const res = await fetch("http://localhost:5001/api/v1/otp/verify", {
+            const res = await fetch("http://localhost:5001/api/v1/email_verification/verify", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -82,9 +97,15 @@ function Auth() {
             if (res.ok) {
                 console.log("Authenticated User:", data);
                 navigate("/preferences");
+                // Small delay to allow navigation to complete before setting user
+                setTimeout(() => {
+                    if (data.user) {
+                        setUser(data.user);
+                    }
+                }, 100);
             } else {
                 console.log(code);
-                setStatus(`Authentication failed: ${JSON.stringify(data)}`);
+                setStatus(`Authentication failed: ${data.error || JSON.stringify(data)}`);
             }
         } catch (err) {
             console.error(err);
@@ -121,6 +142,7 @@ function Auth() {
                                 ref={(el) => (inputsRef.current[i] = el)}
                                 onInput={(e) => handleInput(e, i)}
                                 onKeyDown={(e) => handleKeyDown(e, i)}
+                                onPaste={handlePaste}
                             />
                         ))}
                     </div>

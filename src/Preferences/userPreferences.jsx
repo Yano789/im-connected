@@ -90,25 +90,30 @@ const UserPreferences = () => {
         headers: {
           "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({ username, ...preferences })
       });
 
       const data = await res.json();
+      console.log("Preferences response:", data);
 
       if (res.ok) {
         console.log("Preference saved:", data);
         localStorage.setItem("preferences", JSON.stringify(preferences));
 
-        setUser(data);
+        if (data.user) {
+          setUser(data.user);
+        }
         localStorage.removeItem("canVerifyEmail");
 
         navigate("/forum");
       } else {
-        console.log("Failed to save preferences");
+        console.log("Failed to save preferences:", data);
+        alert(`Failed to save preferences: ${data.error || JSON.stringify(data)}`);
       }
     } catch (err) {
       console.error(err);
-      setStatus("Failed to save preferences. Network error.");
+      alert("Failed to save preferences. Network error.");
     }
   };
 
