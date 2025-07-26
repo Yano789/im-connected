@@ -4,18 +4,14 @@ import UserAvatar from "../../assets/user-avatar.png";
 import ChatBotIcon from "../../assets/ChatbotIcon.png";
 import "./chatStyles.css";
 import { AssistantStream } from "openai/lib/AssistantStream.mjs";
-//import { AssistantStream } from "../../../BACKEND/AI_chatbot/openai-assistants-quickstart/node_modules/openai/lib/AssistantStream";
-//import Markdown from "react-markdown";
-// @ts-expect-error - no types for this yet
-//import { AssistantStreamEvent } from "openai/resources/beta/assistants/assistants";
-//import { RequiredActionFunctionToolCall } from "openai/resources/beta/threads/runs/runs";
+
 
 const UserMessage = ({ text }) => {
   return (
-  <div className="userMessageRow">
+    <div className="userMessageRow">
       <div className="userBubble">{text}</div>
       <img
-        src={UserAvatar}// Make sure this image is in your `public/` folder
+        src={UserAvatar}
         alt="User avatar"
         className="avatar"
       />
@@ -26,13 +22,13 @@ const UserMessage = ({ text }) => {
 const AssistantMessage = ({ text }) => {
   return (
     <div className="assistantMessageRow">
-        <img
-        src={UserAvatar} // Make sure this image is in your `public/` folder
+      <img
+        src={ChatBotIcon}
         alt="Assistant avatar"
         className="avatar"
       />
       <div className="assistantBubble">{text}</div>
-      
+
     </div>
   );
 };
@@ -69,7 +65,7 @@ const ChatWindow = ({
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
-  const [threadId, setThreadId] = useState("");
+  const [threadId, setThreadId] = useState(null);
 
   // automatically scroll to bottom of chat
   const messagesEndRef = useRef(null);
@@ -80,37 +76,33 @@ const ChatWindow = ({
     scrollToBottom();
   }, [messages]);
 
-  // create a new threadID when chat component created
-  /*useEffect(() => {
-    const createThread = async () => {
-      const res = await fetch(`/api/assistants/threads`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      setThreadId(data.threadId);
-    };
-    createThread();
-  }, []);*/
   useEffect(() => {
-    // guard: only run in the browser
     if (typeof window === "undefined") return;
+    //console.log('the useEffect triggered');
 
-    //const saved = localStorage.getItem("threadId");
-    const saved = "thread_MRJJrC53m6DmI8q2pNPipqRB";
-    console.log("saved threadId from localStorage:", saved);
-    if (saved) {
-      // we found an existing thread—keep using it
-      setThreadId(saved);
-    } else {
-      // no thread saved yet, so create one on the backend
-      ; (async () => {
-        const res = await fetch("http://localhost:3000/api/assistants/threads", { method: "POST" });
-        const { threadId: newId } = await res.json();
-        setThreadId(newId);
-        console.log("🆕 created new threadId:", newId);
-        localStorage.setItem("threadId", newId);
-      })();
-    }
+    (async () => {
+      try {
+        /*ask the user route for current threadId */
+        //console.log('before fetching');
+        const res = await fetch(
+          "http://localhost:5001/api/v1/user/threadId",
+          { method: "GET", credentials: "include" }
+        );
+        //console.log('after fetching', res.status);
+        if (!res.ok) throw new Error(await res.text());
+        const { threadId: existing } = await res.json();
+
+        if (existing) {
+          // already stored on the server
+          console.log(`retrieved existing threadId, it is ${existing}`)
+          setThreadId(existing);
+          return;
+        }
+
+      } catch (err) {
+        console.error("Thread‑ID flow error:", err.message);
+      }
+    })();
   }, []);
 
   const sendMessage = async (text) => {
@@ -195,7 +187,7 @@ const ChatWindow = ({
 
   // handleRequiresAction - handle function call
   const handleRequiresAction = async (
-    event ) => {
+    event) => {
     const runId = event.data.id;
     const toolCalls = event.data.required_action.submit_tool_outputs.tool_calls;
     // loop over tool calls and call function handler
