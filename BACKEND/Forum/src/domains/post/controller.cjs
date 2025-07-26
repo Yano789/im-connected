@@ -343,4 +343,14 @@ const deleteDrafts = async (data) => {
     }
 }
 
-module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts }
+const getPostByTitle = async(data)=>{
+    try {
+        const title = data
+        const post = await Post.findOne({title:title,draft:false})
+        return post
+    } catch (error) {
+        throw error
+    }
+}
+
+module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle}

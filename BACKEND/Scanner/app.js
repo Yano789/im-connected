@@ -7,6 +7,77 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
 import cors from 'cors';
+import mongoose from 'mongoose';
+
+// Database connection
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/im-connected';
+
+mongoose.connect(MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log('🔗 Connected to MongoDB (Forum Database)'))
+.catch(err => console.error('❌ MongoDB connection error:', err));
+
+// Import medication models from forum backend
+const careRecipientSchema = new mongoose.Schema({
+    name: { type: String, required: true, trim: true, maxlength: 100 },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    dateOfBirth: { type: Date },
+    medicalConditions: [{ type: String, trim: true }],
+    emergencyContact: { name: String, phone: String, relationship: String },
+    notes: { type: String, maxlength: 1000 },
+    isActive: { type: Boolean, default: true }
+}, { timestamps: true });
+
+const medicationSchema = new mongoose.Schema({
+    careRecipientId: { type: mongoose.Schema.Types.ObjectId, ref: 'CareRecipient', required: true, index: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    name: { type: String, required: true, trim: true, maxlength: 200 },
+    dosage: { type: String, trim: true, maxlength: 100 },
+    strength: { type: String, trim: true, maxlength: 50 },
+    schedule: { type: String, trim: true, maxlength: 200 },
+    dosages: [{
+        period: { type: String, enum: ['Morning', 'Afternoon', 'Evening', 'Night'], required: true },
+        time: { type: String, required: true },
+        taken: { type: Boolean, default: false },
+        takenAt: { type: Date }
+    }],
+    usedTo: { type: String, trim: true, maxlength: 500 },
+    sideEffects: { type: String, trim: true, maxlength: 500 },
+    warnings: { type: String, trim: true, maxlength: 500 },
+    image: { url: String, publicId: String },
+    prescriptionInfo: {
+        doctorName: String,
+        prescribedDate: Date,
+        expiryDate: Date,
+        pharmacyName: String,
+        refillsRemaining: Number
+    },
+    scanData: {
+        scannedText: String,
+        confidence: Number,
+        scanDate: Date,
+        source: { type: String, enum: ['camera', 'upload', 'manual'] }
+    },
+    isActive: { type: Boolean, default: true }
+}, { timestamps: true });
+
+const medicationLogSchema = new mongoose.Schema({
+    medicationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Medication', required: true, index: true },
+    careRecipientId: { type: mongoose.Schema.Types.ObjectId, ref: 'CareRecipient', required: true, index: true },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    dosageIndex: { type: Number, required: true },
+    taken: { type: Boolean, required: true },
+    takenAt: { type: Date, default: Date.now },
+    notes: { type: String, maxlength: 500 },
+    location: { type: String, maxlength: 100 }
+}, { timestamps: true });
+
+// Create models
+const CareRecipient = mongoose.model('CareRecipient', careRecipientSchema);
+const Medication = mongoose.model('Medication', medicationSchema);
+const MedicationLog = mongoose.model('MedicationLog', medicationLogSchema);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1087,6 +1158,327 @@ app.post('/scan-medication', upload.single('medicationImage'), async (req, res) 
     res.status(500).json({
       success: false,
       error: 'Failed to process medication image',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Endpoint for saving scanned medications to the forum database
+ */
+app.post('/save-scanned-medication', upload.single('medicationImage'), async (req, res) => {
+  try {
+    const { careRecipientId, userId } = req.body;
+    
+    console.log('=== SAVE SCANNED MEDICATION REQUEST ===');
+    console.log('Request body:', req.body);
+    console.log('File received:', req.file);
+    
+    if (!req.file) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'No image file provided' 
+      });
+    }
+
+    if (!careRecipientId || !userId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Care recipient ID and user ID are required' 
+      });
+    }
+
+    // Verify care recipient exists
+    const careRecipient = await CareRecipient.findById(careRecipientId);
+    if (!careRecipient) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Care recipient not found' 
+      });
+    }
+
+    console.log(`Processing medication image for care recipient: ${careRecipient.name}`);
+    const startTime = Date.now();
+
+    // Preprocess image with multiple variants
+    const processedImagePaths = await ocrService.preprocessImage(req.file.path);
+    
+    // Perform enhanced OCR
+    const extractedText = await ocrService.performOCR(processedImagePaths);
+    
+    // Extract medication information
+    const medications = await ocrService.extractMedicationInfo(extractedText);
+    
+    // Calculate processing metrics
+    const processingTime = Date.now() - startTime;
+    const scanConfidence = extractedText.length > 20 ? 0.8 : 0.5;
+
+    // Save only the primary/best medication to the database
+    const savedMedications = [];
+    
+    // Helper function to truncate text to database limits
+    const truncateText = (text, maxLength = 500) => {
+      if (!text) return '';
+      return text.length > maxLength ? text.substring(0, maxLength - 3) + '...' : text;
+    };
+    
+    // Only save the first/primary medication instead of all variants
+    if (medications.length > 0) {
+      const primaryMed = medications[0]; // Take the first (usually best) medication
+      
+      const medicationData = {
+        careRecipientId,
+        userId,
+        name: primaryMed.name,
+        dosage: primaryMed.info.strength || '',
+        strength: primaryMed.info.strength || '',
+        schedule: primaryMed.info.schedule || '',
+        usedTo: truncateText(primaryMed.info.extractedContext?.formattedUses || primaryMed.info.usedFor || '', 500),
+        sideEffects: truncateText(primaryMed.info.sideEffects || '', 500),
+        warnings: truncateText(primaryMed.info.warnings || '', 500),
+        image: {
+          url: `http://localhost:${PORT}/uploads/${req.file.filename}`,
+          publicId: req.file.filename
+        },
+        prescriptionInfo: {
+          doctorName: '', // Can be extracted later or filled manually
+          prescribedDate: new Date(),
+          pharmacyName: ''
+        },
+        scanData: {
+          scannedText: extractedText,
+          confidence: scanConfidence,
+          scanDate: new Date(),
+          source: 'upload'
+        },
+        isActive: true
+      };
+
+      const savedMedication = new Medication(medicationData);
+      await savedMedication.save();
+      savedMedications.push(savedMedication);
+      
+      console.log(`Saved primary medication: ${primaryMed.name} for care recipient: ${careRecipient.name}`);
+    }
+
+    const response = {
+      success: true,
+      processingTime,
+      confidence: scanConfidence,
+      extractedText,
+      savedMedications: savedMedications.length,
+      medications: savedMedications.map(med => ({
+        id: med._id,
+        name: med.name,
+        dosage: med.dosage,
+        usedFor: med.usedTo,
+        sideEffects: med.sideEffects,
+        schedule: med.schedule,
+        image: med.image.url,
+        confidence: med.scanData.confidence,
+        warnings: med.warnings,
+        careRecipientId: med.careRecipientId,
+        createdAt: med.createdAt
+      })),
+      careRecipient: {
+        id: careRecipient._id,
+        name: careRecipient.name
+      },
+      metadata: {
+        filename: req.file.filename,
+        fileSize: req.file.size,
+        uploadTime: new Date().toISOString(),
+        savedToDatabase: true
+      }
+    };
+
+    console.log(`Medication scan and save completed in ${processingTime}ms. Saved ${savedMedications.length} medications for ${careRecipient.name}.`);
+    res.json(response);
+
+  } catch (error) {
+    console.error('Medication saving error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to save scanned medication',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Get all care recipients for a user
+ */
+app.get('/care-recipients/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    const careRecipients = await CareRecipient.find({ 
+      userId, 
+      isActive: true 
+    }).select('name dateOfBirth medicalConditions emergencyContact notes createdAt');
+    
+    res.json({
+      success: true,
+      careRecipients
+    });
+  } catch (error) {
+    console.error('Error fetching care recipients:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch care recipients',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Get medications for a care recipient
+ */
+app.get('/medications/:careRecipientId', async (req, res) => {
+  try {
+    const { careRecipientId } = req.params;
+    
+    const medications = await Medication.find({ 
+      careRecipientId, 
+      isActive: true 
+    }).populate('careRecipientId', 'name')
+      .sort({ createdAt: -1 });
+    
+    res.json({
+      success: true,
+      medications
+    });
+  } catch (error) {
+    console.error('Error fetching medications:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch medications',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Create a new care recipient
+ */
+app.post('/care-recipients', async (req, res) => {
+  try {
+    const { name, userId, dateOfBirth, medicalConditions, emergencyContact, notes } = req.body;
+    
+    if (!name || !userId) {
+      return res.status(400).json({
+        success: false,
+        error: 'Name and user ID are required'
+      });
+    }
+    
+    const careRecipient = new CareRecipient({
+      name,
+      userId,
+      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+      medicalConditions: medicalConditions || [],
+      emergencyContact: emergencyContact || {},
+      notes: notes || '',
+      isActive: true
+    });
+    
+    await careRecipient.save();
+    
+    res.json({
+      success: true,
+      careRecipient
+    });
+  } catch (error) {
+    console.error('Error creating care recipient:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create care recipient',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Delete a medication
+ */
+app.delete('/medications/:medicationId', async (req, res) => {
+  try {
+    const { medicationId } = req.params;
+    
+    console.log(`=== DELETE MEDICATION REQUEST ===`);
+    console.log('Medication ID:', medicationId);
+    
+    // Find and delete the medication
+    const deletedMedication = await Medication.findByIdAndDelete(medicationId);
+    
+    if (!deletedMedication) {
+      return res.status(404).json({
+        success: false,
+        error: 'Medication not found'
+      });
+    }
+    
+    console.log(`Medication deleted: ${deletedMedication.name}`);
+    
+    res.json({
+      success: true,
+      message: 'Medication deleted successfully',
+      deletedMedication: {
+        id: deletedMedication._id,
+        name: deletedMedication.name,
+        careRecipientId: deletedMedication.careRecipientId
+      }
+    });
+  } catch (error) {
+    console.error('Error deleting medication:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete medication',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Delete a care recipient and all their medications
+ */
+app.delete('/care-recipients/:careRecipientId', async (req, res) => {
+  try {
+    const { careRecipientId } = req.params;
+    
+    console.log(`=== DELETE CARE RECIPIENT REQUEST ===`);
+    console.log('Care Recipient ID:', careRecipientId);
+    
+    // First, delete all medications for this care recipient
+    const deletedMedications = await Medication.deleteMany({ careRecipientId });
+    console.log(`Deleted ${deletedMedications.deletedCount} medications for care recipient`);
+    
+    // Then delete the care recipient
+    const deletedCareRecipient = await CareRecipient.findByIdAndDelete(careRecipientId);
+    
+    if (!deletedCareRecipient) {
+      return res.status(404).json({
+        success: false,
+        error: 'Care recipient not found'
+      });
+    }
+    
+    console.log(`Care recipient deleted: ${deletedCareRecipient.name}`);
+    
+    res.json({
+      success: true,
+      message: 'Care recipient and all medications deleted successfully',
+      deletedCareRecipient: {
+        id: deletedCareRecipient._id,
+        name: deletedCareRecipient.name
+      },
+      deletedMedicationsCount: deletedMedications.deletedCount
+    });
+  } catch (error) {
+    console.error('Error deleting care recipient:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to delete care recipient',
       details: error.message
     });
   }

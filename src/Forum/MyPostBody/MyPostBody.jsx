@@ -106,6 +106,7 @@ function MyPostBody() {
               postDescription={post.content}
               postComment={post.comments}
               postLikes={post.likes}
+              postMedia={post.media}
               initiallyLiked={likedPostIds.has(post.postId)}
               ActionButton={() => (
                 <Delete

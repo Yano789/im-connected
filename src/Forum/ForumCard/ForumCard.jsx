@@ -93,15 +93,10 @@ function ForumCard(props) {
         <p className="postDescription">{postDescription}</p>
       </div>
       {postMedia && postMedia.length > 0 && (
-        <div className="images">
-          <div className="rectangleParent">
-            {postMedia.map((media, index) => (
-              <img
-                key={index}
-                className="postImage"
-                src={media.url}
-                alt="post"
-              />
+        <div className="postImagesDiv">
+          <div className="postImages">
+            {postMedia.map((m, index) => (
+              <img key={index} className="postImage" src={m.url} alt="post" />
             ))}
           </div>
         </div>

@@ -9,6 +9,7 @@ const postParamSchema = Joi.object({
 });
 
 
+
 const postAndCommentParamsSchema  = Joi.object({
     post: Joi.string().required().messages({
     "any.required": "Post ID is required",

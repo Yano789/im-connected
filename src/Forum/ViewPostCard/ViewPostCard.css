@@ -17,7 +17,8 @@
     @apply self-stretch flex flex-row items-center justify-between gap-0;
   }
 
-  .viewPostUsername, .name {
+  .viewPostUsername,
+  .name {
     @apply relative leading-4 font-semibold cursor-default;
   }
 
@@ -51,14 +52,16 @@
   }
 
   .viewPostDescriptionDiv {
-    @apply self-stretch bg-[#fff2f0] flex flex-row items-center justify-center p-2.5 rounded-[5px];
+    @apply self-stretch bg-[#fff2f0] flex flex-col items-center justify-center p-2.5 rounded-[5px];
   }
 
-  .commentsIcon, .likesIcon {
+  .commentsIcon,
+  .likesIcon {
     @apply w-[30px] relative h-[30px] object-cover;
   }
 
-  .commentsNumber, .likesNumber {
+  .commentsNumber,
+  .likesNumber {
     @apply flex flex-row items-center justify-center gap-2.5 cursor-default;
   }
 
@@ -84,7 +87,24 @@
            transition-shadow duration-300 hover:shadow-lg;
   }
 
-   .viewPostUsername, .viewDatePosted, .name, .tag, .commentsNumber, .likesNumber {
+  .viewPostUsername,
+  .viewDatePosted,
+  .name,
+  .tag,
+  .commentsNumber,
+  .likesNumber {
     @apply text-base sm:text-sm md:text-base;
   }
+.viewPostImagesDiv {
+  @apply w-full overflow-x-auto;
+}
+
+.viewPostImages {
+  @apply flex flex-row gap-3;
+}
+
+.viewPostImage {
+  @apply w-1/3 h-auto object-cover rounded shrink-0;
+}
+
 }

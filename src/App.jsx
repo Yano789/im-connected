@@ -13,6 +13,7 @@ import UserPreferences from "./Preferences/userPreferences";
 import ProfilePage from './Profile/ProfilePage/ProfilePage';
 import { AuthContext } from "./AuthContext";
 import AuthProvider from "./AuthContext";
+import ChatPage from './Chatbot/Chat';
 import LoginSignUpBackground from "./assets/LoginSignUpBackground.jpg";
 
 
@@ -91,6 +92,7 @@ function AppContent() {
         <Route path="/forum/savedpost" element={<SavedPost />} />
         <Route path="/medication" element={<MedicationsPage />} />
         <Route path="/profile" element={< ProfilePage />} />
+        <Route path='/chatbot' element={< ChatPage />}></Route>
       </Routes>
     </div>
   );

@@ -4,6 +4,7 @@ const User = require("../user/model.cjs")
 const {Post} = require("../post/model.cjs")
 const createNestedComment = require("../../utils/buildNestedComments.cjs")
 
+
 const createComment = async (data) => {
     try {
         const { postId, parentCommentId, username, content } = data

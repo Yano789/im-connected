@@ -20,15 +20,19 @@
     @apply w-5 h-5 sm:w-7 sm:h-7 object-contain flex-shrink-0;
   }
 
-  .rectangleParent {
-    @apply w-[120px] h-[120px] sm:w-[150px] sm:h-[150px] bg-gray-200 rounded overflow-hidden;
-  }
+.postImagesDiv {
+  @apply w-full overflow-x-auto;
+}
 
-  .postImage {
-    @apply w-full h-full object-cover;
-  }
+.postImages {
+  @apply flex flex-row gap-3;
+}
 
-  .tags {
+.postImage {
+  @apply w-1/5 h-auto object-cover rounded shrink-0;
+}
+
+.tags {
     @apply flex flex-wrap gap-2 text-sm sm:text-base;
   }
 

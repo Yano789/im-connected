@@ -78,6 +78,13 @@ const paramsSchema = Joi.object({
   }),
 });
 
+const postTitleParamSchema = Joi.object({
+  title: Joi.string().required().messages({
+    "any.required": "title is required",
+    "string.empty": "title cannot be empty",
+  }),
+});
 
 
-module.exports = {postDraftSchema,querySchema,paramsSchema}
+
+module.exports = {postDraftSchema,querySchema,paramsSchema,postTitleParamSchema}
