@@ -1,9 +1,9 @@
 const express = require("express");
-const { createNewUser, authenticateUser, updateUserPreferences ,getUser} = require("./controller.cjs");
+const { createNewUser, authenticateUser, updateUserPreferences, getUser } = require("./controller.cjs");
 const auth = require("../../middleware/auth.cjs");
 const { sendVerificationOTPEmail } = require("../email_verification/controller.cjs");
 const { validateBody } = require("../../middleware/validate.cjs")
-const { loginSchema, signupSchema ,preferencesSchema} = require("../../utils/validators/userValidator.cjs")
+const { loginSchema, signupSchema, preferencesSchema } = require("../../utils/validators/userValidator.cjs")
 const router = express.Router();
 
 
@@ -53,7 +53,7 @@ router.post("/signup", validateBody(signupSchema), async (req, res) => {
   }
 });
 
-router.post("/preferences", validateBody(preferencesSchema),async (req, res) => {
+router.post("/preferences", validateBody(preferencesSchema), async (req, res) => {
   try {
     const { username, language, textSize, contentMode, topics } = req.body;
 
@@ -74,12 +74,12 @@ router.post("/preferences", validateBody(preferencesSchema),async (req, res) => 
 
 //logout
 router.post("/logout", (req, res) => {
-    res.clearCookie("token", {
-        httpOnly: true,
-        secure: true,
-        sameSite: "Strict"
-    });
-    return res.status(200).send("Logged out successfully");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Strict"
+  });
+  return res.status(200).send("Logged out successfully");
 });
 
 router.get("/check-auth", auth, async (req, res) => {
@@ -94,6 +94,34 @@ router.get("/check-auth", auth, async (req, res) => {
   } catch (err) {
     console.error("[check-auth] error:", err);
     res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+router.get('/threadId', auth, async (req, res) => {
+  try {
+    // re‑fetch user record so we include the latest threadId
+    const username = req.currentUser.username;
+    const user = await getUser(username);
+    let threadId = user.threadId;
+    if (!threadId) {
+      //Create a new thread via the Quick‑start POST /api/assistants/threads
+      const createRes = await fetch(
+        "http://localhost:3000/api/assistants/threads",
+        { method: "POST" }
+      );
+      if (!createRes.ok) {
+        throw new Error(`Quickstart failed: ${createRes.status} ${createRes.statusText}`);
+      }
+      const { threadId: newId } = await createRes.json();
+
+      threadId = newId;
+      user.threadId = threadId;
+      await user.save();
+    }
+    return res.json({ threadId });
+  } catch (err) {
+    console.error('[threadId] could not read or create thread:', err);
+    return res.status(500).send('Could not read/create threadId');
   }
 });
 

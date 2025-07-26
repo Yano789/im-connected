@@ -8,6 +8,7 @@ const UserSchema = new Schema({
     email: {type: String,unique: true},
     password: String,
     verified: {type:Boolean,default:false}, //For authorisation purposes 
+    threadId:   { type: String, default: null },
     preferences: {
     preferredLanguage: { type: String, default: "English" },
     textSize: { type: String, default: "Medium" },
