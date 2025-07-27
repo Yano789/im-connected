@@ -12,12 +12,15 @@ import mongoose from 'mongoose';
 // Database connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/im-connected';
 
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('🔗 Connected to MongoDB (Forum Database)'))
-.catch(err => console.error('❌ MongoDB connection error:', err));
+// Only connect to MongoDB in non-test environments or when specifically needed
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect(MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('🔗 Connected to MongoDB (Forum Database)'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
+}
 
 // Import medication models from forum backend
 const careRecipientSchema = new mongoose.Schema({
@@ -860,7 +863,10 @@ class OCRService {
       // Return combined text for better medication detection
       return combinedText;
     } catch (error) {
-      console.error('OCR error:', error);
+      // Only log OCR errors in non-test environments
+      if (process.env.NODE_ENV !== 'test') {
+        console.error('OCR error:', error);
+      }
       throw error;
     }
   }
@@ -1087,7 +1093,7 @@ app.post('/scan-medication', upload.single('medicationImage'), async (req, res) 
   try {
     console.log('=== SCAN MEDICATION REQUEST ===');
     console.log('Request headers:', req.headers);
-    console.log('Request body keys:', Object.keys(req.body));
+    console.log('Request body keys:', (req.body && typeof req.body === 'object') ? Object.keys(req.body) : 'No body');
     console.log('File received:', req.file);
     console.log('Multer error:', req.multerError);
     
@@ -1154,7 +1160,10 @@ app.post('/scan-medication', upload.single('medicationImage'), async (req, res) 
     res.json(response);
 
   } catch (error) {
-    console.error('Medication scanning error:', error);
+    // Only log medication scanning errors in non-test environments
+    if (process.env.NODE_ENV !== 'test') {
+      console.error('Medication scanning error:', error);
+    }
     res.status(500).json({
       success: false,
       error: 'Failed to process medication image',
@@ -1542,7 +1551,10 @@ app.get('/', (req, res) => {
  * Error handling middleware
  */
 app.use((error, req, res, next) => {
-  console.error('Server error:', error);
+  // Only log errors in non-test environments
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('Server error:', error);
+  }
   
   if (error instanceof multer.MulterError) {
     if (error.code === 'LIMIT_FILE_SIZE') {
@@ -1551,6 +1563,18 @@ app.use((error, req, res, next) => {
         error: 'File too large. Maximum size is 10MB.'
       });
     }
+    return res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+
+  // Handle file filter errors (custom validation errors)
+  if (error.message && error.message.includes('Invalid file type')) {
+    return res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 
   res.status(500).json({
@@ -1561,12 +1585,44 @@ app.use((error, req, res, next) => {
 });
 
 // Start server
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🏥 Enhanced Medication Scanner API v2.1.0 running on http://0.0.0.0:${PORT}`);
   console.log(`📱 Ready to scan medication images with authoritative online database integration`);
   console.log(`🔍 Features: Online-only data sources, FDA/NIH integration, enhanced preprocessing`);
   console.log(`✅ Data Policy: All medication information sourced from authoritative online medical databases`);
   console.log(`🚫 No local medication database - ensures maximum reliability and up-to-date information`);
 });
+
+// Graceful shutdown function for tests
+export const closeServer = () => {
+  return new Promise((resolve) => {
+    if (server) {
+      server.close(async () => {
+        // Close database connection if it exists
+        if (mongoose.connection.readyState !== 0) {
+          await mongoose.connection.close();
+        }
+        resolve();
+      });
+    } else {
+      resolve();
+    }
+  });
+};
+
+// Handle process termination gracefully
+if (process.env.NODE_ENV !== 'test') {
+  process.on('SIGTERM', async () => {
+    console.log('SIGTERM received. Shutting down gracefully...');
+    await closeServer();
+    process.exit(0);
+  });
+
+  process.on('SIGINT', async () => {
+    console.log('SIGINT received. Shutting down gracefully...');
+    await closeServer();
+    process.exit(0);
+  });
+}
 
 export default app;

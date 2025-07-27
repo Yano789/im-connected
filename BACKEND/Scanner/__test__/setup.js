@@ -16,9 +16,23 @@ beforeAll(() => {
   }
 });
 
-afterAll(() => {
+afterAll(async () => {
+  // Clean up any running server instances
+  try {
+    const { closeServer } = await import('../app.js');
+    if (closeServer) {
+      await closeServer();
+    }
+  } catch (error) {
+    // Server might not be running, which is fine
+    console.log('Server cleanup:', error.message);
+  }
+  
   // Restore console methods
   jest.restoreAllMocks();
+  
+  // Force close any remaining open handles
+  await new Promise(resolve => setTimeout(resolve, 100));
 });
 
 // Global error handler for unhandled promises
