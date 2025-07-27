@@ -170,9 +170,11 @@ describe("User Routes", () => {
       expect(res.statusCode).toBe(200);
       expect(getUser).toHaveBeenCalledWith("janedoe");
       expect(res.body).toMatchObject({
-        name: "Jane",
-        username: "janedoe",
-        email: "janedoe@gmail.com",
+        user: {
+          name: "Jane",
+          username: "janedoe",
+          email: "janedoe@gmail.com",
+        }
       });
     });
   });
