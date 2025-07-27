@@ -7,10 +7,10 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "NODE_OPTIONS=\"--experimental-vm-modules\" jest",
-    "test:watch": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --watch",
-    "test:coverage": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --coverage",
-    "test:verbose": "NODE_OPTIONS=\"--experimental-vm-modules\" jest --verbose"
+    "test": "NODE_ENV=test NODE_OPTIONS=\"--experimental-vm-modules\" jest --detectOpenHandles --forceExit",
+    "test:watch": "NODE_ENV=test NODE_OPTIONS=\"--experimental-vm-modules\" jest --watch --detectOpenHandles",
+    "test:coverage": "NODE_ENV=test NODE_OPTIONS=\"--experimental-vm-modules\" jest --coverage --detectOpenHandles --forceExit",
+    "test:verbose": "NODE_ENV=test NODE_OPTIONS=\"--experimental-vm-modules\" jest --verbose --detectOpenHandles --forceExit"
   },
   "keywords": [
     "medication",
