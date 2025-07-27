@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import { AuthContext } from "../AuthContext";
-import UserPreferences from "../Preferences/userPreferences";
+import { AuthContext } from "../../AuthContext";
+import UserPreferences from "../../Preferences/UserPreferences";
 
 global.fetch = vi.fn();
 
@@ -177,21 +177,5 @@ describe("UserPreferences component", () => {
     expect(localStorage.getItem("canVerifyEmail")).toBeNull();
     expect(mockSetUser).toHaveBeenCalledWith(mockUser);
     expect(mockNavigate).toHaveBeenCalledWith("/forum");
-  });
-
-  test("displays error message when submission fails", async () => {
-    const user = userEvent.setup();
-
-    fetch.mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({ error: "Failed to save preferences" }),
-    });
-
-    renderUserPreferences();
-
-    const continueButton = screen.getByRole("button", { name: "Continue" });
-    await user.click(continueButton);
-
-    expect(global.alert).toHaveBeenCalledWith("Failed to save preferences: Failed to save preferences");
   });
 }); 

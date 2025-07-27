@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
-import './userPreferences.css';
+import './UserPreferences.css';
 import Children from '../assets/Children.png';
 import Depression from '../assets/Depression.png';
 import Elderly from '../assets/Elderly.png';

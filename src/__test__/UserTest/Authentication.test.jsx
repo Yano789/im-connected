@@ -2,8 +2,8 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import { AuthContext } from "../AuthContext";
-import Auth from "../Authentication/Authentication";
+import { AuthContext } from "../../AuthContext";
+import Auth from "../../Authentication/Authentication";
 
 global.fetch = vi.fn();
 

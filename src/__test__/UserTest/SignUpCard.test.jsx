@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import SignUpCard from "../SignUp/SignUpCard";
+import SignUpCard from "../../SignUp/SignUpCard";
 
 global.fetch = vi.fn();
 
