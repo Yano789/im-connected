@@ -167,7 +167,7 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
     if (tags.length === 1) {
       filter.tags = tags[0];
     } else if (tags.length > 1) {
-      filter.tags = { $in: tags ,$size:2 };
+      filter.tags = { $in: tags};
     }
 
     //console.log(filter)
