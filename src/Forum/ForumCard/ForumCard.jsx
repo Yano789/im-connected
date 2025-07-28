@@ -25,7 +25,6 @@ function ForumCard(props) {
   const navigate = useNavigate();
   const encodedPostId = encodeURIComponent(postId);
 
-  // Sync liked state if initiallyLiked prop changes (important for page navigation)
   useEffect(() => {
     setLiked(initiallyLiked);
   }, [initiallyLiked]);
@@ -58,7 +57,14 @@ function ForumCard(props) {
   return (
     <div
       className="post"
-      onClick={() => navigate(`/forum/viewpost?postId=${encodedPostId}`)}
+      onClick={() =>
+        navigate(`/forum/viewpost?postId=${encodedPostId}`, {
+          state: {
+            bookmarked: props.initialBookmarked,
+            liked: liked,
+          },
+        })
+      }
     >
       <div className="data">
         <div className="forumTitle">

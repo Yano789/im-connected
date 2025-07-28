@@ -33,8 +33,7 @@
   @apply flex h-fit w-full max-w-screen flex-wrap transition-all duration-300 ease-in-out items-center justify-center gap-5 px-5 py-0 flex-col sm:flex-row;
 }
 .header {
-  @apply min-h-fit w-full h-fit relative bg-[#ab97c3] flex items-start justify-start p-[10px] box-border text-left text-[20px] text-[#2d2d2d] font-[Poppins]
-}
+  @apply min-h-fit w-full h-fit relative bg-[#ab97c3] flex items-start justify-start p-[10px] box-border text-left text-base text-[#2d2d2d]
 }
 
-
+}

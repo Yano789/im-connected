@@ -7,6 +7,7 @@
   import MedicationsPage from "./Medications/MedicationsPage/MedicationsPage";
   import LoginCard from "./Login/LoginCard";
   import ProfilePage from './Profile/ProfilePage/ProfilePage';
+  import Dashboard from "./Dashboard/Dashboard/Dashboard";
 
   function App() {
     return (
@@ -24,8 +25,8 @@
             <Route path="/preferences" element={<Preferences/>}/>
             <Route path="/emailauthentication" element={<EmailAuthentication/>}/>
             <Route path="/forgetpassword" element={<ForgetPassword/>}/> 
-            <Route path="/dashboard" element={<Dashboard/>}/>
             */}
+            <Route path="/dashboard" element={<Dashboard/>}/>
             <Route path="/forum" element={<Forum/>}/>
             <Route path="/forum/newpost" element={<NewPost/>}/>
             <Route path="/forum/viewpost" element={<ViewPost/>}/> 

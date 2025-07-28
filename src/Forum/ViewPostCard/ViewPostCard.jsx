@@ -1,30 +1,42 @@
 import "./ViewPostCard.css";
+import Bookmark from "../Bookmark/Bookmark";
 import CommentBody from "../CommentBody/CommentBody";
-import BookmarkIcon from "../../assets/Bookmark.png";
 import CommentsIcon from "../../assets/Comments.png";
 import LikesIcon from "../../assets/Likes.png";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import UnlikesIcon from "../../assets/Unlikes.png";
+
+import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 
 function ViewPostCard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
+
   const postId = searchParams.get("postId");
+
+  const initialBookmarked = location.state?.bookmarked || false;
+  const initialLiked = location.state?.liked || false;
+
   const [postData, setPostData] = useState(null);
   const [error, setError] = useState("");
   const [comments, setComments] = useState([]);
 
+  const [liked, setLiked] = useState(initialLiked);
+  const [likeCount, setLikeCount] = useState(0);
+
   useEffect(() => {
     if (!postId) return;
 
-    fetch(
-      `http://localhost:5001/api/v1/post/getPost/${encodeURIComponent(postId)}`
-    )
+    fetch(`http://localhost:5001/api/v1/post/getPost/${encodeURIComponent(postId)}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch post.");
         return res.json();
       })
-      .then((data) => setPostData(data))
+      .then((data) => {
+        setPostData(data);
+        setLikeCount(data.likes || 0);
+      })
       .catch((err) => {
         console.error(err);
         setError(err.message);
@@ -46,18 +58,33 @@ function ViewPostCard() {
     fetchComments();
   }, [fetchComments]);
 
+  const handleLikeToggle = async (e) => {
+    e.stopPropagation();
+    try {
+      const url = `http://localhost:5001/api/v1/like/${encodeURIComponent(postId)}/${
+        liked ? "unlike" : "like"
+      }`;
+      const method = liked ? "DELETE" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        credentials: "include",
+      });
+
+      if (!res.ok) throw new Error(`Failed to ${liked ? "unlike" : "like"} post`);
+
+      const data = await res.json();
+      setLiked(!liked);
+      setLikeCount(data.likes);
+    } catch (err) {
+      console.error("Error toggling like:", err.message);
+    }
+  };
+
   if (error) return <p>{error}</p>;
   if (!postData) return <p>Loading post...</p>;
 
-  const {
-    title,
-    content,
-    username,
-    createdAt,
-    tags = [],
-    likes,
-    media,
-  } = postData;
+  const { title, content, username, createdAt, tags = [], media } = postData;
 
   return (
     <div className="viewPostDiv">
@@ -78,7 +105,7 @@ function ViewPostCard() {
             </div>
             <div className="viewPostName">
               <div className="viewPostUsername">{username}</div>
-              <img className="bookmarkIcon" alt="Bookmark" src={BookmarkIcon} />
+              <Bookmark postId={postId} initialBookmarked={initialBookmarked} />
             </div>
             <div className="viewPostTags">
               {tags.slice(0, 2).map((tag, idx) => (
@@ -89,9 +116,11 @@ function ViewPostCard() {
             </div>
           </div>
         </div>
+
         <div className="viewPostDescriptionDiv">
           <div className="viewPostDescription">{content}</div>
         </div>
+
         {media && media.length > 0 && (
           <div className="viewPostImagesDiv">
             <div className="viewPostImages">
@@ -107,12 +136,21 @@ function ViewPostCard() {
             <img className="commentsIcon" alt="Comments" src={CommentsIcon} />
             <div className="name">{comments.length}</div>
           </div>
-          <div className="likesNumber">
-            <img className="likesIcon" alt="Likes" src={LikesIcon} />
-            <div className="name">{likes}</div>
+          <div
+            className="likesNumber"
+            onClick={handleLikeToggle}
+            style={{ cursor: "pointer" }}
+          >
+            <img
+              className="likesIcon"
+              alt="Likes"
+              src={liked ? LikesIcon : UnlikesIcon}
+            />
+            <div className="name">{likeCount}</div>
           </div>
         </div>
       </div>
+
       <CommentBody
         comments={comments}
         postId={postId}
