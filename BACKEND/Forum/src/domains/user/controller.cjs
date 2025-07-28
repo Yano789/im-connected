@@ -1,58 +1,65 @@
 const User = require("./model.cjs");
-const {hashData,verifyHashedData} = require("../../utils/hashData.cjs");
+const { hashData, verifyHashedData } = require("../../utils/hashData.cjs");
 const createToken = require("../../utils/createToken.cjs");
 
 const authenticateUser = async (data) => {
     try {
-        const{username,password} = data;
-        const fetchedUser = await User.findOne({username});
-        if(!fetchedUser){
+        const { username, password } = data;
+        const fetchedUser = await User.findOne({ username });
+        if (!fetchedUser) {
             throw Error("Invalid Username Given!");
         }
-        if(!fetchedUser.verified){
-            throw Error ("Email hasn't been verified yet. Check your inbox.");
+        if (!fetchedUser.verified) {
+            throw Error("Email hasn't been verified yet. Check your inbox.");
         }
         const hashedPassword = fetchedUser.password;
-        const passwordMatch = await verifyHashedData(password,hashedPassword);
-        if(!passwordMatch){
-            throw Error ("Incorrect Password Given!");
+        const passwordMatch = await verifyHashedData(password, hashedPassword);
+        if (!passwordMatch) {
+            throw Error("Incorrect Password Given!");
         }
         //Create User Token
-        const tokenData = {userId: fetchedUser._id,email: fetchedUser.email,username:fetchedUser.username};
+        const tokenData = { userId: fetchedUser._id, email: fetchedUser.email, username: fetchedUser.username };
         const token = await createToken(tokenData);
 
         //assign user token
-        const authenticatedUser = await User.findOne({username})
-        return {token,authenticatedUser};
+        const authenticatedUser = await User.findOne({ username })
+        return { token, authenticatedUser };
     } catch (error) {
         throw error;
     }
 };
 
-
-const createNewUser = async(data) =>{
+const createNewUser = async (data) => {
     try {
         const { name, username, email, number, password, preferences = {} } = data;
         //Check if user already exists
-        const existingUserEmail = await User.findOne({email});
-        const existingUsername = await User.findOne({username});
+        const existingUserEmail = await User.findOne({ email });
+        const existingUsername = await User.findOne({ username });
 
-        if(existingUserEmail){
+        if (existingUserEmail) {
             throw Error("User with provided email already exists");
         }
 
-        else if(existingUsername){
+        else if (existingUsername) {
             throw Error("Username has been taken");
         }
-        else{
+        else {
             //hash password
             const hashedPassword = await hashData(password);
             const newUser = new User({
                 name,
+                name,
                 username,
                 email,
                 number,
+                number,
                 password: hashedPassword,
+                preferences: {
+                    preferredLanguage: preferences.preferredLanguage || "English",
+                    textSize: preferences.textSize || "Medium",
+                    contentMode: preferences.contentMode || "Default",
+                    topics: preferences.topics || [],
+                },
                 preferences: {
                     preferredLanguage: preferences.preferredLanguage || "English",
                     textSize: preferences.textSize || "Medium",
@@ -92,4 +99,4 @@ const getUser = async (username)=>{
     
 }
 
-module.exports = {createNewUser,authenticateUser, updateUserPreferences,getUser}
+module.exports = {createNewUser,authenticateUser, updateUserPreferences,getUser};

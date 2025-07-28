@@ -35,13 +35,10 @@ function ForumBody() {
       setLoading(true);
       try {
         const params = new URLSearchParams(query).toString();
-        const res = await fetch(
-          `http://localhost:5001/api/v1/post/?${params}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
+        const res = await fetch(`http://localhost:5001/api/v1/post/?${params}`, {
+          method: "GET",
+          credentials: "include",
+        });
         if (!res.ok) throw new Error("Failed to fetch posts");
         const data = await res.json();
         setPosts(data);

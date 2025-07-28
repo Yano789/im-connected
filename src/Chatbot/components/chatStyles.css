@@ -1,0 +1,177 @@
+
+.Title{
+  align-self: stretch;
+color: #FFB266;
+text-align: center;
+font-family: 'Poppins', sans-serif;
+font-size: 64px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+
+.Title2{
+color: #383838;
+font-family: 'Poppins', sans-serif;
+font-size: 64px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+
+.SubTitle{
+color: #383838;
+text-align: center;
+font-family: 'Poppins', sans-serif;
+font-size: 40px;
+font-style: normal;
+font-weight: 400;
+line-height: normal;
+}
+
+.chatContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1205px;
+  margin: 0 auto;
+  height: 70vh;
+  background: #FFFDF9;
+  border-radius: 16px;
+  box-shadow: 0px 20px 0px #FFB266, 0px 13px 20px rgba(0, 0, 0, 0.25);
+  padding: 32px 24px 16px 24px;
+  box-sizing: border-box;
+}
+
+.chatHeader h1 {
+  font-size: 48px;
+  text-align: center;
+  font-family: Poppins, sans-serif;
+  font-weight: 400;
+  margin: 0;
+  color: #383838;
+}
+
+.highlight {
+  color: #FFB266;
+}
+
+.subtext {
+  text-align: center;
+  font-size: 18px;
+  color: #585858;
+  margin-bottom: 20px;
+}
+
+.messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 8px;
+}
+
+.message {
+display: flex;
+padding: 15px;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+gap: 10px;
+flex: 1 0 0;
+}
+
+.userMessage {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.userMessageRow {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.userBubble {
+  background: #FFF7EF;
+  color: #000;
+  padding: 12px 16px;
+  border-radius: 20px 20px 0px 20px; /* match Figma: sharp bottom-right */
+  box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.15);
+  font-family: system-ui;
+  font-size: 17px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.assistantMessage {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.assistantMessageRow {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.assistantBubble {
+  background: rgba(255, 178, 102, 0.60);
+  color: #000;
+  padding: 12px 16px;
+  border-radius: 20px 20px 20px 0px; /* match Figma: sharp bottom-right */
+  box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.15);
+  font-family: system-ui;
+  font-size: 17px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.inputForm {
+  display: flex;
+  align-items: center;
+  margin-top: 16px;
+  background: #FFDBA8;
+  border-radius: 16px;
+  padding: 8px 16px;
+  font-family: system-ui;
+}
+
+.input {
+  flex-grow: 1;
+  border: none;
+  background: transparent;
+  padding: 12px;
+  font-size: 1em;
+}
+
+.input:focus {
+  outline: none;
+}
+
+.button {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.button img {
+  width: 50px;
+  height: 50px;
+}

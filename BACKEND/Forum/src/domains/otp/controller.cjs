@@ -10,6 +10,7 @@ const verifyOTP = async({email,otp})=>{
         if(!(email&&otp)){
             throw Error("Provide values for email,otp");
         }
+
         const matchedOTPRecord = await OTP.findOne({email});
         if(!(matchedOTPRecord)){
             throw Error("No otp records found.");
@@ -23,7 +24,8 @@ const verifyOTP = async({email,otp})=>{
 
         const hashedOTP = matchedOTPRecord.otp;
         const validOTP = await verifyHashedData(otp,hashedOTP);
-        if(!validOTP) throw new Error("Invalid OTP!")
+        if(!validOTP) throw new Error("Invalid OTP!");
+
         return validOTP;
     } catch (error) {
         throw error;

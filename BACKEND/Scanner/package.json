@@ -7,7 +7,10 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=test NODE_OPTIONS=\"--experimental-vm-modules\" jest --detectOpenHandles --forceExit",
+    "test:watch": "NODE_ENV=test NODE_OPTIONS=\"--experimental-vm-modules\" jest --watch --detectOpenHandles",
+    "test:coverage": "NODE_ENV=test NODE_OPTIONS=\"--experimental-vm-modules\" jest --coverage --detectOpenHandles --forceExit",
+    "test:verbose": "NODE_ENV=test NODE_OPTIONS=\"--experimental-vm-modules\" jest --verbose --detectOpenHandles --forceExit"
   },
   "keywords": [
     "medication",
@@ -21,9 +24,17 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "form-data": "^4.0.4",
+    "mongoose": "^8.16.4",
     "multer": "^2.0.2",
     "node-fetch": "^3.3.2",
     "sharp": "^0.34.3",
     "tesseract.js": "^6.0.1"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.0.3",
+    "supertest": "^6.3.4"
   }
 }
