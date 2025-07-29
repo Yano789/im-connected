@@ -1,8 +1,8 @@
 const express = require("express");
-const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,getAllMyDrafts,getMyDraft,deleteDrafts,getPostByTitle} = require("./controller.cjs");
+const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,getAllMyDrafts,getMyDraft,deleteDrafts,getPostByTitle,searchPosts} = require("./controller.cjs");
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
-const {postDraftSchema,querySchema,paramsSchema,postTitleParamSchema} = require("./../../utils/validators/postValidator.cjs")
+const {postDraftSchema,querySchema,paramsSchema,postTitleParamSchema,searchBarParamSchema} = require("./../../utils/validators/postValidator.cjs")
 const upload = require("./../../config/storage.cjs");
 const normalizeTagsMiddleware = require("./../../middleware/normalizeTags.cjs");
 const {cloudinary} = require("./../../config/cloudinary.cjs");
@@ -100,6 +100,16 @@ router.get("/getPost/title/:title",auth,validateParams(postTitleParamSchema),asy
         const title = req.params.title
         const post = await getPostByTitle(title)
         res.status(200).json(post)
+    } catch (error) {
+        res.status(400).send(error.message)
+    }
+})
+
+router.get("/getPost/search/:search", auth, validateParams(searchBarParamSchema), async (req, res)=>{
+    try {
+        const search = req.params.search
+        const postsTitle = await searchPosts(search)
+        res.status(200).json(postsTitle)
     } catch (error) {
         res.status(400).send(error.message)
     }

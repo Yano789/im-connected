@@ -68,7 +68,7 @@ function Auth() {
 
         const code = inputsRef.current.map((input) => input.value).join("");
         try {
-            const res = await fetch("http://localhost:5001/api/v1/otp/verify", {
+            const res = await fetch("http://localhost:5001/api/v1/otp/verify", { //TOBE CHANGED!
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
