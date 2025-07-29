@@ -11,7 +11,7 @@ const formatTimeToAMPM = (time) => {
     return `${hours}:${minutes} ${ampm}`;
 };
 
-function MedicationItem({ medication, onSelect, isSelected }) {
+function MedicationItem({ medication, onSelect, isSelected, onToggleDose }) {
   return (
     // This wrapper creates the separator line between medication items
     <div className="medication-wrapper">
@@ -28,8 +28,9 @@ function MedicationItem({ medication, onSelect, isSelected }) {
                 <span>{formatTimeToAMPM(dosage.time)}</span>
               <input 
                 type="checkbox" 
-                defaultChecked={dosage.taken} 
                 className="med-checkbox" 
+                defaultChecked={dosage.taken}
+                onChange={() => onToggleDose(medication.id, index)}
               />
             </div>
           ))}

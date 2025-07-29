@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import './MedicationLogging.css';
 import MedicationItem from '../MedicationItem/MedicationItem';
 
-function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddNew }) {
+function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddNew, onToggleDose }) {
     const [isCameraActive, setIsCameraActive] = useState(false);
     const [capturedImage, setCapturedImage] = useState(null);
     const [capturedFile, setCapturedFile] = useState(null);
@@ -361,6 +361,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                         medication={med}
                         onSelect={onSelect}
                         isSelected={selectedMedicationId === med.id}
+                        onToggleDose={onToggleDose}
                     />
                 ))}
             </div>
