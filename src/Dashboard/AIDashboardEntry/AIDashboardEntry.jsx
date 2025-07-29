@@ -1,12 +1,13 @@
 import "./AIDashboardEntry.css";
 function AIDashboardEntry(props){
-    const itemCat = props.itemCat;
+    const itemTitle = props.itemTitle;
     const itemName = props.itemName;
+    const onClick = props.onClick;
     return (
-        <div className="item-div">
-            <div className="item-box">
-                <div className="item-cat">{itemCat}</div>
-                <div className="item-name">{itemName}</div>
+        <div className="itemDiv" onClick={onClick}>
+            <div className="itemBox">
+                <div className="itemName">{itemName}</div>
+                <div className="itemTitle">{itemTitle}</div>
             </div>
         </div>
     );

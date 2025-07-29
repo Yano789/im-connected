@@ -243,7 +243,7 @@ function MedicationsPage() {
         }
     };
 
-    const handleMedicationToggle = (medicationId, dosageIndex) => {
+    const handleMedicationToggle = async (medicationId, dosageIndex) => {
         const updatedRecipients = careRecipients.map(recipient => {
             if (recipient.id === selectedRecipientId) {
                 const updatedMedications = recipient.medications.map(med => {
@@ -251,6 +251,9 @@ function MedicationsPage() {
                         const updatedDosages = med.dosages.map((dosage, index) => 
                             index === dosageIndex ? { ...dosage, taken: !dosage.taken } : dosage
                         );
+
+                        medicationScannerService.updateMedication(med.id, { dosages: updatedDosages });
+
                         return { ...med, dosages: updatedDosages };
                     }
                     return med;
@@ -287,6 +290,7 @@ function MedicationsPage() {
                         onSelect={handleMedicationSelect}
                         selectedMedicationId={selectedMedicationId}
                         onAddNew={handleAddNewClick}
+                        onToggleDose={handleMedicationToggle}
                     />
                 </div>
 

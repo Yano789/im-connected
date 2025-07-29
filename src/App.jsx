@@ -15,6 +15,7 @@ import { AuthContext } from "./AuthContext";
 import AuthProvider from "./AuthContext";
 import ChatPage from './Chatbot/Chat';
 import LoginSignUpBackground from "./assets/LoginSignUpBackground.jpg";
+import Dashboard from "./Dashboard/Dashboard/Dashboard";
 
 
 function AppContent() {
@@ -85,6 +86,7 @@ function AppContent() {
         <Route path="/signup" element={<SignUpCard />}></Route>
         <Route path="/login" element={<LoginCard />} />
         <Route path="/preferences" element={<UserPreferences />}></Route>
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/forum" element={<Forum />} />
         <Route path="/forum/newpost" element={<NewPost />} />
         <Route path="/forum/viewpost" element={<ViewPost />} />

@@ -1,11 +1,28 @@
 @import "tailwindcss";
+
 @layer components {
-  .item-div {
-    @apply flex flex-row flex-wrap gap-4 w-full; /* or max-w-[some value] */
+  .itemDiv {
+    @apply flex flex-row flex-wrap gap-4 w-full
+      cursor-pointer
+      select-none
+      transition-transform duration-150 ease-in-out
+      active:scale-[0.97]
+      hover:scale-[1.03]
+      hover:shadow-[7px_7px_8px_rgba(0,0,0,0.35)];
   }
 
-  .item-box {
-    @apply flex-1 min-w-0 bg-[#ffedca] flex flex-col items-center justify-center text-[#383838] p-2.5 rounded-[10px] shadow-[5px_5px_4px_rgba(0,0,0,0.25)];
+  .itemBox {
+    @apply flex-1 min-w-0 bg-[#FFF2F0] flex flex-row gap-3 items-start justify-between
+      text-[#383838] p-2.5 rounded-[10px]
+      shadow-[5px_5px_4px_rgba(0,0,0,0.25)];
+  }
+  
+  .itemName {
+    @apply font-bold;
+  }
+
+  .itemTitle {
+    @apply text-base;
   }
 }
 
