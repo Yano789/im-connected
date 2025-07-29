@@ -1,17 +1,33 @@
 @import "tailwindcss";
 
-    @layer components {
-    .card {
-    @apply w-full max-w-full min-h-fit relative shadow-[0px_20px_0px_#ff7e7e,0px_13px_20px_rgba(0,0,0,0.25)] 
-         bg-[#fffdf9] flex flex-col items-start justify-start box-border cursor-pointer text-left 
-         text-[#383838] p-5 rounded-[20px] gap-2;
-    }
+@layer components {
+  .card {
+    @apply
+      w-full max-w-full h-full relative
+      shadow-[0px_20px_0px_#ff7e7e,0px_13px_20px_rgba(0,0,0,0.25)]
+      bg-[#fffdf9] flex flex-col items-start justify-start box-border
+      cursor-pointer text-left text-[#383838] p-5 rounded-[20px] gap-2
+      select-none
+      transition-transform duration-200 ease-in-out
+      active:scale-[0.97]
+      hover:scale-[1.05]
+      hover:shadow-[0px_30px_10px_#ff7e7e,0px_20px_40px_rgba(0,0,0,0.35)];
+  }
 
-    .card-subheader {
-        @apply self-stretch relative text-lg lg:text-xl font-bold;
-    }
-    .card-header {
-        @apply self-stretch relative text-xl lg:text-2xl font-bold;
-    }
-    }
+  .card-header {
+    @apply
+      self-stretch relative
+      text-xl lg:text-2xl font-bold
+      touch-manipulation;
+  }
+
+  .card-subheader {
+    @apply
+      self-stretch relative
+      text-lg lg:text-xl font-bold
+      touch-manipulation;
+  }
+}
+
+
 
