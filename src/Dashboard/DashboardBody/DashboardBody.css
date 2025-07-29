@@ -2,14 +2,14 @@
 
 @layer components {
   .dashboard-div {
-    @apply w-full h-screen flex justify-center items-center;
+    @apply w-full h-full flex justify-center items-center;
   }
 
   .dashboard-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-screen-xl w-full;
-  } 
+    @apply flex flex-col gap-10 max-w-screen-xl w-full items-center justify-center p-2.5 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-10;
+  }
 
   .dashboardItem {
-    @apply flex justify-center; 
+    @apply w-full h-full flex justify-center;
   }
 }

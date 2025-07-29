@@ -62,7 +62,7 @@ function ForumDashboard() {
   }, []);
 
   return (
-    <div className="card">
+    <div className="cardDiv">
       <p className="card-header">Forum</p>
       <p className="card-subheader">View trending posts</p>
 

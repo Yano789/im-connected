@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 @layer components {
-  .card {
+  .cardDiv {
     @apply
       w-full max-w-full h-full relative
       shadow-[0px_20px_0px_#ff7e7e,0px_13px_20px_rgba(0,0,0,0.25)]
@@ -26,6 +26,9 @@
       self-stretch relative
       text-lg lg:text-xl font-bold
       touch-manipulation;
+  }
+  .cardDetails{ 
+    @apply flex flex-row w-full h-fit items-start justify-between gap-5; 
   }
 }
 

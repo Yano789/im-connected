@@ -5,7 +5,7 @@ function AIDashboard(){
   	
   	
   	return (
-    		<div className="card">
+    		<div className="cardDiv">
 				<p className="card-header">AI Chat Companion</p>
       			<p className="card-subheader">Get emotional support, summaries, translations, and resource info</p>
       			<AIDashboardEntry itemName="I’m so happy today! Help me write this down..." onClick={() => navigate("/chatbot")}></AIDashboardEntry>
