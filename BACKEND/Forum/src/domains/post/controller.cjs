@@ -387,4 +387,4 @@ const searchPosts = async (search) => {
 
 
 
-module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle,searchPosts}
+module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle,searchPosts,escapeRegex };

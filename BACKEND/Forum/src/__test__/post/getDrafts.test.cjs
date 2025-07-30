@@ -14,8 +14,7 @@ describe("getAllMyDrafts", () => {
       { postId: "d1", username: "user1", draft: true },
       { postId: "d2", username: "user1", draft: true },
     ];
-
-    // Mock the chainable methods find().sort()
+    
     Post.find.mockReturnValue({
       sort: jest.fn().mockResolvedValue(mockDrafts),
     });
