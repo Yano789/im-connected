@@ -1,0 +1,19 @@
+{
+    "Dashboard": "仪表板",
+    "Forum": "论坛",
+    "Medication": "论坛",
+    "Chatbot": "聊天机器人",
+    "Profile": "轮廓",
+    "No Forum Posts": "论坛上没有此标题的帖子", 
+    "Sign Out": "登出", 
+    "Search": "在此输入进行搜索...",
+    "AIDashboardHeader": "AI聊天伴侣", 
+    "AIDashboardSubHeader": "获得情感支持、摘要、翻译和资源信息",
+    "AIDashboardEntry1": "我今天太开心了！帮我写下来...",
+    "AIDashboardEntry2": "你能帮我研究一下吗...",
+    "AIDashboardEntry3": "为我总结一下这篇文章...",
+    "ForumSubHeader": "查看热门帖子",
+    "Latest Post": "最新帖子",
+    "Highest Liked Post": "最高点赞的帖子",
+    "Highest Commented Post": "评论最高的帖子"
+}

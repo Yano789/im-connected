@@ -1,6 +1,7 @@
 import AIDashboardEntry from "../AIDashboardEntry/AIDashboardEntry";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function ForumDashboard() {
   const [topPosts, setTopPosts] = useState({
@@ -10,6 +11,7 @@ function ForumDashboard() {
   });
 
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -63,8 +65,8 @@ function ForumDashboard() {
 
   return (
     <div className="cardDiv">
-      <p className="card-header">Forum</p>
-      <p className="card-subheader">View trending posts</p>
+      <p className="card-header">{t("Forum")}</p>
+      <p className="card-subheader">{t("ForumSubHeader")}</p>
 
       {loading ? (
         <p>Loading...</p>
@@ -73,7 +75,7 @@ function ForumDashboard() {
       ) : (
         <>
           <AIDashboardEntry
-            itemName="Latest Post"
+            itemName={t("Latest Post")}
             itemTitle={topPosts.latest?.title || "N/A"}
             onClick={() =>
               navigate(
@@ -84,7 +86,7 @@ function ForumDashboard() {
             }
           />
           <AIDashboardEntry
-            itemName="Highest Liked Post"
+            itemName={t("Highest Liked Post")}
             itemTitle={topPosts.liked?.title || "N/A"}
             onClick={() =>
               navigate(
@@ -95,7 +97,7 @@ function ForumDashboard() {
             }
           />
           <AIDashboardEntry
-            itemName="Highest Commented Post"
+            itemName={t("Highest Commented Post")}
             itemTitle={topPosts.commented?.title || "N/A"}
             onClick={() =>
               navigate(
