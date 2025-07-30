@@ -133,4 +133,17 @@ router.get('/threadId', auth, async (req, res) => {
   }
 });
 
+router.get('/language', auth, async (req, res) => {
+  try {
+    // re‑fetch user record so we include the latest threadId
+    const username = req.currentUser.username;
+    const user = await getUser(username);
+    let language = user.preferences.preferredLanguage;
+    return res.json({ language });
+  } catch (err) {
+    console.error('Could not retrieve language settings', err);
+    return res.status(500).send('Could not retrieve language settings');
+  }
+});
+
 module.exports = router;
