@@ -61,7 +61,7 @@ const preferencesSchema = Joi.object({
     "string.empty": "Username cannot be empty",
   }),
   language: Joi.string()
-    .valid("English", "Chinese", "Malay", "Tamil")
+    .valid("en", "zh", "ms", "ta")
     .default("English"),
   textSize: Joi.string()
     .valid("Small", "Medium", "Large")

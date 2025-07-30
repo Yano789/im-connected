@@ -58,7 +58,7 @@ router.post("/preferences", validateBody(preferencesSchema), async (req, res) =>
     const { username, language, textSize, contentMode, topics } = req.body;
 
     const preferences = {
-      language,
+      preferredLanguage:language,
       textSize,
       contentMode,
       topics,

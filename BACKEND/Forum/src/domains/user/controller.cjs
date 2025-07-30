@@ -55,13 +55,7 @@ const createNewUser = async (data) => {
                 number,
                 password: hashedPassword,
                 preferences: {
-                    preferredLanguage: preferences.preferredLanguage || "English",
-                    textSize: preferences.textSize || "Medium",
-                    contentMode: preferences.contentMode || "Default",
-                    topics: preferences.topics || [],
-                },
-                preferences: {
-                    preferredLanguage: preferences.preferredLanguage || "English",
+                    preferredLanguage: preferences.preferredLanguage || "en",
                     textSize: preferences.textSize || "Medium",
                     contentMode: preferences.contentMode || "Default",
                     topics: preferences.topics || [],

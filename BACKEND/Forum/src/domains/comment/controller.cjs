@@ -2,6 +2,7 @@ const Comment = require("./model.cjs")
 const {hashData} = require("../../utils/hashData.cjs");
 const User = require("../user/model.cjs")
 const {Post} = require("../post/model.cjs")
+const translate = require("./../translation/controller.cjs")
 const createNestedComment = require("../../utils/buildNestedComments.cjs")
 
 
@@ -82,21 +83,44 @@ const deleteComment = async (data) => {
 }
 
 
-const getAllComments = async(postId) => {
+const getAllComments = async ({postId,username}) => {
   try {
     const allComments = await Comment.find({ postId }).sort({ createdAt: -1 }).lean();
-    const nestedComments = await createNestedComment(allComments);
-    console.log(JSON.stringify(nestedComments, null, 2));
 
+    const translatedComments = await Promise.all(
+      allComments.map(async (comment) => {
+        // Get user's language preference
+        const user = await User.findOne({username}).lean();
+        console.log(user)
+        const preferredLang = user?.preferences.preferredLanguage || 'en';
+        console.log(preferredLang);
+
+        // Translate the content
+        const translatedContent = await translate(comment.content, preferredLang);
+
+        return {
+          ...comment,
+          content: translatedContent,
+        };
+      })
+    );
+
+    const nestedComments = await createNestedComment(translatedComments);
     return nestedComments;
+
   } catch (error) {
     throw error;
   }
-}
+};
 
 const getComment = async (data) => {
     try {
-        const { postId, commentId} = data
+        const { postId, commentId,username} = data
+        const user = await User.findOne({username}).lean();
+        console.log(user)
+        if(!user){
+            throw Error("No user")
+        }
         if (!postId) {
             throw Error("No postId")
         }
@@ -107,7 +131,10 @@ const getComment = async (data) => {
         if (!comment) {
             throw Error("No such comment found")
         }
-        return comment
+        const preferredLang = user?.preferences.preferredLanguage || 'en';
+        console.log(preferredLang);
+        const translatedComment = await translate(comment.content,preferredLang)
+        return translatedComment
 
     } catch (error) {
         throw error

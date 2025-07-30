@@ -50,10 +50,11 @@ router.delete("/:comment/delete", auth ,validateParams(postAndCommentParamsSchem
 })
 
 //get only all the comments in a nested structure
-router.get("/",validateParams(postParamSchema),async (req, res) => {
+router.get("/",auth,validateParams(postParamSchema),async (req, res) => {
     try {
         const postId = req.params.post
-        const nestedComments = await getAllComments(postId)
+        const username = req.currentUser.username
+        const nestedComments = await getAllComments({postId,username})
         res.status(200).json(nestedComments)
     } catch (error) {
         res.status(400).send(error.message)
@@ -61,11 +62,12 @@ router.get("/",validateParams(postParamSchema),async (req, res) => {
 })
 
 //get a specific comment
-router.get("/:comment",validateParams(postAndCommentParamsSchema),async(req,res)=>{
+router.get("/:comment",auth,validateParams(postAndCommentParamsSchema),async(req,res)=>{
     try {
         const postId = req.params.post
         const commentId = req.params.comment
-        const comment = await getComment({postId,commentId})
+        const username = req.currentUser.username
+        const comment = await getComment({postId,commentId,username})
         res.status(200).json(comment)
     } catch (error) {
         res.status(400).send(error.message)
