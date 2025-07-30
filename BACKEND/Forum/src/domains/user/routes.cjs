@@ -3,7 +3,7 @@ const { createNewUser, authenticateUser, updateUserPreferences, getUser } = requ
 const auth = require("../../middleware/auth.cjs");
 const { sendVerificationOTPEmail } = require("../email_verification/controller.cjs");
 const { validateBody } = require("../../middleware/validate.cjs")
-const { loginSchema, signupSchema, preferencesSchema } = require("../../utils/validators/userValidator.cjs")
+const { loginSchema, signupSchema, preferencesSchema} = require("../../utils/validators/userValidator.cjs")
 const router = express.Router();
 
 
@@ -82,14 +82,6 @@ router.post("/logout", (req, res) => {
   return res.status(200).send("Logged out successfully");
 });
 
-
-// router.get("/check-auth", auth, async (req, res) => {
-//   const username = req.currentUser
-//   const user = await getUser(username)
-//   res.status(200).json(user);
-// });
-
-// /check-auth route with improved error handling and debug logging
 router.get("/check-auth", auth, async (req, res) => {
   try {
     console.log("[check-auth] req.currentUser:", req.currentUser);
@@ -126,7 +118,7 @@ router.get('/threadId', auth, async (req, res) => {
       user.threadId = threadId;
       await user.save();
     }
-    return res.json({ threadId });
+    return res.status(200).json({ threadId });
   } catch (err) {
     console.error('[threadId] could not read or create thread:', err);
     return res.status(500).send('Could not read/create threadId');
@@ -139,11 +131,21 @@ router.get('/language', auth, async (req, res) => {
     const username = req.currentUser.username;
     const user = await getUser(username);
     let language = user.preferences.preferredLanguage;
-    return res.json({ language });
+    return res.status.json({ language });
   } catch (err) {
     console.error('Could not retrieve language settings', err);
     return res.status(500).send('Could not retrieve language settings');
   }
 });
+
+router.get("/getUser/:user",auth,async(req,res)=>{
+  try {
+    const username = req.currentUser.username;
+    const user = await getUser(username);
+    return res.status(200).json(user)
+  } catch (error) {
+    return res.status(400).send(error.message)
+  }
+})
 
 module.exports = router;
