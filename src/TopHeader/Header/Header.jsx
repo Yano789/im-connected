@@ -11,6 +11,7 @@ function Header() {
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [error, setError] = useState(null);
+  const [isFocused, setIsFocused] = useState(false);
 
   const navigate = useNavigate();
 
@@ -48,7 +49,9 @@ function Header() {
   const fetchSearchResults = async (searchInput) => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/v1/post/getPost/search/${encodeURIComponent(searchInput)}`,
+        `http://localhost:5001/api/v1/post/getPost/search/${encodeURIComponent(
+          searchInput
+        )}`,
         {
           method: "GET",
           credentials: "include",
@@ -79,18 +82,58 @@ function Header() {
             className="typeHereTo"
             placeholder="Type here to search..."
             onChange={(e) => setSearchInput(e.target.value)}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setTimeout(() => setIsFocused(false), 150)}
           />
           <img className="applicationIcon" alt="" src={SearchIcon} />
-          <div className="searchDropdown">
-            {searchResults.length === 0 && (
-              <div className="searchEntry">No forum posts with this title</div>
-            )}
-            {searchResults.slice(0,3).map((item, index) => (
-              <div className="searchEntry" key={index}>
-                {item.title}
-              </div>
-            ))}
-          </div>
+          {isFocused && searchInput.trim() !== "" && (
+            <div className="searchDropdown">
+              {searchResults.length === 0 && (
+                <div className="searchEntry">
+                  No forum posts with this title
+                </div>
+              )}
+              {searchResults.slice(0, 3).map((item, index) => {
+                const title = item.title || "";
+                const input = searchInput.trim();
+                const encodedPostId = encodeURIComponent(item.postId);
+
+                const matchIndex = title
+                  .toLowerCase()
+                  .indexOf(input.toLowerCase());
+
+                if (matchIndex === -1) {
+                  return (
+                    <div className="searchEntry" key={index}>
+                      {title}
+                    </div>
+                  );
+                }
+
+                const before = title.slice(0, matchIndex);
+                const match = title.slice(
+                  matchIndex,
+                  matchIndex + input.length
+                );
+                const after = title.slice(matchIndex + input.length);
+
+                return (
+                  <div
+                    className="searchEntry"
+                    key={index}
+                    onClick={() => {
+                      setIsFocused(false);
+                      navigate(`/forum/viewpost?postId=${encodedPostId}`);
+                    }}
+                  >
+                    {before}
+                    <span className="highlightMatch">{match}</span>
+                    {after}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
         <TabBar></TabBar>
         <button className="buttonStyle1" onClick={handleLogout}>
