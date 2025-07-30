@@ -35,13 +35,16 @@
   @apply flex h-fit w-full max-w-screen flex-wrap transition-all duration-300 ease-in-out items-center justify-center gap-5 px-5 py-0 flex-col sm:flex-row;
 }
 .header {
-  @apply w-full h-fit relative min-h-fit bg-[#ab97c3] flex items-start justify-start p-[2%] box-border text-left text-base text-[#2d2d2d] overflow-visible;
+  @apply w-full h-fit relative min-h-fit bg-[#ab97c3] flex items-start justify-start p-3 box-border text-left text-base text-[#2d2d2d] overflow-visible;
 }
 .searchDropdown {
   @apply absolute top-full left-0 w-full bg-white shadow-lg mt-2 rounded-lg z-20 max-h-60 overflow-y-auto flex flex-col;
 }
 .searchEntry {
   @apply px-4 py-2 hover:bg-gray-100 cursor-pointer text-base text-black;
+}
+.highlightMatch {
+  @apply font-bold text-[#ab97c3];
 }
 
 
