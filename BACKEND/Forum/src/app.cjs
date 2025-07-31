@@ -12,7 +12,13 @@ const app = express();
 //middleware
 app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173", // Your frontend URL
+  origin: [
+    "http://localhost:5173", // Vite dev server
+    "http://localhost:80",   // Docker frontend
+    "http://localhost",      // Docker frontend (without port)
+    "http://localhost:3000", // Alternative dev port
+    "http://localhost:8080"  // Nginx proxy
+  ],
   credentials: true                // This is REQUIRED for cookies to work
 }));
 app.use(bodyParser());

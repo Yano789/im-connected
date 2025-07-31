@@ -1,0 +1,42 @@
+{
+  "name": "im-connected-forum-backend",
+  "version": "1.0.0",
+  "description": "Forum backend service for IM-CONNECTED application",
+  "main": "src/index.cjs",
+  "scripts": {
+    "start": "node src/index.cjs",
+    "dev": "nodemon src/index.cjs",
+    "test": "jest"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "cors": "^2.8.5",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.3.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.5",
+    "joi": "^17.9.2",
+    "cloudinary": "^1.40.0",
+    "multer": "^1.4.5-lts.1",
+    "multer-storage-cloudinary": "^4.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "jest": "^29.6.4",
+    "supertest": "^6.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "forum",
+    "backend",
+    "express",
+    "mongodb",
+    "healthcare"
+  ],
+  "author": "IM-CONNECTED Team",
+  "license": "MIT"
+}

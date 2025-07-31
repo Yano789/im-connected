@@ -1,0 +1,125 @@
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7
+    container_name: im-connected-mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: im-connected
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    networks:
+      - im-connected-network
+
+  # Forum Backend Service
+  forum-backend:
+    build:
+      context: ./BACKEND/Forum
+      dockerfile: Dockerfile
+    container_name: im-connected-forum
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${PORT}
+      - MONGODB_URI=${MONGODB_URI}
+      - TOKEN_KEY=${TOKEN_KEY}
+      - TOKEN_EXPIRY=${TOKEN_EXPIRY}
+      - AUTH_EMAIL=${AUTH_EMAIL}
+      - AUTH_PASS=${AUTH_PASS}
+      - CLOUDINARY_CLOUD_NAME=${CLOUDINARY_CLOUD_NAME}
+      - CLOUDINARY_API_KEY=${CLOUDINARY_API_KEY}
+      - CLOUDINARY_API_SECRET=${CLOUDINARY_API_SECRET}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - GOOGLE_TRANSLATE_API_KEY=${GOOGLE_TRANSLATE_API_KEY}
+    ports:
+      - "5001:5001"
+    depends_on:
+      - mongodb
+    volumes:
+      - forum_uploads:/app/uploads
+    networks:
+      - im-connected-network
+
+  # Scanner Backend Service
+  scanner-backend:
+    build:
+      context: ./BACKEND/Scanner
+      dockerfile: Dockerfile
+    container_name: im-connected-scanner
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - SCANNER_PORT=${SCANNER_PORT}
+      - MONGODB_URI=${MONGODB_URI}
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongodb
+    volumes:
+      - scanner_uploads:/app/uploads
+    networks:
+      - im-connected-network
+
+  # AI Chatbot Service
+  ai-chatbot:
+    build:
+      context: ./BACKEND/AI_chatbot/src
+      dockerfile: Dockerfile
+    container_name: im-connected-ai-chatbot
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=${NODE_ENV:-production}
+      - PORT=${AI_CHATBOT_PORT}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_ASSISTANT_ID=${OPENAI_ASSISTANT_ID}
+    ports:
+      - "3000:3000"
+    networks:
+      - im-connected-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: im-connected-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - forum-backend
+      - scanner-backend
+      - ai-chatbot
+    networks:
+      - im-connected-network
+
+  # Nginx Reverse Proxy (Optional - for production routing)
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: im-connected-proxy
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx-proxy.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - frontend
+      - forum-backend
+      - scanner-backend
+      - ai-chatbot
+    networks:
+      - im-connected-network
+
+volumes:
+  mongodb_data:
+  forum_uploads:
+  scanner_uploads:
+
+networks:
+  im-connected-network:
+    driver: bridge
