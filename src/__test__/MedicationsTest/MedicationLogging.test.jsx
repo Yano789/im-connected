@@ -7,7 +7,7 @@ vi.mock('../../Medications/MedicationItem/MedicationItem', () => ({
   default: ({ medication }) => <div>{medication.name}</div>,
 }));
 
-vi.mock('../../services/medicationScannerService', () => ({
+vi.mock('../../Medications/services/medicationScannerService', () => ({
   default: {
     validateImageFile: () => true,
   },
