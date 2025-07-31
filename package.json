@@ -9,8 +9,8 @@
     "scanner": "cd BACKEND/Scanner && npm run dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run scanner\" \"npm run start\" \"cd BACKEND/AI_chatbot/src && npm run dev\"",
     "test": "jest",
-    "backendtest": "jest",
-    "frontendtest": "vitest",
+    "backendtest:forum": "jest BACKEND/Forum/src",
+    "frontendtest": "vitest src",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
