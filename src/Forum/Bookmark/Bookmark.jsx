@@ -3,7 +3,7 @@ import BookmarkIcon from "../../assets/Bookmark.png";
 import UnbookmarkIcon from "../../assets/Unbookmark.png";
 import { useState } from "react";
 
-function Bookmark({ postId, token, initialBookmarked, onUnbookmark }) {
+function Bookmark({ postId, initialBookmarked}) {
   const [bookmarked, setBookmarked] = useState(initialBookmarked);
   const bookmarkIcon = bookmarked ? BookmarkIcon : UnbookmarkIcon;
 
@@ -17,21 +17,15 @@ function Bookmark({ postId, token, initialBookmarked, onUnbookmark }) {
       const res = await fetch(url, {
         method,
         headers: {
-          Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        credentials: "include", // in case token is cookie
+        credentials: "include",
       });
       if (!res.ok) throw new Error(await res.text());
 
-      // flip state
       const newState = !bookmarked;
       setBookmarked(newState);
 
-      // notify parent if unbookmarked
-      if (!newState && onUnbookmark) {
-        onUnbookmark();
-      }
     } catch (err) {
       console.error("Error updating bookmark:", err.message);
     }

@@ -66,6 +66,7 @@ const ChatWindow = ({
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [threadId, setThreadId] = useState(null);
+  const [language, setLanguage] = useState(null);
 
   // automatically scroll to bottom of chat
   const messagesEndRef = useRef(null);
@@ -96,11 +97,25 @@ const ChatWindow = ({
           // already stored on the server
           console.log(`retrieved existing threadId, it is ${existing}`)
           setThreadId(existing);
-          return;
+          //return;
         }
 
       } catch (err) {
         console.error("Thread‑ID flow error:", err.message);
+      }
+      try {
+        const langRes = await fetch(
+          "http://localhost:5001/api/v1/user/language",
+          { method: "GET", credentials: "include" }
+        );
+        if (!langRes.ok) {
+            throw new Error('Failed to fetch language: ' + await langRes.text());
+          }
+        const { language } = await langRes.json();
+        console.log(`retrieved preferredLanguage: ${language}`);
+        setPreferredLanguage(language);
+      } catch {
+        console.error("Language retrieval error:", err.message);
       }
     })();
   }, []);

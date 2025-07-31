@@ -1,117 +1,147 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from "react";
 import Header from "../../TopHeader/Header/Header";
-import './ProfilePage.css';
-import UserInfoCard from '../UserInfoCard/UserInfoCard';
-import PreferencesCard from '../PreferencesCard/PreferencesCard';
-
-// Dummy Data for the profile page
-const initialUserData = {
-    name: 'Kenny Lu',
-    username: 'kenny_lu',
-    email: 'abc@gmail.com',
-    phone: '1234 5678',
-    password: '', 
-    confirmPassword: '', 
-    avatar: 'https://i.imgur.com/8m2bAOr.jpeg', // Placeholder
-    preferences: {
-        language: 'English',
-        textSize: 'Medium',
-        contentMode: 'Default Mode'
-    }
-};
+import "./ProfilePage.css";
+import UserInfoCard from "../UserInfoCard/UserInfoCard";
+import PreferencesCard from "../PreferencesCard/PreferencesCard";
 
 function ProfilePage() {
-    const [userData, setUserData] = useState(initialUserData);
+  const [userData, setUserData] = useState("");
 
-    const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
 
-    const [errors, setErrors] = useState({}); 
+  const [errors, setErrors] = useState({});
 
-
-    const handleProfileChange = (e) => {
-        const { name, value } = e.target;
-        setUserData(prevData => ({ ...prevData, [name]: value }));
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5001/api/v1/user/getUser",
+          {
+            credentials: "include",
+          }
+        );
+        const data = await response.json();
+        if (response.ok) {
+          setUserData(data);
+        } else {
+          console.error("Failed to fetch user:", data.error);
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
     };
 
-    const handleProfileSave = () => {
-        const newErrors = {};
-        // Regular expressions to test the formats
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        const phoneRegex = /^[0-9\s]+$/;
+    fetchUser();
+  }, []);
 
-        // --- NEW: Email Validation ---
-        if (!emailRegex.test(userData.email)) {
-            newErrors.email = "Please enter a valid email address.";
-        }
+  const handleProfileChange = (e) => {
+    const { name, value } = e.target;
+    setUserData((prevData) => ({ ...prevData, [name]: value }));
+  };
 
-        // --- NEW: Phone Validation ---
-        if (!phoneRegex.test(userData.phone)) {
-            newErrors.phone = "Phone number can only contain numbers and spaces.";
-        }
-        
-        // Existing Password validation
-        if (userData.password && userData.password !== userData.confirmPassword) {
-            newErrors.password = "Passwords do not match.";
-        }
+  const handleProfileSave = () => {
+    const newErrors = {};
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const phoneRegex = /^[0-9\s]+$/;
+    if (!emailRegex.test(userData.email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+    if (!phoneRegex.test(userData.phone)) {
+      newErrors.phone = "Phone number can only contain numbers and spaces.";
+    }
+    if (userData.password && userData.password !== userData.confirmPassword) {
+      newErrors.password = "Passwords do not match.";
+    }
 
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors); // If there are any errors, show them
-            return; // And stop the save process
-        }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
-    // If no errors, clear old errors and save
     setErrors({});
     setIsEditingProfile(false);
     console.log("Profile Saved!", userData);
-    // Connect to backend here?
-};
+  };
 
-    const handleAvatarChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const newAvatarUrl = URL.createObjectURL(e.target.files[0]);
-            setUserData(prevData => ({ ...prevData, avatar: newAvatarUrl }));
-        }
+  const handleAvatarChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const newAvatarUrl = URL.createObjectURL(e.target.files[0]);
+      setUserData((prevData) => ({ ...prevData, avatar: newAvatarUrl }));
+    }
+  };
+
+  const handlePreferenceChange = async (category, value) => {
+    const updatedPreferences = {
+      ...userData.preferences,
+      [category]: value,
     };
 
-    const handlePreferenceChange = (category, value) => {
-        setUserData(prevData => ({
-            ...prevData,
-            preferences: {
-                ...prevData.preferences,
-                [category]: value
-            }
-        }));
-    };
-    
-    return (
-        <>
-            <Header />
-            <div className="profile-page-container">
-                <div className="profile-greeting">
-                    <h1>
-                        How are you <span className="profile-name">{userData.name.split(' ')[0]}</span>?
-                    </h1>
-                    <p>Manage your profile here</p>
-                </div>
-                <div className="profile-layout">
-                    <div className="profile-left-column">
-                        <UserInfoCard 
-                            user={userData}
-                            isEditing={isEditingProfile}
-                            onChange={handleProfileChange}
-                            onSave={handleProfileSave}
-                            onEditClick={() => setIsEditingProfile(true)}
-                            onAvatarChange={handleAvatarChange}
-                            errors={errors}
-                        />
-                    </div>
-                    <div className="profile-right-column">
-                        <PreferencesCard preferences={userData.preferences} onPreferenceChange={handlePreferenceChange} />
-                    </div>
-                </div>
-            </div>
-        </>
-    );
+    setUserData((prevData) => ({
+      ...prevData,
+      preferences: updatedPreferences,
+    }));
+
+    try {
+      const response = await fetch("http://localhost:5001/api/v1/preferences", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: userData.username,
+          language: updatedPreferences.language,
+          textSize: updatedPreferences.textSize,
+          contentMode: updatedPreferences.contentMode,
+          topics: updatedPreferences.topics || [],
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        console.error("Failed to update preferences:", data.error);
+      } else {
+        console.log("Preferences updated successfully!", data.preferences);
+      }
+    } catch (error) {
+      console.error("Error updating preferences:", error);
+    }
+  };
+
+  return (
+    <>
+      <Header />
+      <div className="profile-page-container">
+        <div className="profile-greeting">
+          <h1>
+            How are you{" "}
+            <span className="profile-name">
+              {userData?.name?.split(" ")[0] || "User"}
+            </span>
+          </h1>
+          <p>Manage your profile here</p>
+        </div>
+        <div className="profile-layout">
+          <div className="profile-left-column">
+            <UserInfoCard
+              user={userData}
+              isEditing={isEditingProfile}
+              onChange={handleProfileChange}
+              onSave={handleProfileSave}
+              onEditClick={() => setIsEditingProfile(true)}
+              onAvatarChange={handleAvatarChange}
+              errors={errors}
+            />
+          </div>
+          <div className="profile-right-column">
+            <PreferencesCard
+              preferences={userData.preferences}
+              onPreferenceChange={handlePreferenceChange}
+            />
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
 
 export default ProfilePage;

@@ -27,6 +27,7 @@ PostSchema.path('tags').validate(function (value) {
   return value.length <= 2;
 }, 'A post can have at most 2 tags.');
 
+
 const Post = mongoose.model("Post",PostSchema);
 
 module.exports = {Post,allowedTags};

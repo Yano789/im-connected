@@ -1,21 +1,21 @@
 import AIDashboard from "../AIDashboard/AIDashboard";
 import MedDashboard from "../MedDashboard/MedDashboard";
+import ForumDashboard from "../ForumDashboard/ForumDashboard"
 import "./DashboardBody.css";
 
 function DashboardBody(){
     return(
 <div className="dashboard-div">
   <div className="dashboard-grid">
-    <div className="border p-4">
+    <div className="dashboardItem">
       <MedDashboard />
     </div>
-    <div className="border p-4">
+    <div className="dashboardItem">
+      <ForumDashboard/>
+    </div>
+    <div className="dashboardItem">
       <AIDashboard/>
     </div>
-    <div className="border p-4">
-      <AIDashboard/>
-    </div>
-    <div className="border p-4">Cell 4</div>
   </div>
 </div>
 

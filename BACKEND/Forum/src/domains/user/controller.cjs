@@ -55,13 +55,7 @@ const createNewUser = async (data) => {
                 number,
                 password: hashedPassword,
                 preferences: {
-                    preferredLanguage: preferences.preferredLanguage || "English",
-                    textSize: preferences.textSize || "Medium",
-                    contentMode: preferences.contentMode || "Default",
-                    topics: preferences.topics || [],
-                },
-                preferences: {
-                    preferredLanguage: preferences.preferredLanguage || "English",
+                    preferredLanguage: preferences.preferredLanguage || "en",
                     textSize: preferences.textSize || "Medium",
                     contentMode: preferences.contentMode || "Default",
                     topics: preferences.topics || [],
@@ -78,20 +72,31 @@ const createNewUser = async (data) => {
 
 
 const updateUserPreferences = async ({ username, preferences }) => {
-  const updatedUser = await User.findOneAndUpdate(
-    { username },
-    { preferences },
-    {
-      new: true,
-      runValidators: true,
+    try {
+        const updatedUser = await User.findOneAndUpdate(
+            { username },
+            { preferences },
+            {
+                new: true,
+                runValidators: true,
+            });
+        if (!updatedUser) {
+            throw new Error("User not found");
+        }
+        return updatedUser;
+    } catch (error) {
+        throw error;
     }
-  );
-  return updatedUser;
+
+
 };
 
 const getUser = async (username)=>{
     try {
         const user = await User.findOne({username})
+        if (!user) {
+            throw new Error("User not found");
+        }
         return user
     } catch (error) {
         throw error

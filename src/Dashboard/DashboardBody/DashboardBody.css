@@ -1,9 +1,15 @@
 @import "tailwindcss";
-@layer components{
-    .dashboard-div{
-        @apply w-full h-screen flex m-auto items-center justify-center px-4;
-    }
-    .dashboard-grid{
-        @apply w-full max-w-screen-xl grid grid-cols-1 lg:grid-cols-2 gap-4;
-    }
+
+@layer components {
+  .dashboard-div {
+    @apply w-full h-full flex justify-center items-center;
+  }
+
+  .dashboard-grid {
+    @apply flex flex-col gap-10 max-w-screen-xl w-full items-center justify-center p-2.5 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-10;
+  }
+
+  .dashboardItem {
+    @apply w-full h-full flex justify-center;
+  }
 }

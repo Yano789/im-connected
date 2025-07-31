@@ -30,7 +30,6 @@ function ForumBody() {
     updateQuery({ filter: filterString || "default" });
   };
 
-  // Fetch posts
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
@@ -56,7 +55,7 @@ function ForumBody() {
   useEffect(() => {
     const fetchSavedAndLiked = async () => {
       try {
-        // Fetch saved posts
+
         const savedRes = await fetch("http://localhost:5001/api/v1/saved", {
           method: "GET",
           credentials: "include",
@@ -65,7 +64,6 @@ function ForumBody() {
         const savedData = await savedRes.json();
         setSavedPostIds(new Set(savedData.map((p) => p.postId)));
 
-        // Fetch liked posts
         const likedRes = await fetch("http://localhost:5001/api/v1/like", {
           method: "GET",
           credentials: "include",
@@ -106,7 +104,7 @@ function ForumBody() {
               postComment={post.comments}
               postLikes={post.likes}
               postMedia={post.media}
-              initiallyLiked={likedPostIds.has(post.postId)} // <-- important for sync
+              initiallyLiked={likedPostIds.has(post.postId)}
               ActionButton={() => (
                 <Bookmark
                   postId={post.postId}

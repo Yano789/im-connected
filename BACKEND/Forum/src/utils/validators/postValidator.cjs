@@ -85,6 +85,14 @@ const postTitleParamSchema = Joi.object({
   }),
 });
 
+const searchBarParamSchema = Joi.object({
+  search: Joi.string().required().messages({
+    "any.required": "search content is required",
+    "string.empty": "search content cannot be empty",
+  }),
+});
 
 
-module.exports = {postDraftSchema,querySchema,paramsSchema,postTitleParamSchema}
+
+
+module.exports = {postDraftSchema,querySchema,paramsSchema,postTitleParamSchema,searchBarParamSchema};

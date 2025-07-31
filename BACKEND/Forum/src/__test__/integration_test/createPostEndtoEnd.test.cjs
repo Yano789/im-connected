@@ -2,7 +2,7 @@ require("dotenv").config();
 const request = require("supertest");
 const app = require("../../app.cjs"); //express app
 const User = require("../../domains/user/model.cjs");
-const { Post } = require("./../../domains/post/model.cjs")
+const { Post } = require("../../domains/post/model.cjs")
 
 require("./setUpMongo.cjs"); // Mongo Memory Server setup
 
@@ -43,7 +43,7 @@ describe("Create Post", () => {
       .set("Content-Type", "application/json");
 
 
-
+    
     expect(response.statusCode).toBe(200);
     expect(response.body).toHaveProperty("title", "Test Post");
   });

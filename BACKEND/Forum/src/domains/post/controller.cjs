@@ -167,7 +167,7 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
     if (tags.length === 1) {
       filter.tags = tags[0];
     } else if (tags.length > 1) {
-      filter.tags = { $in: tags ,$size:2 };
+      filter.tags = { $in: tags};
     }
 
     //console.log(filter)
@@ -353,4 +353,38 @@ const getPostByTitle = async(data)=>{
     }
 }
 
-module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle}
+
+
+function escapeRegex(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+const searchPosts = async (search) => {
+  try {
+    if (!search || typeof search !== 'string') return [];
+
+    const safeSearch = escapeRegex(search.trim());
+    const regex = new RegExp(safeSearch, 'i'); 
+
+    const posts = await Post.find({
+      title: { $regex: regex },
+      draft: false
+    })
+    .select('postId title -_id') 
+    .limit(10)
+    .sort({ createdAt: -1 });
+
+    console.log(posts);
+
+
+    return posts.map(post => ({ postId: post.postId, title: post.title }));
+  } catch (error) {
+    console.error('Error searching post titles:', error);
+    throw error;
+  }
+};
+
+
+
+
+module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle,searchPosts,escapeRegex };

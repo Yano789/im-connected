@@ -15,14 +15,16 @@
   @apply flex flex-row items-center justify-start gap-2.5 text-[32px];
 }
 .typeHereTo {
-  @apply w-full leading-[22px];
+  @apply w-full leading-[22px] h-full p-2.5;
 }
-.title {
+.title {  
   @apply self-stretch flex flex-row items-center justify-between gap-0;
 }
 .search {
-  @apply flex-1 min-w-[300px] max-w-[700px] bg-[#c8b8db] h-fit flex flex-row items-center justify-start box-border px-5 py-[9px] rounded-lg text-sm sm:text-base md:text-lg;
+  @apply relative flex-1 min-w-[300px] max-w-[700px] bg-[#c8b8db] h-fit flex flex-row items-center justify-start rounded-lg p-1
+    transition-shadow duration-200 ease-in-out hover:shadow-md focus-within:shadow-lg z-10;
 }
+
 .dashboard {
   @apply relative leading-6;
 }
@@ -33,8 +35,18 @@
   @apply flex h-fit w-full max-w-screen flex-wrap transition-all duration-300 ease-in-out items-center justify-center gap-5 px-5 py-0 flex-col sm:flex-row;
 }
 .header {
-  @apply min-h-fit w-full h-fit relative bg-[#ab97c3] flex items-start justify-start p-[10px] box-border text-left text-[20px] text-[#2d2d2d] font-[Poppins]
+  @apply w-full h-fit relative min-h-fit bg-[#ab97c3] flex items-start justify-start p-3 box-border text-left text-base text-[#2d2d2d] overflow-visible;
 }
+.searchDropdown {
+  @apply absolute top-full left-0 w-full bg-white shadow-lg mt-2 rounded-lg z-20 max-h-60 overflow-y-auto flex flex-col;
+}
+.searchEntry {
+  @apply px-4 py-2 hover:bg-gray-100 cursor-pointer text-base text-black;
+}
+.highlightMatch {
+  @apply font-bold text-[#ab97c3];
 }
 
 
+
+}
