@@ -88,12 +88,33 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.SCANNER_PORT || 3001;
 
-// Enhanced CORS configuration
+// Configure CORS with proper origin handling
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:5001'],
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      'http://localhost:5173', // Vite dev server
+      'http://localhost:3000', // AI chatbot
+      'http://localhost:5001', // Forum backend
+      'http://localhost:80',   // Docker frontend
+      'http://localhost',      // Docker frontend (without port)
+      'http://localhost:8080'  // Nginx proxy
+    ];
+    
+    console.log('CORS: Request from origin:', origin);
+    
+    // Allow requests with no origin (mobile apps, curl, etc.) or from allowed origins
+    if (!origin || allowedOrigins.includes(origin)) {
+      console.log('CORS allowed for origin:', origin || 'no-origin');
+      // Pass the specific origin back, or '*' for no-origin requests
+      callback(null, origin || '*');
+    } else {
+      console.log('CORS blocked for origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept']
 }));
 
 // Middleware
