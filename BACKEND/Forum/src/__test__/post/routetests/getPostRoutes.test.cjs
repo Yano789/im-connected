@@ -132,7 +132,7 @@ describe("GET /getPost/:post", () => {
         createdAt: c.createdAt.toISOString(),
       })),
     });
-    expect(getPostWithComment).toHaveBeenCalledWith("post123");
+    expect(getPostWithComment).toHaveBeenCalledWith({"postId": "post123", "username": "testUser"});
   });
 
   test("should return 400 on error", async () => {

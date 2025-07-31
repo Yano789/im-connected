@@ -1,74 +1,119 @@
-jest.mock("./../../domains/post/model.cjs")
+jest.mock("../../domains/post/model.cjs");
+jest.mock("../../domains/user/model.cjs");
+jest.mock("../../domains/translation/controller.cjs");
 
+const { Post } = require("../../domains/post/model.cjs");
+const User = require("../../domains/user/model.cjs");
+const translate = require("../../domains/translation/controller.cjs");
 
-const { Post} = require("../../domains/post/model.cjs")
-
-
-const {getFilteredPosts} = require("../../domains/post/controller.cjs")
-
-
+// Import real getFilteredPosts from controller (no mocking of addCacheBuster)
+const { getFilteredPosts } = require("../../domains/post/controller.cjs");
 
 describe("getFilteredPosts", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
+  const mockUser = {
+    username: "user1",
+    preferences: {
+      topics: ["tag1", "tag2"],
+      preferredLanguage: "es",
+    },
+  };
+
+  const mockPosts = [
+    {
+      title: "Original Title",
+      content: "Original Content",
+      createdAt: new Date(),
+      likes: 10,
+      comments: 2,
+      media: [{ url: "https://example.com/image1.jpg" }],
+    },
+  ];
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("returns filtered and translated posts based on user preferences", async () => {
+    User.findOne.mockResolvedValue(mockUser);
+    const mockSort = jest.fn().mockResolvedValue(mockPosts);
+    Post.find.mockReturnValue({ sort: mockSort });
+    translate.mockImplementation(async (text, lang) => `${text} [${lang}]`);
+
+    const posts = await getFilteredPosts({
+      tags: [],
+      sort: "latest",
+      source: "default",
+      username: "user1",
     });
 
-    const samplePosts = [
-        { postId: "1", tags: ["Physical Disability & Chronic Illness"], draft: false, createdAt: new Date(1), likes: 5, comments: 2 },
-        { postId: "2", tags: ["Personal Mental Health"], draft: false, createdAt: new Date(2), likes: 10, comments: 1 },
-        { postId: "3", tags: ["Physical Disability & Chronic Illness", "Personal Mental Health"], draft: false, createdAt: new Date(3), likes: 8, comments: 5 },
-    ];
+    expect(User.findOne).toHaveBeenCalledWith({ username: "user1" });
+    expect(Post.find).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tags: { $in: ["tag1", "tag2"] },
+        draft: false,
+      })
+    );
+    expect(posts[0].title).toBe("Original Title [es]");
+    expect(posts[0].content).toBe("Original Content [es]");
+    // Check the media URL contains the real cache buster parameter ?cb= (timestamp)
+    expect(posts[0].media[0].url).toMatch(/\?cb=\d+$/);
+  });
 
-    test("fetch posts filtered by single tag and sorted by latest", async () => {
-        Post.find.mockReturnValue({
-            sort: jest.fn().mockResolvedValue([samplePosts[0]])
-        });
+it("uses fallback query if no posts found with preferences", async () => {
+  User.findOne.mockResolvedValue(mockUser);
 
-        const result = await getFilteredPosts({ tags: ["Physical Disability & Chronic Illness"], sort: "latest" });
+  const firstSort = jest.fn().mockResolvedValue([]); // first call returns no posts
+  const secondSort = jest.fn().mockResolvedValue(mockPosts); // fallback returns posts
 
-        expect(Post.find).toHaveBeenCalledWith({ tags: "Physical Disability & Chronic Illness", draft: false });
-        expect(result).toEqual([samplePosts[0]]);
-    });
+  Post.find
+    .mockReturnValueOnce({ sort: firstSort })   // first query
+    .mockReturnValueOnce({ sort: secondSort }); // fallback query
 
-    test("fetch posts filtered by exactly two tags and sorted by most likes", async () => {
-        Post.find.mockReturnValue({
-            sort: jest.fn().mockResolvedValue([samplePosts[2]])
-        });
+  const posts = await getFilteredPosts({
+    tags: [],
+    sort: "latest",
+    source: "default",
+    username: "user1"
+  });
 
-        const tags = ["Physical Disability & Chronic Illness", "Personal Mental Health"];
-        const result = await getFilteredPosts({ tags, sort: "most likes" });
+  expect(Post.find).toHaveBeenCalledTimes(2);
+  expect(posts.length).toBe(1);
+});
 
-        expect(Post.find).toHaveBeenCalledWith({ tags: { $in: tags }, draft: false });
-        expect(result).toEqual([samplePosts[2]]);
-    });
 
-    test("fetch posts with no tags filter, default sort latest", async () => {
-        Post.find.mockReturnValue({
-            sort: jest.fn().mockResolvedValue(samplePosts)
-        });
+it("filters only by username when source is not 'default'", async () => {
+  User.findOne.mockResolvedValue(mockUser);
 
-        const result = await getFilteredPosts({ tags: [], sort: "latest" });
+  const mockSort = jest.fn().mockResolvedValue(mockPosts);
+  Post.find.mockReturnValue({ sort: mockSort });
 
-        expect(Post.find).toHaveBeenCalledWith({ draft: false });
-        expect(result).toEqual(samplePosts);
-    });
+  await getFilteredPosts({
+    tags: [],
+    sort: "most likes",
+    source: "profile",
+    username: "user1"
+  });
 
-    test("handles unknown sort option by sorting by latest", async () => {
-        Post.find.mockReturnValue({
-            sort: jest.fn().mockResolvedValue(samplePosts)
-        });
+  expect(Post.find).toHaveBeenCalledWith(
+    expect.objectContaining({
+      username: "user1",
+      draft: false
+    })
+  );
+  expect(mockSort).toHaveBeenCalledWith({ likes: -1 });
+});
 
-        const result = await getFilteredPosts({ tags: [], sort: "unknown sort" });
 
-        expect(Post.find).toHaveBeenCalledWith({ draft: false });
-        expect(result).toEqual(samplePosts);
-    });
+  it("throws an error if user fetch fails", async () => {
+    User.findOne.mockRejectedValue(new Error("DB error"));
 
-    test("throws an error on database failure", async () => {
-        Post.find.mockImplementation(() => {
-            throw new Error("DB error");
-        });
-
-        await expect(getFilteredPosts({ tags: [] })).rejects.toThrow("Failed to filter/sort posts: DB error");
-    });
+    await expect(
+      getFilteredPosts({
+        tags: [],
+        sort: "latest",
+        source: "default",
+        username: "user1"
+      })
+    ).rejects.toThrow("Failed to filter/sort posts: DB error");
+  });
 });

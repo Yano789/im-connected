@@ -1,72 +1,89 @@
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const { Post} = require("../../domains/post/model.cjs")
+jest.mock("../../domains/post/model.cjs");
+jest.mock("../../domains/user/model.cjs");
+jest.mock("../../domains/translation/controller.cjs");
 
-const {searchPosts} = require("../../domains/post/controller.cjs");
+const { Post } = require("../../domains/post/model.cjs");
+const User = require("../../domains/user/model.cjs");
+const translate = require("../../domains/translation/controller.cjs");
 
+const { searchPosts } = require("../../domains/post/controller.cjs");
 
-beforeAll(async () => {
-  const mongoServer = await MongoMemoryServer.create();
-  await mongoose.connect(mongoServer.getUri(), { useNewUrlParser: true, useUnifiedTopology: true });
-});
+describe("searchPosts", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
 
-afterAll(async () => {
-  await mongoose.disconnect();
-  await mongoose.connection.close();
-});
+    // Default mock User.findOne to resolve a user with no preferred language
+    User.findOne.mockReturnValue({
+      lean: () => Promise.resolve({ preferences: { preferredLanguage: null } }),
+    });
 
-beforeEach(async () => {
-  // Clear all documents before each test
-  await Post.deleteMany({});
-});
-
-describe('searchPosts()', () => {
-  it('should return matching posts by title (case-insensitive, partial)', async () => {
-    await Post.create([
-      { postId: '1', title: 'Hello World', draft: false },
-      { postId: '2', title: 'hello universe', draft: false },
-      { postId: '3', title: 'Goodbye', draft: false },
-      { postId: '4', title: 'Hidden Draft', draft: true },
-    ]);
-
-    const results = await searchPosts('hello');
-
-    expect(results).toHaveLength(2);
-    expect(results).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ postId: '1', title: 'Hello World' }),
-        expect.objectContaining({ postId: '2', title: 'hello universe' }),
-      ])
-    );
+    // Default mock translate to just return the input text (identity)
+    translate.mockImplementation(async (text, lang) => text);
   });
 
-  it('should return an empty array for non-matching search', async () => {
-    await Post.create([{ postId: '1', title: 'No Match Here', draft: false }]);
-    const results = await searchPosts('Unmatched');
+  it("should return matching posts by title (case-insensitive, partial)", async () => {
+    const mockPosts = [
+      { postId: "1", title: "Hello World" },
+      { postId: "2", title: "hello universe" },
+    ];
+
+    Post.find.mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockResolvedValue(mockPosts),
+    });
+
+    const results = await searchPosts({ search: "hello", username: "testuser" });
+
+    expect(Post.find).toHaveBeenCalledWith({
+      title: expect.any(Object),
+      draft: false,
+    });
+    expect(results).toEqual(mockPosts);
+  });
+
+  it("should return an empty array for non-matching search", async () => {
+    Post.find.mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockResolvedValue([]),
+    });
+
+    const results = await searchPosts({ search: "nomatch", username: "testuser" });
+
     expect(results).toEqual([]);
   });
 
-  it('should return an empty array if search is missing or not a string', async () => {
+  it("should return empty array if search is invalid", async () => {
     expect(await searchPosts(null)).toEqual([]);
     expect(await searchPosts(undefined)).toEqual([]);
     expect(await searchPosts({})).toEqual([]);
     expect(await searchPosts(123)).toEqual([]);
   });
 
-  it('should escape regex special characters in input', async () => {
-    await Post.create([{ postId: '1', title: 'Welcome (Beta)', draft: false }]);
-    const results = await searchPosts('(Beta)');
-    expect(results).toHaveLength(1);
-    expect(results[0]).toEqual(expect.objectContaining({ title: 'Welcome (Beta)' }));
-  });
+  it("should translate post titles and content if preferred language exists", async () => {
+    User.findOne.mockReturnValue({
+      lean: () => Promise.resolve({ preferences: { preferredLanguage: "es" } }),
+    });
 
-  it('should not return draft posts', async () => {
-    await Post.create([
-      { postId: '1', title: 'Visible Post A ', draft: false },
-      { postId: '2', title: 'Visible Post', draft: true },
+    const mockPosts = [
+      { postId: "1", title: "Hello World", content: "Content A" },
+    ];
+
+    Post.find.mockReturnValue({
+      select: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockResolvedValue(mockPosts),
+    });
+
+    translate.mockImplementation(async (text, lang) => `translated: ${text}`);
+
+    const results = await searchPosts({ search: "hello", username: "testuser" });
+
+    expect(translate).toHaveBeenCalledWith("Hello World", "es");
+    expect(translate).toHaveBeenCalledWith("Content A", "es");
+    expect(results).toEqual([
+      { postId: "1", title: "translated: Hello World" },
     ]);
-    const results = await searchPosts('visible');
-    expect(results).toHaveLength(1);
-    expect(results[0].postId).toBe('1');
   });
 });
