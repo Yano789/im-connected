@@ -6,7 +6,7 @@ import CareRecipientList from '../CareRecipientList/CareRecipientList';
 import MedicationLogging from '../MedicationLogging/MedicationLogging';
 import MedicationDetails from '../MedicationDetails/MedicationDetails';
 import MedicationForm from '../MedicationForm/MedicationForm';
-import medicationScannerService from '../../services/medicationScannerService';
+import medicationScannerService from '../services/medicationScannerService';
 
 function MedicationsPage() {
     const [careRecipients, setCareRecipients] = useState([]);

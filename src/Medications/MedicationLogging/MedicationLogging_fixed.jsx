@@ -249,7 +249,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
             const file = e.target.files[0];
             if (file) {
                 // Validate the file using the scanner service
-                import('../../services/medicationScannerService').then(({ default: scannerService }) => {
+                import('../services/medicationScannerService').then(({ default: scannerService }) => {
                     if (scannerService.validateImageFile(file)) {
                         onAddNew(file);
                     } else {

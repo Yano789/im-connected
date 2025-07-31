@@ -11,7 +11,7 @@ import PillboxIcon from "../assets/PillboxIconSplashscreen.png";
 import ChatbotIcon from "../assets/ChatbotIconSplashscreen.png";
 import ForumIcon from "../assets/ForumIconSplashscreen.png";
 
-import "./SplashScreen.css";
+import "./Splashscreen.css";
 
 const services = [
   {

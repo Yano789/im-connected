@@ -9,7 +9,7 @@ window.URL.createObjectURL = vi.fn(() => 'mock-url');
 
 
 // --- Mock Services ---
-vi.mock('../../services/medicationScannerService', () => ({
+vi.mock('../../Medications/services/medicationScannerService', () => ({
   default: {
     validateImageFile: vi.fn(() => true),
     checkApiHealth: vi.fn(() => Promise.resolve(true)),
@@ -17,7 +17,7 @@ vi.mock('../../services/medicationScannerService', () => ({
     formatMedicationData: vi.fn((data) => ({ name: data.name, usedFor: 'Test Use' })),
   },
 }));
-vi.mock('../../services/medicationCloudinaryService', () => ({
+vi.mock('../../Medications/services/medicationCloudinaryService', () => ({
   default: {
     uploadMedicationImage: vi.fn(() => Promise.resolve({ url: 'http://new-image.com', public_id: '123' })),
   },
@@ -54,7 +54,7 @@ describe('MedicationForm Component (New Version)', () => {
     });
 
     it('should call the scanner service when the scan button is clicked', async () => {
-        const medicationScannerService = (await import('../../services/medicationScannerService')).default;
+        const medicationScannerService = (await import('../../Medications/services/medicationScannerService')).default;
         const { container } = render(<MedicationForm medication={null} onSave={() => {}} onCancel={() => {}} />);
 
         const fileInput = container.querySelector('.scanner-section .file-input');

@@ -329,7 +329,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                 console.log('File selected:', file);
                 
                 // Import and validate using the scanner service
-                import('../../services/medicationScannerService').then(({ default: scannerService }) => {
+                import('../services/medicationScannerService').then(({ default: scannerService }) => {
                     if (scannerService.validateImageFile(file)) {
                         console.log('File validation passed, calling onAddNew');
                         onAddNew(file);

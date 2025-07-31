@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './MedicationForm.css';
-import medicationScannerService from '../../services/medicationScannerService';
-import medicationCloudinaryService from '../../services/medicationCloudinaryService';
+import medicationScannerService from '../services/medicationScannerService';
+import medicationCloudinaryService from '../services/medicationCloudinaryService';
 
 const getPeriodFromTime = (time) => {
     if (!time) return 'Morning';
