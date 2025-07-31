@@ -9,17 +9,6 @@ const resetPasswordSchema = Joi.object({
       "string.email": "Invalid email format",
       "any.required": "Email is required",
     }),
-
-  otp: Joi.string()
-    .length(6)
-    .pattern(/^\d+$/)
-    .required()
-    .messages({
-      "string.length": "OTP must be 6 digits",
-      "string.pattern.base": "OTP must be numeric",
-      "any.required": "OTP is required",
-    }),
-
   newPassword: Joi.string()
     .pattern(/^(?=.*[A-Z])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/)
     .required()
