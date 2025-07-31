@@ -12,7 +12,7 @@ import Money from '../assets/Money.png';
 import Wheelchair from '../assets/Wheelchair.png';
 
 const UserPreferences = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
+  const [selectedLanguage, setSelectedLanguage] = useState('en');
   const [selectedTextSize, setSelectedTextSize] = useState('Medium');
   const [selectedContentMode, setSelectedContentMode] = useState('Easy Read');
   const [selectedTopics, setSelectedTopics] = useState([]);
@@ -56,13 +56,14 @@ const UserPreferences = () => {
   const handleTopicToggle = (topicLabel) => {
     setSelectedTopics(prev => {
       if (prev.includes(topicLabel)) {
-        // If already selected, remove it
+        //if already selected, remove it
         return prev.filter(label => label !== topicLabel);
-      } else if (prev.length < 2) {
-        // If less than 2 selected, add it
+      } 
+      else if (prev.length < 2) {
+        //if less than 2 selected, add it
         return [...prev, topicLabel];
       }
-      // If 2 are already selected and this isn't one of them, do nothing
+      //if 2 are already selected and this isn't one of them, do nothing
       return prev;
     });
   };

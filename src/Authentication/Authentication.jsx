@@ -7,6 +7,7 @@ import { AuthContext } from "../AuthContext";
 function Auth() {
     const inputsRef = useRef([]);
     const [status, setStatus] = useState(null);
+    const [loading, setLoading] = useState(false);
     const email = localStorage.getItem("email");
     const navigate = useNavigate();
     const { setUser } = useContext(AuthContext);
@@ -34,7 +35,7 @@ function Auth() {
         e.preventDefault();
         const pastedData = e.clipboardData.getData('text');
         const digits = pastedData.replace(/\D/g, '').slice(0, 6);
-        
+
         if (digits.length === 6) {
             inputsRef.current.forEach((input, index) => {
                 if (input) {
@@ -80,6 +81,8 @@ function Auth() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setLoading(true);
+        setStatus(null);
 
         const code = inputsRef.current.map((input) => input.value).join("");
         try {
@@ -97,7 +100,6 @@ function Auth() {
             if (res.ok) {
                 console.log("Authenticated User:", data);
                 navigate("/preferences");
-                // Small delay to allow navigation to complete before setting user
                 setTimeout(() => {
                     if (data.user) {
                         setUser(data.user);
@@ -110,6 +112,8 @@ function Auth() {
         } catch (err) {
             console.error(err);
             setStatus("Authentication failed. Network error.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -147,15 +151,19 @@ function Auth() {
                         ))}
                     </div>
 
-                    <button type="submit" className="auth-signup-button">
-                        Sign Up
+                    <button type="submit" className="auth-signup-button" disabled={loading}>
+                        {loading ? "Verifying..." : "Sign Up"}
                     </button>
                 </form>
 
-                {status && <div className="status-message">{status}</div>}
+                {status && (
+                    <div className={`status-message ${status.includes("successfully") || status.includes("resent") ? "success" : "error"}`}>
+                        {status}
+                    </div>
+                )}
             </div>
 
-            <img src={SignUpPeople} alt="Sign Up Visual" className="signup-image" />
+            <img src={SignUpPeople} alt="Sign Up Visual" className="auth-image" />
         </div>
     )
 }

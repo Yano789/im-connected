@@ -10,6 +10,7 @@ function LoginCard() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
@@ -29,6 +30,8 @@ function LoginCard() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setStatus(null);
 
     const requestBody = { username, password, rememberMe };
     console.log("Sending login request to server:", requestBody);
@@ -66,6 +69,8 @@ function LoginCard() {
     } catch (err) {
       console.error("Network or other error:", err);
       setStatus(`Login failed. Network error: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,9 +121,9 @@ function LoginCard() {
             required
             className="form-input"
           />
-          <a href="#" className="forgot-password">
-            Forget your password
-          </a>
+          <Link to="/forgotpassword" className="forgot-password">
+            Forgot your password?
+          </Link>
         </div>
 
         <label className="remember-me">
@@ -131,11 +136,15 @@ function LoginCard() {
           Remember me
         </label>
 
-        <button type="submit" className="login-button">
-          Log in
+        <button type="submit" className="login-button" disabled={loading}>
+          {loading ? "Logging in..." : "Log in"}
         </button>
 
-        {status && <div className="status-message">{status}</div>}
+        {status && (
+          <div className={`status-message ${status.includes("successful") ? "success" : "error"}`}>
+            {status}
+          </div>
+        )}
       </form>
     </div>
 

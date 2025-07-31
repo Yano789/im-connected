@@ -10,6 +10,9 @@ import LoginCard from "./Login/LoginCard";
 import SignUpCard from "./SignUp/SignUpCard";
 import Authentication from "./Authentication/Authentication";
 import UserPreferences from "./Preferences/userPreferences";
+import ForgotPasswordEmail from "./ForgotPassword/ForgotPasswordEmail";
+import ForgotPasswordOTP from "./ForgotPassword/ForgotPasswordOTP";
+import ForgotPasswordNewPassword from "./ForgotPassword/ForgotPasswordNewPassword";
 import ProfilePage from './Profile/ProfilePage/ProfilePage';
 import { AuthContext } from "./AuthContext";
 import AuthProvider from "./AuthContext";
@@ -33,11 +36,12 @@ function AppContent() {
     "/profile"
   ];
 
-  const authRoutes = ["/login", "/signup"];
+  const authRoutes = ["/login", "/signup", "/forgotpassword"];
   const verificationRoutes = ["/auth", "/preferences"];
+  const forgotPasswordRoutes = ["/forgotpassword/otp", "/forgotpassword/newpassword"];
 
-  // Check if current page needs background styling
-  const needsAuthBackground = authRoutes.includes(location.pathname) || verificationRoutes.includes(location.pathname);
+  const needsAuthBackground = authRoutes.includes(location.pathname) || verificationRoutes.includes(location.pathname) 
+                              || forgotPasswordRoutes.includes(location.pathname);
 
   useEffect(() => {
     if (loading) return;
@@ -71,6 +75,13 @@ function AppContent() {
         console.log("Redirecting unauthenticated user from verification route to login");
         navigate("/login", { replace: true });
       }
+      else if (forgotPasswordRoutes.includes(currentPath)) {
+        const resetEmail = localStorage.getItem("resetEmail");
+        if (!resetEmail) {
+          console.log("Redirecting user from forgot password flow without email to forgot password page");
+          navigate("/forgotpassword", { replace: true });
+        }
+      }
     }
   }, [user, loading, location, navigate]);
 
@@ -96,6 +107,9 @@ function AppContent() {
         <Route path="/login" element={<LoginCard />} />
         <Route path="/auth" element={<Authentication />} />
         <Route path="/preferences" element={<UserPreferences />}></Route>
+        <Route path="/forgotpassword" element={<ForgotPasswordEmail />} />
+        <Route path="/forgotpassword/otp" element={<ForgotPasswordOTP />} />
+        <Route path="/forgotpassword/newpassword" element={<ForgotPasswordNewPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/forum" element={<Forum />} />
         <Route path="/forum/newpost" element={<NewPost />} />

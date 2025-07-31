@@ -1,9 +1,30 @@
 // SignUpCard.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import SignUpPeople from "../assets/SignUpPeople.png";
 import "./SignUpCard.css";
+
+const validatePassword = (password) => {
+  const errors = [];
+
+  if (password.length < 8) {
+    errors.push("Password must be at least 8 characters long");
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    errors.push("Password must contain at least one uppercase letter");
+  }
+
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+    errors.push("Password must contain at least one special character");
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors
+  };
+};
 
 const countries = [
   { code: "US", flag: "🇺🇸", dialCode: "+1", name: "United States" },
@@ -30,16 +51,30 @@ function SignUpCard() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const [selectedCountry, setSelectedCountry] = useState(countries[1]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const navigate = useNavigate();
 
+
+
   const handleSignUp = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setStatus("");
 
     if (password !== confirmPassword) {
       setStatus("Passwords do not match!");
+      setLoading(false);
+      return;
+    }
+
+    const passwordValidation = validatePassword(password);
+    if (!passwordValidation.isValid) {
+      setStatus(passwordValidation.errors.join(", "));
+      setLoading(false);
       return;
     }
 
@@ -75,6 +110,8 @@ function SignUpCard() {
     } catch (err) {
       console.error("Sign up error:", err);
       setStatus("Sign up failed. Network error.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -139,8 +176,7 @@ function SignUpCard() {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            className="form-input"
-          />
+            className="form-input" />
         </div>
 
         <div className="form-field">
@@ -178,8 +214,7 @@ function SignUpCard() {
               type="tel"
               value={formatPhoneNumber(number)}
               onChange={handlePhoneChange}
-              className="phone-input"
-            />
+              className="phone-input" />
           </div>
         </div>
 
@@ -191,8 +226,7 @@ function SignUpCard() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="form-input"
-          />
+            className="form-input" />
         </div>
 
         <div className="password-row">
@@ -202,8 +236,7 @@ function SignUpCard() {
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="password-toggle"
-              >
+                className="password-toggle">
                 {passwordVisible ? <EyeOff size={14} /> : <Eye size={14} />}
                 <span>{passwordVisible ? "Hide" : "Show"}</span>
               </button>
@@ -213,8 +246,7 @@ function SignUpCard() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="form-input"
-            />
+              className="form-input" />
           </div>
 
           <div className="form-field password-group">
@@ -223,8 +255,7 @@ function SignUpCard() {
               <button
                 type="button"
                 onClick={toggleConfirmPasswordVisibility}
-                className="password-toggle"
-              >
+                className="password-toggle">
                 {confirmPasswordVisible ? <EyeOff size={14} /> : <Eye size={14} />}
                 <span>{confirmPasswordVisible ? "Hide" : "Show"}</span>
               </button>
@@ -234,20 +265,32 @@ function SignUpCard() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="form-input"
-            />
+              className="form-input" />
           </div>
         </div>
 
-        <p className="password-requirements">
-          Use 8 or more characters with a mix of letters, numbers & symbols
-        </p>
+        {password && (
+          <div className="password-requirements">
+            <div className={`requirement ${password.length >= 8 ? "met" : "unmet"}`}>
+              ✓ At least 8 characters
+            </div>
+            <div className={`requirement ${/[A-Z]/.test(password) ? "met" : "unmet"}`}>
+              ✓ One uppercase letter
+            </div>
+            <div className={`requirement ${/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) ? "met" : "unmet"}`}>
+              ✓ One special character
+            </div>
+          </div>
+        )}
 
-        <button type="submit" className="signup-button">
-          Sign Up
+        <button type="submit" className="signup-button" disabled={loading}>
+          {loading ? "Signing up..." : "Sign Up"}
         </button>
 
-        {status && <div className="status-message">{status}</div>}
+        {status &&
+          (<div className={`status-message ${status.includes("successfully") ? "success" : "error"}`}>
+            {status}
+          </div>)}
       </form>
     </div>
   );
