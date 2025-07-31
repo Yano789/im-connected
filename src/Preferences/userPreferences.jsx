@@ -22,10 +22,10 @@ const UserPreferences = () => {
   const { setUser } = useContext(AuthContext);
 
   const languages = [
-    { id: 'English', label: 'English' },
-    { id: 'Chinese', label: '华文' },
-    { id: 'Malay', label: 'Bahasa Melayu' },
-    { id: 'Tamil', label: 'தமிழ்' }
+    { id: 'en', label: 'English' },
+    { id: 'zh', label: '华文' },
+    { id: 'ms', label: 'Bahasa Melayu' },
+    { id: 'ta', label: 'தமிழ்' }
   ];
 
   const textSizes = [

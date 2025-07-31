@@ -94,6 +94,7 @@ function AppContent() {
         <Route path="/" element={<Splashscreen />}></Route>
         <Route path="/signup" element={<SignUpCard />}></Route>
         <Route path="/login" element={<LoginCard />} />
+        <Route path="/auth" element={<Authentication />} />
         <Route path="/preferences" element={<UserPreferences />}></Route>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/forum" element={<Forum />} />

@@ -1,4 +1,4 @@
-// File: C:\Users\Chadrick\Documents\term5_ai_chatbot\IM-CONNECTED\BACKEND\AI_chatbot\src\app\api\assistants\threads\[threadId]\messages\route.ts
+// File: D:\Study\Uni\T5\ESC\IM-CONNECTED\BACKEND\AI_chatbot\src\app\api\assistants\threads\[threadId]\messages\route.ts
 import * as entry from '../../../../../../../../app/api/assistants/threads/[threadId]/messages/route.js'
 import type { NextRequest } from 'next/server.js'
 
