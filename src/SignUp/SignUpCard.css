@@ -266,6 +266,20 @@
   font-size: 12px;
 }
 
+.requirement {
+  margin: 2px 0;
+  font-size: 11px;
+  transition: color 0.2s ease;
+}
+
+.requirement.met {
+  color: #10b981;
+}
+
+.requirement.unmet {
+  color: #6b7280;
+}
+
 .remember-me {
   display: flex;
   align-items: center;
@@ -307,10 +321,23 @@
   transform: translateY(1px);
 }
 
+.signup-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 .status-message {
-  color: #ef4444;
   font-size: 14px;
   margin-top: 10px;
+  text-align: center;
+}
+
+.status-message.success {
+  color: #10b981;
+}
+
+.status-message.error {
+  color: #ef4444;
 }
 
 @media (max-width: 768px) {

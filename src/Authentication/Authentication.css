@@ -114,7 +114,7 @@
 }
 
 .auth-signup-button:hover {
-  background: #b39ccc; /* slightly darker lavender */
+  background: #b39ccc;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
   transition: all 0.2s ease;
@@ -124,16 +124,35 @@
   transform: translateY(1px);
 }
 
-.signup-image {
-  width: 1190px;
-  height: 793px;
+.auth-signup-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.auth-image {
+  position: fixed;
   left: 0;
-  top: 287px;
-  position: absolute;
+  bottom: 0;
+  max-height: 80vh;
+  width: auto;
+  height: 500px;
+  min-width: 250px;
+  object-fit: contain;
+  user-select: none;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .status-message {
-  color: #ef4444;
   font-size: 14px;
   margin-top: 10px;
+  text-align: center;
+}
+
+.status-message.success {
+  color: #10b981;
+}
+
+.status-message.error {
+  color: #ef4444;
 }
