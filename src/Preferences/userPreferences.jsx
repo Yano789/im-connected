@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../AuthContext';
-import './userPreferences.css';
+import './UserPreferences.css';
 import Children from '../assets/Children.png';
 import Depression from '../assets/Depression.png';
 import Elderly from '../assets/Elderly.png';
@@ -22,10 +22,10 @@ const UserPreferences = () => {
   const { setUser } = useContext(AuthContext);
 
   const languages = [
-    { id: 'English', label: 'English' },
-    { id: 'Chinese', label: '华文' },
-    { id: 'Malay', label: 'Bahasa Melayu' },
-    { id: 'Tamil', label: 'தமிழ்' }
+    { id: 'en', label: 'English' },
+    { id: 'zh', label: '华文' },
+    { id: 'ms', label: 'Bahasa Melayu' },
+    { id: 'ta', label: 'தமிழ்' }
   ];
 
   const textSizes = [
@@ -90,25 +90,30 @@ const UserPreferences = () => {
         headers: {
           "Content-Type": "application/json"
         },
+        credentials: "include",
         body: JSON.stringify({ username, ...preferences })
       });
 
       const data = await res.json();
+      console.log("Preferences response:", data);
 
       if (res.ok) {
         console.log("Preference saved:", data);
         localStorage.setItem("preferences", JSON.stringify(preferences));
 
-        setUser(data);
+        if (data.user) {
+          setUser(data.user);
+        }
         localStorage.removeItem("canVerifyEmail");
 
         navigate("/forum");
       } else {
-        console.log("Failed to save preferences");
+        console.log("Failed to save preferences:", data);
+        alert(`Failed to save preferences: ${data.error || JSON.stringify(data)}`);
       }
     } catch (err) {
       console.error(err);
-      setStatus("Failed to save preferences. Network error.");
+      alert("Failed to save preferences. Network error.");
     }
   };
 

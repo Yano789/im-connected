@@ -30,6 +30,9 @@ function LoginCard() {
   const handleLogin = async (e) => {
     e.preventDefault();
 
+    const requestBody = { username, password, rememberMe };
+    console.log("Sending login request to server:", requestBody);
+
     try {
       const res = await fetch("http://localhost:5001/api/v1/user", {
         method: "POST",
@@ -37,7 +40,7 @@ function LoginCard() {
           "Content-Type": "application/json",
         },
         credentials: "include", 
-        body: JSON.stringify({ username, password, rememberMe }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await res.json();
@@ -58,11 +61,11 @@ function LoginCard() {
         console.log("Authenticated User:", data);
         navigate("/forum");
       } else {
-        setStatus(`Login failed: ${data}`);
+        setStatus(`Login failed: ${data.error || JSON.stringify(data)}`);
       }
     } catch (err) {
-      console.error(err);
-      setStatus("Login failed. Network error.");
+      console.error("Network or other error:", err);
+      setStatus(`Login failed. Network error: ${err.message}`);
     }
   };
 

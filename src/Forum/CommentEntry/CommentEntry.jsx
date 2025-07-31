@@ -1,6 +1,7 @@
 // CommentEntry.jsx
 import { useState } from "react";
 import "./CommentEntry.css";
+import { useTranslation } from "react-i18next";
 
 function CommentEntry({ comment, postId, refreshComments, onDelete }) {
   const { commentId, username, createdAt, content, children = [] } = comment;
@@ -9,6 +10,8 @@ function CommentEntry({ comment, postId, refreshComments, onDelete }) {
   const [editedContent, setEditedContent] = useState(content);
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState("");
+  const {t} = useTranslation();
+
 
   const handleEdit = async () => {
     try {

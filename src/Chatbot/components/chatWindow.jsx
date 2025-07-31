@@ -114,7 +114,7 @@ const ChatWindow = ({
         const { language } = await langRes.json();
         console.log(`retrieved preferredLanguage: ${language}`);
         setPreferredLanguage(language);
-      } catch {
+      } catch (err) {
         console.error("Language retrieval error:", err.message);
       }
     })();

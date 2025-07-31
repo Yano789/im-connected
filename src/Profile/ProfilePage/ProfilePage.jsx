@@ -3,6 +3,7 @@ import Header from "../../TopHeader/Header/Header";
 import "./ProfilePage.css";
 import UserInfoCard from "../UserInfoCard/UserInfoCard";
 import PreferencesCard from "../PreferencesCard/PreferencesCard";
+import i18next from "i18next";
 
 function ProfilePage() {
   const [userData, setUserData] = useState("");
@@ -80,16 +81,19 @@ function ProfilePage() {
       ...prevData,
       preferences: updatedPreferences,
     }));
+    if (category === "preferredLanguage") {
+      i18next.changeLanguage(value);
+    }
 
     try {
-      const response = await fetch("http://localhost:5001/api/v1/preferences", {
+      const response = await fetch("http://localhost:5001/api/v1/user/preferences", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           username: userData.username,
-          language: updatedPreferences.language,
+          language: updatedPreferences.preferredLanguage,
           textSize: updatedPreferences.textSize,
           contentMode: updatedPreferences.contentMode,
           topics: updatedPreferences.topics || [],
@@ -99,8 +103,6 @@ function ProfilePage() {
       const data = await response.json();
       if (!response.ok) {
         console.error("Failed to update preferences:", data.error);
-      } else {
-        console.log("Preferences updated successfully!", data.preferences);
       }
     } catch (error) {
       console.error("Error updating preferences:", error);

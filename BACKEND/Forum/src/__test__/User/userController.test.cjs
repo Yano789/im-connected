@@ -15,8 +15,7 @@ describe("createNewUser", () => {
     })
     test("Creating a user", async () => {
         const mockData = {
-            firstName: "John",
-            lastName: "Doe",
+            name: "John Doe",
             username: "johndoe",
             email: "john@example.com",
             password: "password123"
@@ -80,7 +79,7 @@ describe("authenticateUser", () => {
     test("should throw error for invalid username", async () => {
         User.findOne.mockResolvedValueOnce(null);
         await expect(authenticateUser({ username: "wronguser", password: "123" }))
-            .rejects.toThrow("Invalid Username Given!");
+            .rejects.toThrow("Invalid credentials");
     });
 
     test("should throw error if email not verified", async () => {
@@ -99,7 +98,7 @@ describe("authenticateUser", () => {
         verifyHashedData.mockResolvedValue(false);
 
         await expect(authenticateUser({ username: "johndoe", password: "wrong" }))
-            .rejects.toThrow("Incorrect Password Given!");
+            .rejects.toThrow("Invalid credentials");
     });
 
 

@@ -32,7 +32,7 @@ router.post("/", validateBody(loginSchema), async (req, res) => {
     res.status(200).json(authenticatedUser);
   } catch (error) {
 
-    res.status(400).send(error.message);
+    res.status(400).json({ error: error.message });
   }
 });
 
@@ -49,7 +49,7 @@ router.post("/signup", validateBody(signupSchema), async (req, res) => {
     res.status(200).json(newUser);
 
   } catch (error) {
-    res.status(400).send(error.message);
+    res.status(400).json({ error: error.message });
   }
 });
 

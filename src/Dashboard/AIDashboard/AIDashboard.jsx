@@ -1,16 +1,18 @@
 import AIDashboardEntry from "../AIDashboardEntry/AIDashboardEntry";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 function AIDashboard(){
 	const navigate = useNavigate();
+	const {t} = useTranslation();
   	
   	
   	return (
     		<div className="cardDiv">
-				<p className="card-header">AI Chat Companion</p>
-      			<p className="card-subheader">Get emotional support, summaries, translations, and resource info</p>
-      			<AIDashboardEntry itemName="I’m so happy today! Help me write this down..." onClick={() => navigate("/chatbot")}></AIDashboardEntry>
-				<AIDashboardEntry itemName="Can you help me research..." onClick={() => navigate("/chatbot")}></AIDashboardEntry>
-				<AIDashboardEntry  itemName="Summarise this post for me..." onClick={() => navigate("/chatbot")}></AIDashboardEntry>
+				<p className="card-header">{t("AIDashboardHeader")}</p>
+      			<p className="card-subheader">{t("AIDashboardSubHeader")}</p>
+      			<AIDashboardEntry itemName={t("AIDashboardEntry1")} onClick={() => navigate("/chatbot")}></AIDashboardEntry>
+				<AIDashboardEntry itemName={t("AIDashboardEntry2")}onClick={() => navigate("/chatbot")}></AIDashboardEntry>
+				<AIDashboardEntry  itemName={t("AIDashboardEntry3")} onClick={() => navigate("/chatbot")}></AIDashboardEntry>
     		</div>
             );
 };

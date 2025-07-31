@@ -5,6 +5,7 @@ import TabBar from "../TabBar/TabBar";
 import { AuthContext } from "../../AuthContext";
 import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function Header() {
   const { setUser } = useContext(AuthContext);
@@ -14,6 +15,7 @@ function Header() {
   const [isFocused, setIsFocused] = useState(false);
 
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   useEffect(() => {
     if (searchInput.trim() === "") {
@@ -80,9 +82,9 @@ function Header() {
         <div className="search">
           <input
             className="typeHereTo"
-            placeholder="Type here to search..."
+            placeholder={t("Search")}
             onChange={(e) => setSearchInput(e.target.value)}
-            onFocus={() => setIsFocused(true)}
+            onFocus={() => setIsFocused(true)}No forum posts with this title
             onBlur={() => setTimeout(() => setIsFocused(false), 150)}
           />
           <img className="applicationIcon" alt="" src={SearchIcon} />
@@ -90,7 +92,7 @@ function Header() {
             <div className="searchDropdown">
               {searchResults.length === 0 && (
                 <div className="searchEntry">
-                  No forum posts with this title
+                  {t("No Forum Posts")}
                 </div>
               )}
               {searchResults.slice(0, 3).map((item, index) => {
@@ -137,7 +139,7 @@ function Header() {
         </div>
         <TabBar></TabBar>
         <button className="buttonStyle1" onClick={handleLogout}>
-          Sign Out
+          {t("Sign Out")}
         </button>
       </div>
     </div>

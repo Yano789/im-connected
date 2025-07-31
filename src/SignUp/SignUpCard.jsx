@@ -29,7 +29,7 @@ function SignUpCard() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-  const [status, setStatus] = useState(null);
+  const [status, setStatus] = useState("");
   const [selectedCountry, setSelectedCountry] = useState(countries[1]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -43,7 +43,13 @@ function SignUpCard() {
       return;
     }
 
-    const fullNumber = `${selectedCountry.dialCode}${number}`;
+    const requestBody = {
+      name,
+      username,
+      number: `${selectedCountry.dialCode}${number}`,
+      email,
+      password
+    };
 
     try {
       const res = await fetch("http://localhost:5001/api/v1/user/signup", {
@@ -52,29 +58,22 @@ function SignUpCard() {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify({
-          name,
-          username,
-          number: `${selectedCountry.dialCode}${number}`,
-          email,
-          password
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         setStatus("Account created successfully!");
-        console.log("Created User:", data);
         localStorage.setItem("email", email);
         localStorage.setItem("username", username);
         localStorage.setItem("canVerifyEmail", 'true');
         navigate("/auth");
       } else {
-        setStatus(`Sign up failed: ${data.message || JSON.stringify(data)} (Phone: ${fullNumber})`);
+        setStatus(`Sign up failed: ${data.error || data.message}`);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Sign up error:", err);
       setStatus("Sign up failed. Network error.");
     }
   };
@@ -92,7 +91,6 @@ function SignUpCard() {
       return `${cleaned.slice(0, 4)} ${cleaned.slice(4, 8)}`;
     }
 
-    // Fallback: group every 3 digits (basic readable grouping)
     return cleaned.replace(/(.{3})/g, "$1 ").trim();
   };
 
@@ -188,7 +186,7 @@ function SignUpCard() {
         <div className="form-field">
           <label className="form-label">Email address</label>
           <input
-            type="text"
+            type="email"
             placeholder="Enter your email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -245,15 +243,13 @@ function SignUpCard() {
           Use 8 or more characters with a mix of letters, numbers & symbols
         </p>
 
-
-        <button type="submit" className="signup-button" onClick={handleSignUp}>
+        <button type="submit" className="signup-button">
           Sign Up
         </button>
 
         {status && <div className="status-message">{status}</div>}
       </form>
     </div>
-
   );
 }
 

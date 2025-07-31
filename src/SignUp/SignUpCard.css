@@ -240,12 +240,15 @@
 .password-row input {
   flex: 1;
   min-width: 0;
+  
 }
 
 .password-group {
   flex: 1;
   display: flex;
   flex-direction: column;
+  width: 40%;
+  box-sizing: border-box;
 }
 
 .forgot-password {
@@ -325,6 +328,15 @@
     max-height: 60vh;
     height: 300px;
   }
+  
+  .password-row {
+    flex-direction: column;  
+    gap: 12px;              
+  }
+
+  .password-group {
+    width: 100%;           
+  }
 }
 
 @media (max-width: 480px) {
@@ -361,5 +373,40 @@
   .password-group {
     flex: 1 1 48%;       
     min-width: 0;       
+  }
+}
+
+@media (max-width: 1200px) {
+  .password-row {
+    gap: 10px;
+  }
+  
+  .password-row input {
+    width: calc(50% - 5px);
+  }
+}
+
+@media (max-width: 1000px) {
+  .password-row {
+    gap: 8px;
+  }
+  
+  .password-row input {
+    width: calc(50% - 4px);
+  }
+}
+
+@media (max-width: 900px) {
+  .password-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .password-group {
+    width: 100%;
+  }
+  
+  .password-row input {
+    width: 100%;
   }
 }

@@ -7,7 +7,7 @@ const authenticateUser = async (data) => {
         const { username, password } = data;
         const fetchedUser = await User.findOne({ username });
         if (!fetchedUser) {
-            throw Error("Invalid Username Given!");
+            throw Error("Invalid credentials");
         }
         if (!fetchedUser.verified) {
             throw Error("Email hasn't been verified yet. Check your inbox.");
@@ -15,7 +15,7 @@ const authenticateUser = async (data) => {
         const hashedPassword = fetchedUser.password;
         const passwordMatch = await verifyHashedData(password, hashedPassword);
         if (!passwordMatch) {
-            throw Error("Incorrect Password Given!");
+            throw Error("Invalid credentials");
         }
         //Create User Token
         const tokenData = { userId: fetchedUser._id, email: fetchedUser.email, username: fetchedUser.username };

@@ -13,43 +13,33 @@ function PreferencesCard({ preferences = {}, onPreferenceChange }) {
         <h3 className="preference-label">Preferred Language</h3>
         <div className="preference-options">
           <button
-            onClick={() => onPreferenceChange("preferredLanguage", "English")}
+            onClick={() => onPreferenceChange("preferredLanguage", "en")}
             className={
-              preferredLanguage === "English"
-                ? "pref-button selected"
-                : "pref-button"
+              preferredLanguage === "en" ? "pref-button selected" : "pref-button"
             }
           >
             English
           </button>
           <button
-            onClick={() => onPreferenceChange("preferredLanguage", "中文")}
+            onClick={() => onPreferenceChange("preferredLanguage", "zh")}
             className={
-              preferredLanguage === "中文"
-                ? "pref-button selected"
-                : "pref-button"
+              preferredLanguage === "zh" ? "pref-button selected" : "pref-button"
             }
           >
             中文
           </button>
           <button
-            onClick={() =>
-              onPreferenceChange("preferredLanguage", "Bahasa Melayu")
-            }
+            onClick={() => onPreferenceChange("preferredLanguage", "ms")}
             className={
-              preferredLanguage === "Bahasa Melayu"
-                ? "pref-button selected"
-                : "pref-button"
+              preferredLanguage === "ms" ? "pref-button selected" : "pref-button"
             }
           >
             Bahasa Melayu
           </button>
           <button
-            onClick={() => onPreferenceChange("preferredLanguage", "தமிழ்")}
+            onClick={() => onPreferenceChange("preferredLanguage", "ta")}
             className={
-              preferredLanguage === "தமிழ்"
-                ? "pref-button selected"
-                : "pref-button"
+              preferredLanguage === "ta" ? "pref-button selected" : "pref-button"
             }
           >
             தமிழ்
@@ -62,31 +52,19 @@ function PreferencesCard({ preferences = {}, onPreferenceChange }) {
         <div className="preference-options">
           <button
             onClick={() => onPreferenceChange("textSize", "Small")}
-            className={
-              textSize === "Small"
-                ? "pref-button selected"
-                : "pref-button"
-            }
+            className={textSize === "Small" ? "pref-button selected" : "pref-button"}
           >
             Small
           </button>
           <button
             onClick={() => onPreferenceChange("textSize", "Medium")}
-            className={
-              textSize === "Medium"
-                ? "pref-button selected"
-                : "pref-button"
-            }
+            className={textSize === "Medium" ? "pref-button selected" : "pref-button"}
           >
             Medium
           </button>
           <button
             onClick={() => onPreferenceChange("textSize", "Big")}
-            className={
-              textSize === "Big"
-                ? "pref-button selected"
-                : "pref-button"
-            }
+            className={textSize === "Big" ? "pref-button selected" : "pref-button"}
           >
             Big
           </button>
@@ -97,9 +75,7 @@ function PreferencesCard({ preferences = {}, onPreferenceChange }) {
         <h3 className="preference-label">Content Mode</h3>
         <div className="preference-options content-modes">
           <button
-            onClick={() =>
-              onPreferenceChange("contentMode", "Easy Reader Mode")
-            }
+            onClick={() => onPreferenceChange("contentMode", "Easy Reader Mode")}
             className={
               contentMode === "Easy Reader Mode"
                 ? "pref-button content-button selected"
