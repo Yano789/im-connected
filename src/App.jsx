@@ -16,54 +16,63 @@ import AuthProvider from "./AuthContext";
 import ChatPage from './Chatbot/Chat';
 import LoginSignUpBackground from "./assets/LoginSignUpBackground.jpg";
 import Dashboard from "./Dashboard/Dashboard/Dashboard";
-
+import Splashscreen from './Splashscreen/Splashscreen';
 
 function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
-
-  const isLoginPage = location.pathname === '/login';
-  const isSignUpPage = location.pathname === '/signup';
-  const isAuthPage = location.pathname === '/auth';
-  const isPreferencePage = location.pathname === '/preferences';
-
   const { user, loading } = useContext(AuthContext);
 
+  const protectedRoutes = [
+    "/forum",
+    "/forum/newpost", 
+    "/forum/viewpost",
+    "/forum/mypost",
+    "/forum/savedpost",
+    "/medication",
+    "/profile"
+  ];
+
+  const authRoutes = ["/login", "/signup"];
+  const verificationRoutes = ["/auth", "/preferences"];
+
+  // Check if current page needs background styling
+  const needsAuthBackground = authRoutes.includes(location.pathname) || verificationRoutes.includes(location.pathname);
+
   useEffect(() => {
+    if (loading) return;
+
     const canVerifyEmail = localStorage.getItem("canVerifyEmail") === "true";
-    const pathname = location.pathname;
+    const currentPath = location.pathname;
 
-    const loggedInPaths = [
-      "/forum",
-      "/forum/newpost",
-      "/forum/viewpost",
-      "/forum/mypost",
-      "/forum/savedpost",
-      "/medication",
-      "/profile"
-    ];
-    const canVerifyPaths = ["/auth", "/preferences"];
-    const publicAuthPages = ["/login", "/signup"];
+    console.log("Route protection debug:", {
+      user: !!user,
+      currentPath,
+      canVerifyEmail,
+      loading
+    });
 
-    if (!loading) {
-      if (user) {
-        //if user logged in, redirect away from login/signup/auth/preferences
-        if ([...canVerifyPaths, ...publicAuthPages].includes(pathname)) {
-          navigate("/forum", { replace: true });
-        }
-      } else {
-        if (loggedInPaths.includes(pathname)) {
-          navigate("/login", { replace: true });
-        } else if (canVerifyPaths.includes(pathname)) {
-          if (!canVerifyEmail) {
-            navigate("/login", { replace: true });
-          }
-        }
-        //dont!! redirect for /login or /signup if not logged in
+    if (user) {  // if logged in
+      if (authRoutes.includes(currentPath) || currentPath === "/auth") {
+        console.log("Redirecting authenticated user from auth route to forum");
+        navigate("/forum", { replace: true });
+      }
+      else if (currentPath === "/preferences" && !canVerifyEmail) {
+        console.log("Redirecting authenticated user from preferences to forum");
+        navigate("/forum", { replace: true });
+      }
+    } 
+    else {    // if not logged in (not a user)
+      if (protectedRoutes.includes(currentPath)) {
+        console.log("Redirecting unauthenticated user from protected route to login");
+        navigate("/login", { replace: true });
+      }
+      else if (verificationRoutes.includes(currentPath) && !canVerifyEmail) {
+        console.log("Redirecting unauthenticated user from verification route to login");
+        navigate("/login", { replace: true });
       }
     }
   }, [user, loading, location, navigate]);
-
 
   if (loading) {
     return <div>Loading...</div>;
@@ -72,19 +81,20 @@ function AppContent() {
   return (
     <div
       style={{
-        backgroundImage: isLoginPage || isSignUpPage || isAuthPage || isPreferencePage
+        backgroundImage: needsAuthBackground
           ? `url(${LoginSignUpBackground})`
           : "linear-gradient(to bottom, #FFFDF9 75%, #F1C5C0 100%)",
-        backgroundSize: isLoginPage || isSignUpPage || isAuthPage || isPreferencePage ? "cover" : "auto",
-        backgroundRepeat: isLoginPage || isSignUpPage || isAuthPage || isPreferencePage ? "no-repeat" : "auto",
-        backgroundPosition: isLoginPage || isSignUpPage || isAuthPage || isPreferencePage ? "left center" : "auto",
+        backgroundSize: needsAuthBackground ? "cover" : "auto",
+        backgroundRepeat: needsAuthBackground ? "no-repeat" : "auto",
+        backgroundPosition: needsAuthBackground ? "left center" : "auto",
         minHeight: "100vh"
       }}
     >
       <Routes>
-        <Route path="/auth" element={<Authentication />}></Route>
+        <Route path="/" element={<Splashscreen />}></Route>
         <Route path="/signup" element={<SignUpCard />}></Route>
         <Route path="/login" element={<LoginCard />} />
+        <Route path="/auth" element={<Authentication />} />
         <Route path="/preferences" element={<UserPreferences />}></Route>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/forum" element={<Forum />} />
@@ -110,5 +120,4 @@ function App() {
   );
 }
 
-
-export default App
+export default App;

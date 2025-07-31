@@ -113,7 +113,7 @@ describe("User Routes", () => {
   describe("POST /api/user/preferences", () => {
     test("updates user preferences", async () => {
       const mockPreferences = {
-        language: "English",
+        preferredLanguage: "en",
         textSize: "Medium",
         contentMode: "Default",
         topics: ["Pediatric Care", "Mental Health"],
@@ -125,7 +125,7 @@ describe("User Routes", () => {
 
       const res = await request(app).post("/api/user/preferences").send({
         username: "janedoe",
-        language: "English",
+        language: "en",
         textSize: "Medium",
         contentMode: "Default",
         topics: ["Pediatric Care", "Mental Health"],
@@ -169,10 +169,12 @@ describe("User Routes", () => {
 
       expect(res.statusCode).toBe(200);
       expect(getUser).toHaveBeenCalledWith("janedoe");
-      expect(res.body.user).toMatchObject({
-        name: "Jane",
-        username: "janedoe",
-        email: "janedoe@gmail.com",
+      expect(res.body).toMatchObject({
+        user: {
+          name: "Jane",
+          username: "janedoe",
+          email: "janedoe@gmail.com",
+        }
       });
     });
   });

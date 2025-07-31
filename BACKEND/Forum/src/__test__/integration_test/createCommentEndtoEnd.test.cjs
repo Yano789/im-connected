@@ -21,7 +21,7 @@ describe("Create a comment to a post", () => {
             password: "hashed-password",
             verified: true,
             preferences: {
-                preferredLanguage: "English",
+                preferredLanguage: "en",
                 textSize: "Medium",
                 contentMode: "Default",
                 topics: ["Pediatric Care"]

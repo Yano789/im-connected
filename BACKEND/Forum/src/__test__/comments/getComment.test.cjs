@@ -1,40 +1,76 @@
 jest.mock("./../../domains/comment/model.cjs");
+jest.mock("./../../domains/user/model.cjs");
+jest.mock("./../../domains/translation/controller.cjs"); // adjust path if needed
 
 const { getComment } = require("./../../domains/comment/controller.cjs");
-
 const Comment = require("./../../domains/comment/model.cjs");
+const User = require("./../../domains/user/model.cjs");
+const translate = require("./../../domains/translation/controller.cjs");
 
 describe('getComment', () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should return translated comment", async () => {
+    const mockComment = {
+      commentId: 'c1',
+      postId: 'p1',
+      username: 'john',
+      content: 'This is a comment',
+      createdAt: Date.now(),
+    };
+
+    const mockUser = {
+      username: 'john',
+      preferences: {
+        preferredLanguage: 'es',
+      }
+    };
+
+    Comment.findOne.mockReturnValue(mockComment);
+
+    User.findOne.mockReturnValue({
+      lean: jest.fn().mockResolvedValue(mockUser)
     });
-    test("should return comment",async()=>{
-        const mockComment = {
-            commentId: 'c1',
-            postId: 'p1',
-            username: 'john',
-            content: 'This is a comment',
-            createdAt: Date.now(),
-        };
 
-        Comment.findOne.mockResolvedValue(mockComment);
+    translate.mockResolvedValue('Este es un comentario');
 
-        const result = await getComment({ postId:"p1", commentId: 'c1' });
+    const result = await getComment({ postId: "p1", commentId: 'c1', username: 'john' });
 
-        expect(Comment.findOne).toHaveBeenCalledWith({ postId:"p1", commentId: 'c1' });
-        expect(result).toEqual(mockComment);
-    })
+    expect(User.findOne).toHaveBeenCalledWith({ username: 'john' });
+    expect(Comment.findOne).toHaveBeenCalledWith({ postId: "p1", commentId: 'c1' });
+    expect(translate).toHaveBeenCalledWith('This is a comment', 'es');
+    expect(result).toBe('Este es un comentario');
+  });
 
-    test("should throw error if no PostId or commentId is provided",async()=>{
-        await expect(getComment({ postId: null, commentId: 'c1' })).rejects.toThrow("No postId");
-        await expect(getComment({ postId: 'p1', commentId: null })).rejects.toThrow("No commentId");
-    })
+  test("should throw error if no postId or commentId is provided", async () => {
+    User.findOne.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({ preferences: { preferredLanguage: 'en' } })
+    });
 
-    test("should throw error if comment not found",async()=>{
-        Comment.findOne.mockResolvedValue(null);
-        await expect(getComment({ postId:"p1", commentId: 'c1' })).rejects.toThrow("No such comment found");
-    })
+    await expect(getComment({ postId: null, commentId: 'c1', username: 'john' })).rejects.toThrow("No postId");
+    await expect(getComment({ postId: 'p1', commentId: null, username: 'john' })).rejects.toThrow("No commentId");
+  });
 
-})
+  test("should throw error if user not found", async () => {
+    User.findOne.mockReturnValue({
+      lean: jest.fn().mockResolvedValue(null)
+    });
+
+    await expect(getComment({ postId: 'p1', commentId: 'c1', username: 'john' })).rejects.toThrow("No user");
+  });
+
+  test("should throw error if comment not found", async () => {
+    User.findOne.mockReturnValue({
+      lean: jest.fn().mockResolvedValue({ preferences: { preferredLanguage: 'en' } })
+    });
+
+    Comment.findOne.mockReturnValue(null);
+
+    await expect(getComment({ postId: 'p1', commentId: 'c1', username: 'john' })).rejects.toThrow("No such comment found");
+  });
+});
+
 
 

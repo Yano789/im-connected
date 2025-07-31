@@ -1,0 +1,277 @@
+/* overall page */
+.splash-screen {
+  font-family: "Poppins", sans-serif;
+  color: #333;
+}
+
+/* ─── HEADER ───────────────────────────────────────────────────── */
+.splash-header {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) auto;
+  align-items: center;
+  position: relative;
+  padding: clamp(20px, 5vh, 80px) clamp(20px, 10vw, 80px);
+  background: linear-gradient(180deg, #c2a9f5 0%, #956bff 100%);
+  gap: 24px;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+/* left column */
+.header-left .sponsor-text {
+  color: #fff;
+  font-size: clamp(16px, 1.8vw, 20px);
+  margin-bottom: 4px;  
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25em; 
+}
+
+.logo-text {
+  font-size: clamp(18px, 6vw, 100px);
+  display: inline-flex;      
+  align-items: center;
+  gap: 0.20em;               
+}
+
+.logo-bold {
+  font-weight: 550; 
+}
+
+.heart-logo {
+  height: 2em;
+  width: auto;
+  filter: drop-shadow(0 0px 25px rgb(255, 143, 177));
+}
+
+.tagline {
+  color: #fff;
+  font-size: clamp(18px, 2vw, 28px);
+  margin-top: 4px;  
+}
+
+/* right column */
+.header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: relative;
+}
+
+.lang-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.globe-icon {
+  width: 18px;
+  height: auto;
+}
+
+.chevron-down {
+  font-size: 10px;
+}
+
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 24px;
+}
+
+.top-button {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 12px;
+  transition: transform 0.2s;
+}
+
+.signup-btn {
+  background: #7acc82;
+  color: #fff;
+}
+
+.signin-btn {
+  background: #ff8d6a;
+  color: #fff;
+}
+
+.top-button:hover {
+  transform: translateY(-2px);
+}
+
+.header-chars {
+  margin: 0;
+  width: 260px;
+  object-fit: contain;
+  filter: drop-shadow(0 0px 50px rgba(241, 192, 255, 1));
+}
+
+/* ─── SERVICES ─────────────────────────────────────────────────── */
+.services-section {
+  flex: 1;
+  background: #fffcf7;
+  padding: clamp(20px, 5vh, 40px) clamp(20px, 10vw, 40px);
+  display: flex;
+  flex-direction: column;
+}
+
+.services-title {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 32px;
+  padding: clamp(20px, 8vh, 20px) clamp(20px, 10vw, 20px);
+}
+
+/* cards column */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+  order: 1;
+}
+
+.service-card {
+  position: relative; 
+  background: #fff;
+  border-radius: 16px;
+  padding: 
+    clamp(16px, 2vw, 24px)               /* top    */
+    clamp(16px, 2vw, 24px)               /* right  */
+    calc(clamp(16px, 2vw, 24px) + 32px)  /* bottom = existing padding + icon height */
+    clamp(16px, 2vw, 24px);              /* left   */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;      
+  will-change: transform;            
+}
+
+
+.service-card h3 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.service-card p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.service-icon {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.service-card:hover,
+.service-card.active {
+  transform: translateY(-6px);
+}
+
+
+/* colored shadows per card */
+.med-card-shadow {
+  box-shadow: 4px 4px 15px rgba(219, 117, 112, 1);
+}
+
+.ai-card-shadow {
+  box-shadow: 4px 4px 15px rgba(241, 156, 103, 1);
+}
+
+.forum-card-shadow {
+  box-shadow: 4px 4px 15px rgba(182, 169, 217, 1);
+}
+
+/* screenshot display */
+.service-display {
+  order: 2;  
+  width: 100%;
+}
+
+/* ─── MOBILE / TABLET COLLAPSE ─────────────────────────────────── */
+@media (max-width: 992px) {
+  /* STACK the header into one column */
+  .splash-header {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .header-left {
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .header-left .sponsor-text {
+    font-size: clamp(13px, 3vw, 22px);
+  }
+
+  .logo-text {
+    font-size: clamp(36px, 9vw, 128px);
+  }
+
+  .tagline {
+    font-size: clamp(20px, 4vw, 28px);
+  }
+  
+  .logo-row {
+    display: flex;
+    justify-content: center;/* center “imConnected + heart” */
+    align-items: center;
+    gap: 0.25em;
+  }
+
+  .header-right {
+    /* center all buttons + image */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* make the top row of buttons center */
+  .header-buttons {
+    justify-content: center;
+  }
+
+  /* shrink the illustration to fit */
+  .header-chars {
+    width: 80%;
+    max-width: 300px;
+  }
+
+  /* SERVICES: collapse into one column */
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* show cards first, then the screenshot */
+  .cards-grid {
+    order: 1;
+  }
+  .service-display {
+    order: 2;
+    margin-top: 32px; /* give some breathing room */
+  }
+  
+}

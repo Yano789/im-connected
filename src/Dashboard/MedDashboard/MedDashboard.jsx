@@ -1,9 +1,11 @@
 import "./MedDashboard.css";
 import MedDashboardEntry from "../MedDashboardEntry/MedDashboardEntry";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 function DashboardItem() {
   const [medications, setMedications] = useState([]);
+  const {t} = useTranslation();
 
   useEffect(() => {
     const fetchMedications = async () => {
@@ -35,19 +37,19 @@ function DashboardItem() {
 
   return (
     <div className="cardDiv">
-      <p className="card-header">Medicine Logger</p>
-      <p className="card-subheader">Has your care recipient taken:</p>
+      <p className="card-header">{t("MedDashboardHeader")}</p>
+      <p className="card-subheader">{t("MedDashboardSubHeader")}</p>
 
       {medications.map((med, index) => (
         <div key={index} className="cardDetails">
           <MedDashboardEntry
-            medicineName={med.name || "Unknown Med"}
-            medicineDosage={med.dosage || "Unknown Dosage"}
+            medicineName={med.name || t("Unknown Medication")}
+            medicineDosage={med.dosage || t("Unknown Dosage")}
           />
           <ul>
             {med.dosages.map((d, idx) => (
               <li key={d._id || idx}>
-                Time: {d.time} — Taken: {d.taken ? "Yes" : "No"}
+                {t("Time")} {d.time} — {t("Taken")} {d.taken ? t("Yes") : t("No")}
               </li>
             ))}
           </ul>

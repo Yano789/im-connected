@@ -11,20 +11,61 @@ import HospitalIcon from "../../assets/Hospital.png";
 
 import Topic from "../Topic/Topic";
 import { useState } from "react";
-const TAGS = [
-  { id: 1, name: "All", image: AllIcon },
-  { id: 2, name: "Physical Disability & Chronic Illness", image: WheelchairIcon },
-  { id: 3, name: "Personal Mental Health", image: MentalHealthIcon },
-  { id: 4, name: "Subsidies and Govt Support", image: GovtIcon },
-  { id: 5, name: "Pediatric Care", image: ChildrenIcon },
-  { id: 6, name: "End of Life Care", image: ElderlyIcon },
-  { id: 7, name: "Financial & Legal Help", image: MoneyIcon },
-  { id: 8, name: "Mental Disability", image: DepressionIcon },
-  { id: 9, name: "Hospitals and Clinics", image: HospitalIcon },
-];
-
+import { useTranslation } from "react-i18next";
 
 function TopicSelector({ onTagFilterChange }) {
+  const { t } = useTranslation();
+  const TAGS = [
+    { id: 1, name: "All", localName: t("Tag1"), image: AllIcon },
+    {
+      id: 2,
+      name: "Physical Disability & Chronic Illness",
+      localName: t("Tag2"),
+      image: WheelchairIcon,
+    },
+    {
+      id: 3,
+      name: "Personal Mental Health",
+      localName: t("Tag3"),
+      image: MentalHealthIcon,
+    },
+    {
+      id: 4,
+      name: "Subsidies and Govt Support",
+      localName: t("Tag4"),
+      image: GovtIcon,
+    },
+    {
+      id: 5,
+      name: "Pediatric Care",
+      localName: t("Tag4"),
+      image: ChildrenIcon,
+    },
+    {
+      id: 6,
+      name: "End of Life Care",
+      localName: t("Tag5"),
+      image: ElderlyIcon,
+    },
+    {
+      id: 7,
+      name: "Financial & Legal Help",
+      localName: t("Tag6"),
+      image: MoneyIcon,
+    },
+    {
+      id: 8,
+      name: "Mental Disability",
+      localName: t("Tag7"),
+      image: DepressionIcon,
+    },
+    {
+      id: 9,
+      name: "Hospitals and Clinics",
+      localName: t("Tag8"),
+      image: HospitalIcon,
+    },
+  ];
   const [clickedTopics, setClickedTopics] = useState([]);
 
   const handleTopicClicked = (topicId) => {
@@ -54,16 +95,16 @@ function TopicSelector({ onTagFilterChange }) {
   return (
     <div className="topicSelector">
       <div className="topicTitle">
-        <div className="showPostsRelated">Show Posts Related To</div>
+        <div className="showPostsRelated">{t("TopicSelectorHeader")}</div>
       </div>
       <div className="topicTags">
-        {TAGS.map(({ id, name, image }) => (
+        {TAGS.map(({ id, localName, image }) => (
           <Topic
             key={id}
             topicId={id}
-            topicName={name}
+            topicName={localName}
             topicImage={image}
-            onClick={() => handleTopicClicked(id)}  
+            onClick={() => handleTopicClicked(id)}
             clicked={clickedTopics.includes(id)}
           />
         ))}

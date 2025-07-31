@@ -7,7 +7,7 @@ const authenticateUser = async (data) => {
         const { username, password } = data;
         const fetchedUser = await User.findOne({ username });
         if (!fetchedUser) {
-            throw Error("Invalid Username Given!");
+            throw Error("Invalid credentials");
         }
         if (!fetchedUser.verified) {
             throw Error("Email hasn't been verified yet. Check your inbox.");
@@ -15,7 +15,7 @@ const authenticateUser = async (data) => {
         const hashedPassword = fetchedUser.password;
         const passwordMatch = await verifyHashedData(password, hashedPassword);
         if (!passwordMatch) {
-            throw Error("Incorrect Password Given!");
+            throw Error("Invalid credentials");
         }
         //Create User Token
         const tokenData = { userId: fetchedUser._id, email: fetchedUser.email, username: fetchedUser.username };
@@ -55,13 +55,7 @@ const createNewUser = async (data) => {
                 number,
                 password: hashedPassword,
                 preferences: {
-                    preferredLanguage: preferences.preferredLanguage || "English",
-                    textSize: preferences.textSize || "Medium",
-                    contentMode: preferences.contentMode || "Default",
-                    topics: preferences.topics || [],
-                },
-                preferences: {
-                    preferredLanguage: preferences.preferredLanguage || "English",
+                    preferredLanguage: preferences.preferredLanguage || "en",
                     textSize: preferences.textSize || "Medium",
                     contentMode: preferences.contentMode || "Default",
                     topics: preferences.topics || [],
@@ -78,20 +72,31 @@ const createNewUser = async (data) => {
 
 
 const updateUserPreferences = async ({ username, preferences }) => {
-  const updatedUser = await User.findOneAndUpdate(
-    { username },
-    { preferences },
-    {
-      new: true,
-      runValidators: true,
+    try {
+        const updatedUser = await User.findOneAndUpdate(
+            { username },
+            { preferences },
+            {
+                new: true,
+                runValidators: true,
+            });
+        if (!updatedUser) {
+            throw new Error("User not found");
+        }
+        return updatedUser;
+    } catch (error) {
+        throw error;
     }
-  );
-  return updatedUser;
+
+
 };
 
 const getUser = async (username)=>{
     try {
         const user = await User.findOne({username})
+        if (!user) {
+            throw new Error("User not found");
+        }
         return user
     } catch (error) {
         throw error

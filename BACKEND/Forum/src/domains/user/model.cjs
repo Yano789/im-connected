@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const {allowedTags} = require("./../post/model.cjs");
+const allowedLang = ['en','ms','ta','zh'];
 const UserSchema = new Schema({
     name: String,
     username: {type: String,unique: true,index: true},
@@ -10,7 +11,7 @@ const UserSchema = new Schema({
     verified: {type:Boolean,default:false}, //For authorisation purposes 
     threadId:   { type: String, default: null },
     preferences: {
-    preferredLanguage: { type: String, default: "English" },
+    preferredLanguage: { type: String, default: "en",enum:allowedLang },
     textSize: { type: String, default: "Medium" },
     contentMode: { type: String, default: "Default" },
     topics: [{

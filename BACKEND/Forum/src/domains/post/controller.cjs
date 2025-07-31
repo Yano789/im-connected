@@ -3,6 +3,7 @@ const { hashData } = require("../../utils/hashData.cjs");
 const User = require("../user/model.cjs");
 const Comment = require("../comment/model.cjs")
 const createNestedComment = require("../../utils/buildNestedComments.cjs")
+const translate = require("./../../domains/translation/controller.cjs")
 const { v2: cloudinary } = require("cloudinary");
 const savedPost = require("../savedPosts/model.cjs")
 
@@ -52,54 +53,54 @@ const createPost = async (data) => {
 };
 
 const editDraft = async (data) => {
-  try {
-    const { postId, content, title, tags, username, draft, newMedia, mediaToRemove } = data;
-    const existingDraft = await Post.findOne({ postId });
+    try {
+        const { postId, content, title, tags, username, draft, newMedia, mediaToRemove } = data;
+        const existingDraft = await Post.findOne({ postId });
 
-    if (!existingDraft) throw Error("Draft does not exist");
-    if (existingDraft.username !== username) throw new Error("unauthorized");
-    if (!existingDraft.draft) throw Error("Cannot edit a published post");
+        if (!existingDraft) throw Error("Draft does not exist");
+        if (existingDraft.username !== username) throw new Error("unauthorized");
+        if (!existingDraft.draft) throw Error("Cannot edit a published post");
 
-    const currentMedia = existingDraft.media || [];
-    const toRemoveSet = new Set(mediaToRemove || []);
-    const mediaToDelete = currentMedia.filter(m => toRemoveSet.has(m.public_id));
+        const currentMedia = existingDraft.media || [];
+        const toRemoveSet = new Set(mediaToRemove || []);
+        const mediaToDelete = currentMedia.filter(m => toRemoveSet.has(m.public_id));
 
-   
-    const deletePromises = mediaToDelete.map(async (file) => {
-      try {
-        
-        return await cloudinary.uploader.destroy(file.public_id, {
-          resource_type: file.type === "video" ? "video" : "image",
+
+        const deletePromises = mediaToDelete.map(async (file) => {
+            try {
+
+                return await cloudinary.uploader.destroy(file.public_id, {
+                    resource_type: file.type === "video" ? "video" : "image",
+                });
+            } catch (err) {
+                console.error(`Error deleting media ${file.public_id}:`, err);
+                return null;
+            }
         });
-      } catch (err) {
-        console.error(`Error deleting media ${file.public_id}:`, err);
-        return null;
-      }
-    });
-    await Promise.all(deletePromises);
-    
-
-    const updatedMedia = [
-      ...currentMedia.filter(m => !toRemoveSet.has(m.public_id)),
-      ...(newMedia || []),
-    ];
-
-    existingDraft.title = title;
-    existingDraft.content = content;
-    existingDraft.tags = tags;
-    existingDraft.media = updatedMedia;
-    existingDraft.edited = true;
-    existingDraft.draft = draft;
+        await Promise.all(deletePromises);
 
 
-    
-    await existingDraft.save();
-  
+        const updatedMedia = [
+            ...currentMedia.filter(m => !toRemoveSet.has(m.public_id)),
+            ...(newMedia || []),
+        ];
 
-    return existingDraft;
-  } catch (err) {
-    throw err;
-  }
+        existingDraft.title = title;
+        existingDraft.content = content;
+        existingDraft.tags = tags;
+        existingDraft.media = updatedMedia;
+        existingDraft.edited = true;
+        existingDraft.draft = draft;
+
+
+
+        await existingDraft.save();
+
+
+        return existingDraft;
+    } catch (err) {
+        throw err;
+    }
 };
 
 const deletePost = async (data) => {
@@ -122,18 +123,18 @@ const deletePost = async (data) => {
                     const result = await cloudinary.uploader.destroy(file.public_id, {
                         resource_type: file.type === "video" ? "video" : "image",
                     });
-                    
+
                     return result;
                 } catch (err) {
-                    
-                    throw err; 
+
+                    throw err;
                 }
             });
 
             await Promise.all(deletionPromises);
         }
 
-        
+
         await Promise.all([
             Post.deleteOne({ postId: postId, draft: false }),
             Comment.deleteMany({ postId: postId }),
@@ -142,79 +143,86 @@ const deletePost = async (data) => {
 
         return existingPost;
     } catch (error) {
-        
+
         throw error;
     }
 };
 
 
 const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default", username }) => {
-  try {
-    let filter = {};
+    try {
+        let filter = {};
+        const user = await User.findOne({ username })
+        console.log(user)
+        const preferredTags = user?.preferences?.topics
+        const preferredLang = user?.preferences?.preferredLanguage
+        console.log(preferredTags)
 
-    if (tags.length === 0 && username) {
-      const user = await User.findOne({ username }).lean();
-      console.log(user)
-      const preferredTags = user?.preferences?.topics
-      console.log(preferredTags)
+        if (tags.length === 0) {
+            if (Array.isArray(preferredTags) && preferredTags.length > 0) {
+                tags = preferredTags.map(tag => tag.trim()).filter(tag => tag.length > 0);
+            }
+        }
 
-      if (Array.isArray(preferredTags) && preferredTags.length > 0) {
-        tags = preferredTags.map(tag => tag.trim()).filter(tag => tag.length > 0);
-      }
+
+        if (tags.length === 1) {
+            filter.tags = tags[0];
+        } else if (tags.length > 1) {
+            filter.tags = { $in: tags };
+        }
+
+        //console.log(filter)
+
+
+        let sortOptions = {};
+        switch (sort.toLowerCase()) {
+            case "latest":
+                sortOptions.createdAt = -1;
+                break;
+            case "most likes":
+                sortOptions.likes = -1;
+                break;
+            case "most comments":
+                sortOptions.comments = -1;
+                break;
+            case "earliest":
+                sortOptions.createdAt = 1;
+                break;
+            default:
+                sortOptions.createdAt = -1;
+        }
+
+
+        if (source !== "default") {
+            filter.username = username;
+        }
+
+        let posts = await Post.find({ ...filter, draft: false }).sort(sortOptions);
+        if (posts.length === 0 && source === "default") {
+            posts = await Post.find({ draft: false }).sort(sortOptions);
+        }
+
+
+        posts.forEach(post => {
+            if (post.media && post.media.length > 0) {
+                post.media = post.media.map(file => ({
+                    ...file,
+                    url: addCacheBuster(file.url),
+                }));
+            }
+        });
+
+        if (preferredLang) {
+            for (let post of posts) {
+                post.title = await translate(post.title, preferredLang);
+                post.content = await translate(post.content, preferredLang); // if `post.content` exists
+            }
+        }
+
+        return posts;
+    } catch (error) {
+        throw new Error("Failed to filter/sort posts: " + error.message);
     }
-
-
-    if (tags.length === 1) {
-      filter.tags = tags[0];
-    } else if (tags.length > 1) {
-      filter.tags = { $in: tags};
-    }
-
-    //console.log(filter)
-
-
-    let sortOptions = {};
-    switch (sort.toLowerCase()) {
-      case "latest":
-        sortOptions.createdAt = -1;
-        break;
-      case "most likes":
-        sortOptions.likes = -1;
-        break;
-      case "most comments":
-        sortOptions.comments = -1;
-        break;
-      case "earliest":
-        sortOptions.createdAt = 1;
-        break;
-      default:
-        sortOptions.createdAt = -1;
-    }
-
-
-    if (source !== "default") {
-      filter.username = username;
-    }
-
-    let posts = await Post.find({ ...filter, draft: false }).sort(sortOptions);
-    if(posts.length === 0 && source === "default"){
-        posts = await Post.find({draft: false }).sort(sortOptions);
-    }
-
-
-    posts.forEach(post => {
-      if (post.media && post.media.length > 0) {
-        post.media = post.media.map(file => ({
-          ...file,
-          url: addCacheBuster(file.url),
-        }));
-      }
-    });
-
-    return posts;
-  } catch (error) {
-    throw new Error("Failed to filter/sort posts: " + error.message);
-  }
 };
 
 
@@ -235,7 +243,11 @@ const modeLimit = async (data) => {
 }
 
 const getPostWithComment = async (data) => {
-    const postId = data
+    const { postId, username } = data
+    const user = await User.findOne({ username }).lean();
+    const preferredLang = user?.preferences?.preferredLanguage
+    console.log(preferredLang)
+
     try {
         let [post, comments] = await Promise.all([
             Post.findOne({ postId }).lean(),
@@ -244,10 +256,11 @@ const getPostWithComment = async (data) => {
         if (!post) {
             throw Error("Post not found");
         }
-        if (post.comments != comments.length) {
-            post = await Post.findOneAndUpdate({ postId: postId, draft: false }, { comments: comments.length }, { new: true })
+        if (post.comments !== comments.length) {
+            await Post.updateOne({ postId, draft: false }, { comments: comments.length });
+            post.comments = comments.length; // update in local memory
         }
-        const nestedComments = await createNestedComment(comments)
+        
 
         if (post.media && post.media.length > 0) {
             post.media = post.media.map(file => ({
@@ -255,6 +268,24 @@ const getPostWithComment = async (data) => {
                 url: addCacheBuster(file.url),
             }));
         }
+
+        let translatedComments = null
+        if (preferredLang) {
+            post.title = await translate(post.title, preferredLang);
+            post.content = await translate(post.content, preferredLang);
+            translatedComments = await Promise.all(
+      comments.map(async (comment) => {
+        const translatedContent = await translate(comment.content, preferredLang);
+
+        return {
+          ...comment,
+          content: translatedContent,
+        };
+      })
+    );
+        }
+
+        const nestedComments = await createNestedComment(translatedComments)
         const response = {
             ...post,
             commentArray: nestedComments,
@@ -267,7 +298,7 @@ const getPostWithComment = async (data) => {
 }
 
 
-
+/*
 const getAllMyPosts = async (data) => {
     try {
         const username = data
@@ -284,11 +315,14 @@ const getAllMyPosts = async (data) => {
     } catch (error) {
         throw error
     }
-}
+}*/
 
 const getAllMyDrafts = async (data) => {
     try {
         const username = data
+        const user = await User.findOne({ username }).lean();
+        const preferredLang = user?.preferences?.preferredLanguage
+        console.log(preferredLang)
         const myDrafts = await Post.find({ username, draft: true }).sort({ createdAt: -1 });
         myDrafts.forEach(draft => {
             if (draft.media && draft.media.length > 0) {
@@ -298,6 +332,14 @@ const getAllMyDrafts = async (data) => {
                 }));
             }
         });
+
+        if (preferredLang) {
+            for (let draft of myDrafts) {
+                draft.title = await translate(draft.title, preferredLang);
+                draft.content = await translate(draft.content, preferredLang);
+            }
+        }
+
         return myDrafts
     } catch (error) {
         throw error
@@ -307,6 +349,9 @@ const getAllMyDrafts = async (data) => {
 const getMyDraft = async (data) => {
     try {
         const { username, postId } = data
+        const user = await User.findOne({ username }).lean();
+        const preferredLang = user?.preferences?.preferredLanguage
+        console.log(preferredLang)
         const myDraft = await Post.findOne({ username: username, postId: postId, draft: true })
         if (myDraft?.media && myDraft.media.length > 0) {
             myDraft.media = myDraft.media.map(file => ({
@@ -314,6 +359,11 @@ const getMyDraft = async (data) => {
                 url: addCacheBuster(file.url),
             }));
         }
+        if (preferredLang) {
+            myDraft.title = await translate(myDraft.title, preferredLang);
+            myDraft.content = await translate(myDraft.content, preferredLang);
+        }
+
         return myDraft
     } catch (error) {
         throw error
@@ -343,10 +393,17 @@ const deleteDrafts = async (data) => {
     }
 }
 
-const getPostByTitle = async(data)=>{
+const getPostByTitle = async (data) => {
     try {
-        const title = data
-        const post = await Post.findOne({title:title,draft:false})
+        const { title, username } = data
+        const user = await User.findOne({ username }).lean();
+        const preferredLang = user?.preferences?.preferredLanguage
+        console.log(preferredLang)
+        const post = await Post.findOne({ title: title, draft: false }).lean()
+        if (preferredLang) {
+            post.title = await translate(post.title, preferredLang);
+            post.content = await translate(post.content, preferredLang);
+        }
         return post
     } catch (error) {
         throw error
@@ -356,35 +413,45 @@ const getPostByTitle = async(data)=>{
 
 
 function escapeRegex(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-const searchPosts = async (search) => {
-  try {
-    if (!search || typeof search !== 'string') return [];
+const searchPosts = async (data) => {
+    try {
+            const search = typeof data === 'string' ? data : data?.search;
+    const username = typeof data === 'object' ? data?.username : undefined;
+        const user = await User.findOne({ username }).lean();
+        const preferredLang = user?.preferences?.preferredLanguage
+        console.log(preferredLang)
+        if (!search || typeof search !== 'string') return [];
 
-    const safeSearch = escapeRegex(search.trim());
-    const regex = new RegExp(safeSearch, 'i'); 
+        const safeSearch = escapeRegex(search.trim());
+        const regex = new RegExp(safeSearch, 'i');
 
-    const posts = await Post.find({
-      title: { $regex: regex },
-      draft: false
-    })
-    .select('postId title -_id') 
-    .limit(10)
-    .sort({ createdAt: -1 });
+        const posts = await Post.find({
+            title: { $regex: regex },
+            draft: false
+        })
+            .select('postId title -_id')
+            .limit(10)
+            .sort({ createdAt: -1 });
 
-    console.log(posts);
+        console.log(posts);
+        if (preferredLang) {
+            for (let post of posts) {
+                post.title = await translate(post.title, preferredLang);
+                post.content = await translate(post.content, preferredLang);
+            }
+        }
 
-
-    return posts.map(post => ({ postId: post.postId, title: post.title }));
-  } catch (error) {
-    console.error('Error searching post titles:', error);
-    throw error;
-  }
+        return posts.map(post => ({ postId: post.postId, title: post.title }));
+    } catch (error) {
+        console.error('Error searching post titles:', error);
+        throw error;
+    }
 };
 
 
 
 
-module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyPosts, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle,searchPosts}
+module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle,searchPosts,escapeRegex,addCacheBuster};

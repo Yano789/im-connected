@@ -87,7 +87,8 @@ router.get("/", auth, validateQuery(querySchema), async (req, res) => {
 router.get("/getPost/:post", auth ,validateParams(paramsSchema),async (req, res) => {
     try {
         const postId = req.params.post
-        const response = await getPostWithComment(postId)
+        const username = req.currentUser.username
+        const response = await getPostWithComment({postId,username})
         res.status(200).json(response);
     } catch (error) {
         res.status(400).send(error.message)
@@ -98,7 +99,8 @@ router.get("/getPost/:post", auth ,validateParams(paramsSchema),async (req, res)
 router.get("/getPost/title/:title",auth,validateParams(postTitleParamSchema),async(req,res)=>{
     try {
         const title = req.params.title
-        const post = await getPostByTitle(title)
+        const username = req.currentUser.username
+        const post = await getPostByTitle({title,username})
         res.status(200).json(post)
     } catch (error) {
         res.status(400).send(error.message)
@@ -108,7 +110,8 @@ router.get("/getPost/title/:title",auth,validateParams(postTitleParamSchema),asy
 router.get("/getPost/search/:search", auth, validateParams(searchBarParamSchema), async (req, res)=>{
     try {
         const search = req.params.search
-        const postsTitle = await searchPosts(search)
+        const username = req.currentUser.username
+        const postsTitle = await searchPosts({search,username})
         res.status(200).json(postsTitle)
     } catch (error) {
         res.status(400).send(error.message)

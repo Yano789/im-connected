@@ -9,7 +9,7 @@ const connectToDB = async()=>{
         console.log("Attempting to connect to MongoDB...");
         await mongoose.connect(MONGODB_URI, {
             serverSelectionTimeoutMS: 30000, // Timeout after 30s
-            socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+            socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity 
             family: 4, // Use IPv4, skip trying IPv6
             retryWrites: true,
             w: "majority"

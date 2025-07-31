@@ -2,8 +2,10 @@
 import "./CommentBody.css";
 import CommentEntry from "../CommentEntry/CommentEntry";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 function CommentBody({ comments = [], postId, refreshComments }) {
+  const {t} = useTranslation();
   const [commentInput, setCommentInput] = useState("");
 
   const handlePostComment = async () => {
@@ -56,19 +58,19 @@ function CommentBody({ comments = [], postId, refreshComments }) {
 
   return (
     <div className="commentSection">
-      <div className="addAComment">Add a Comment</div>
+      <div className="addAComment">{t("Add a Comment")}</div>
       <textarea
         className="addComment"
-        placeholder="Write something..."
+        placeholder={t("Write something")}
         value={commentInput}
         onChange={(e) => setCommentInput(e.target.value)}
       />
       <button className="viewPostButton" onClick={handlePostComment}>
-        Post
+        {t("Post")}
       </button>
 
       <div className="viewPostCommentsDiv">
-        <div className="viewPostComment">Comments</div>
+        <div className="viewPostComment">{t("Comments")}</div>
         {comments.length > 0 ? (
           comments.map((comment) => (
             <CommentEntry
@@ -80,7 +82,7 @@ function CommentBody({ comments = [], postId, refreshComments }) {
             />
           ))
         ) : (
-          <p>No comments yet.</p>
+          <p>{t("No Comments Yet")}</p>
         )}
       </div>
     </div>
