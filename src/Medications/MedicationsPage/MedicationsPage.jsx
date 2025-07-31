@@ -35,28 +35,32 @@ function MedicationsPage() {
             setLoading(true);
             setError(null);
             
-            // Get care recipients from Forum API
+            // Get care recipients from Scanner API (since medications are saved there)
             const recipients = await medicationScannerService.getCareRecipients();
             console.log('MedicationsPage: Received recipients:', recipients);
             
             if (recipients && Array.isArray(recipients)) {
                 console.log('MedicationsPage: Processing', recipients.length, 'recipients');
-                // Transform Forum API data to match frontend format
+                // Transform Scanner API data to match frontend format
                 const transformedRecipients = await Promise.all(
                     recipients.map(async (recipient) => {
-                        // Get medications for each recipient
+                        // Get medications for each recipient from Scanner API
                         const medications = await medicationScannerService.getMedications(recipient._id);
+                        console.log('MedicationsPage - Raw medications from API for recipient', recipient.name, ':', medications);
                         const medicationsList = Array.isArray(medications) ? 
-                            medications.map(med => ({
-                                id: med._id,
-                                name: med.name,
-                                dosage: med.dosage,
-                                usedTo: med.usedTo,
-                                sideEffects: med.sideEffects,
-                                warnings: med.warnings,
-                                image: med.image?.url || 'https://i.imgur.com/8m2bAOr.jpeg',
-                                dosages: med.dosages || [{ period: 'Morning', time: '08:00', taken: false }]
-                            })) : [];
+                            medications.map(med => {
+                                console.log('MedicationsPage - Processing medication:', med.name, 'Image:', med.image);
+                                return {
+                                    id: med._id,
+                                    name: med.name,
+                                    dosage: med.dosage,
+                                    usedTo: med.usedTo,
+                                    sideEffects: med.sideEffects,
+                                    warnings: med.warnings,
+                                    image: med.image || '', // Use the actual image URL from Scanner database
+                                    dosages: med.dosages || [{ period: 'Morning', time: '08:00', taken: false }]
+                                };
+                            }) : [];
 
                         return {
                             id: recipient._id,
@@ -143,43 +147,65 @@ function MedicationsPage() {
         console.log("Saving medication data:", medData);
         
         try {
-            // Create the medication data for saving to the database
-            const medicationData = {
-                name: medData.name,
-                dosage: medData.dosage || '',
-                schedule: medData.schedule || '',
-                usedTo: medData.usedTo || '',
-                sideEffects: medData.sideEffects || '',
-                warnings: medData.warnings || '',
-                image: medData.image || 'https://i.imgur.com/8m2bAOr.jpeg',
-                careRecipientId: selectedRecipientId,
-                // Use dosages array from the form data, or convert schedule for compatibility
-                dosages: medData.dosages && medData.dosages.length > 0 ? 
-                    medData.dosages : 
-                    (medData.schedule ? 
-                        [{ time: medData.schedule, taken: false }] : 
-                        [{ time: 'As prescribed', taken: false }])
-            };
-
             if (mode === 'create') {
                 // Check if we have a captured file from scanning
                 if (capturedFile) {
-                    // Save medication with image file (from scanning)
-                    await medicationScannerService.scanAndSaveMedication(
+                    console.log('Saving scanned medication with captured file...');
+                    // For scanned medications, use scanAndSaveMedication which handles image upload internally
+                    const scanResult = await medicationScannerService.scanAndSaveMedication(
                         capturedFile, 
                         selectedRecipientId
-                        // userId removed - let backend handle authentication via JWT
                     );
+                    console.log('Scan and save completed:', scanResult);
                 } else {
+                    console.log('Saving manually entered medication...');
+                    // Create the medication data for saving to the database
+                    const medicationData = {
+                        name: medData.name,
+                        dosage: medData.dosage || '',
+                        schedule: medData.schedule || '',
+                        usedTo: medData.usedTo || '',
+                        sideEffects: medData.sideEffects || '',
+                        warnings: medData.warnings || '',
+                        image: medData.image || '',
+                        careRecipientId: selectedRecipientId,
+                        // Use dosages array from the form data, or convert schedule for compatibility
+                        dosages: medData.dosages && medData.dosages.length > 0 ? 
+                            medData.dosages : 
+                            (medData.schedule ? 
+                                [{ time: medData.schedule, taken: false }] : 
+                                [{ time: 'As prescribed', taken: false }])
+                    };
+                    
                     // Save medication without scanning (manual entry)
                     await medicationScannerService.createMedication(medicationData);
                 }
             } else {
+                console.log('Updating existing medication...');
+                // Create the medication data for updating
+                const medicationData = {
+                    name: medData.name,
+                    dosage: medData.dosage || '',
+                    schedule: medData.schedule || '',
+                    usedTo: medData.usedTo || '',
+                    sideEffects: medData.sideEffects || '',
+                    warnings: medData.warnings || '',
+                    image: medData.image || '',
+                    careRecipientId: selectedRecipientId,
+                    // Use dosages array from the form data, or convert schedule for compatibility
+                    dosages: medData.dosages && medData.dosages.length > 0 ? 
+                        medData.dosages : 
+                        (medData.schedule ? 
+                            [{ time: medData.schedule, taken: false }] : 
+                            [{ time: 'As prescribed', taken: false }])
+                };
+                
                 // For editing existing medications, use update endpoint
                 await medicationScannerService.updateMedication(selectedMedication.id, medicationData);
             }
 
             // Reload care recipients and medications from the database
+            console.log('Reloading care recipients...');
             await loadCareRecipients();
             
             setMode('view');

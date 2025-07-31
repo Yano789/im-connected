@@ -17,6 +17,10 @@ const AnimateContent = ({ children, contentKey }) => (
 );
 
 function MedicationDetails({ medication, onEdit }) {
+    // Debug: Log what image URL we're receiving
+    console.log('MedicationDetails - medication:', medication);
+    console.log('MedicationDetails - image URL:', medication?.image);
+    
     if (!medication) {
         return (
             <div className="details-card">
@@ -25,7 +29,11 @@ function MedicationDetails({ medication, onEdit }) {
         );
     }
     
-    const activePeriods = new Set(medication.dosages?.map(d => d.period) || []);
+    const activePeriods = new Set(
+        medication.dosages
+            ?.filter(dosage => dosage.taken)
+            ?.map(dosage => dosage.period) || []
+    );
 
     const iconTransition = { type: "spring", stiffness: 400, damping: 25 };
     const activeStyle = { backgroundColor: '#fde2e4', borderColor: '#e56b6f', scale: 1 };
@@ -112,7 +120,14 @@ function MedicationDetails({ medication, onEdit }) {
             <div className="detail-section">
                 <h3 className="section-header">Image</h3>
                 <AnimateContent contentKey={medication.image}>
-                    <img src={medication.image} alt={medication.name} className="medication-image" />
+                    {medication.image ? (
+                        <img src={medication.image} alt={medication.name} className="medication-image" />
+                    ) : (
+                        <div className="no-image-placeholder">
+                            <p>No image available</p>
+                            <small>Upload an image when editing this medication</small>
+                        </div>
+                    )}
                 </AnimateContent>
             </div>
 

@@ -165,7 +165,8 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                     dosage: medicationData.dosage || prevData.dosage,
                     schedule: medicationData.schedule || prevData.schedule,
                     warnings: medicationData.warnings || prevData.warnings,
-                    image: medicationData.image || prevData.image,
+                    // Don't set image from scan result - it will be set during save
+                    // image: medicationData.image || prevData.image,
                 }));
 
                 setScanSuccess(`Medication "${medicationData.name}" scanned successfully! Confidence: ${Math.round(medicationData.confidence * 100)}% - Form auto-filled. Click "Save Medicine" to store permanently.`);
@@ -199,8 +200,13 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
-            const newImageUrl = URL.createObjectURL(e.target.files[0]);
-            setFormData(prev => ({ ...prev, image: newImageUrl }));
+            const file = e.target.files[0];
+            // Set the selected file for upload
+            setSelectedFile(file);
+            // Create preview URL but don't set it as the permanent image
+            const previewUrl = URL.createObjectURL(file);
+            setPreviewUrl(previewUrl);
+            // Don't set formData.image to blob URL - it will be set to Cloudinary URL after upload
         }
     };
 
@@ -230,7 +236,10 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
         let finalFormData = { ...formData };
         
         // If there's a selected file (captured or uploaded), upload it first
-        if (selectedFile && !formData.image) {
+        // Check for selectedFile OR if formData.image is a blob URL that needs to be replaced
+        const needsImageUpload = selectedFile || (formData.image && formData.image.startsWith('blob:'));
+        
+        if (needsImageUpload && selectedFile) {
             setIsUploading(true);
             setUploadError('');
             setUploadSuccess('');
@@ -399,7 +408,13 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                 <div className="form-group">
                     <label>Image</label>
                     <div className="image-preview-container">
-                        {formData.image && <img src={formData.image} alt="Medication Preview" className="image-preview" />}
+                        {(previewUrl || formData.image) && (
+                            <img 
+                                src={previewUrl || formData.image} 
+                                alt="Medication Preview" 
+                                className="image-preview" 
+                            />
+                        )}
                     </div>
                     <label htmlFor="image-upload" className="upload-image-button">
                         {isEditing ? 'Upload New Image' : 'Upload Image'}

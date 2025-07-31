@@ -121,6 +121,46 @@ app.use(cors({
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+// Helper function to upload image to Cloudinary via Forum backend
+async function uploadImageToCloudinary(imagePath, authToken) {
+  try {
+    console.log('Uploading image to Cloudinary via Forum backend:', imagePath);
+    
+    // Create FormData for the request
+    const FormData = (await import('form-data')).default;
+    const formData = new FormData();
+    
+    // Add the image file to form data
+    const imageStream = fs.createReadStream(imagePath);
+    formData.append('medicationImage', imageStream);
+    
+    // Make request to Forum backend's upload endpoint
+    const response = await fetch('http://localhost:5001/api/medications/upload-image', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': authToken ? `Bearer ${authToken}` : '',
+        ...formData.getHeaders()
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Cloudinary upload failed: ${response.status} ${response.statusText}`);
+    }
+    
+    const result = await response.json();
+    console.log('Image successfully uploaded to Cloudinary:', result.data);
+    
+    return {
+      url: result.data.url,
+      publicId: result.data.public_id
+    };
+  } catch (error) {
+    console.error('Error uploading to Cloudinary:', error);
+    throw error;
+  }
+}
+
 // Enhanced multer configuration with better error handling
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -1161,19 +1201,21 @@ app.post('/scan-medication', upload.single('medicationImage'), async (req, res) 
         usedFor: med.info.extractedContext?.formattedUses || med.info.usedFor || '',
         sideEffects: med.info.sideEffects || '',
         schedule: med.info.schedule || '',
-        image: `http://localhost:${PORT}/uploads/${req.file.filename}`,
+        image: '', // Image will be uploaded to Cloudinary when medication is saved
         confidence: med.info.confidence || 0.5,
         sources: med.info.sources || ['OCR'],
         brandNames: med.info.brandNames || [],
         warnings: med.info.warnings || '',
-        extractedContext: med.info.extractedContext || null
+        extractedContext: med.info.extractedContext || null,
+        localImagePath: req.file.path // Keep local path for later Cloudinary upload
       })),
       metadata: {
         filename: req.file.filename,
         fileSize: req.file.size,
         uploadTime: new Date().toISOString(),
         ocrVariantsUsed: processedImagePaths.length,
-        textFormatting: 'enhanced_readability'
+        textFormatting: 'enhanced_readability',
+        localImagePath: req.file.path // Keep local path for later Cloudinary upload
       }
     };
 
@@ -1256,6 +1298,17 @@ app.post('/save-scanned-medication', upload.single('medicationImage'), async (re
     if (medications.length > 0) {
       const primaryMed = medications[0]; // Take the first (usually best) medication
       
+      // Upload image to Cloudinary via Forum backend
+      let imageData = { url: '', publicId: '' };
+      try {
+        const authToken = req.headers.authorization; // Pass through auth token if available
+        imageData = await uploadImageToCloudinary(req.file.path, authToken);
+        console.log('Image uploaded to Cloudinary successfully:', imageData);
+      } catch (cloudinaryError) {
+        console.warn('Failed to upload to Cloudinary, saving without image:', cloudinaryError.message);
+        // Continue without image rather than failing the entire operation
+      }
+      
       const medicationData = {
         careRecipientId,
         userId,
@@ -1266,10 +1319,7 @@ app.post('/save-scanned-medication', upload.single('medicationImage'), async (re
         usedTo: truncateText(primaryMed.info.extractedContext?.formattedUses || primaryMed.info.usedFor || '', 500),
         sideEffects: truncateText(primaryMed.info.sideEffects || '', 500),
         warnings: truncateText(primaryMed.info.warnings || '', 500),
-        image: {
-          url: `http://localhost:${PORT}/uploads/${req.file.filename}`,
-          publicId: req.file.filename
-        },
+        image: imageData, // Use Cloudinary image data
         prescriptionInfo: {
           doctorName: '', // Can be extracted later or filled manually
           prescribedDate: new Date(),
@@ -1289,6 +1339,16 @@ app.post('/save-scanned-medication', upload.single('medicationImage'), async (re
       savedMedications.push(savedMedication);
       
       console.log(`Saved primary medication: ${primaryMed.name} for care recipient: ${careRecipient.name}`);
+      
+      // Clean up local file after successful Cloudinary upload
+      try {
+        if (imageData.url && fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+          console.log('Local file cleaned up after Cloudinary upload');
+        }
+      } catch (cleanupError) {
+        console.warn('Failed to clean up local file:', cleanupError.message);
+      }
     }
 
     const response = {
@@ -1356,73 +1416,6 @@ app.get('/care-recipients/:userId', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch care recipients',
-      details: error.message
-    });
-  }
-});
-
-/**
- * Get medications for a care recipient
- */
-app.get('/medications/:careRecipientId', async (req, res) => {
-  try {
-    const { careRecipientId } = req.params;
-    
-    const medications = await Medication.find({ 
-      careRecipientId, 
-      isActive: true 
-    }).populate('careRecipientId', 'name')
-      .sort({ createdAt: -1 });
-    
-    res.json({
-      success: true,
-      medications
-    });
-  } catch (error) {
-    console.error('Error fetching medications:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch medications',
-      details: error.message
-    });
-  }
-});
-
-/**
- * Create a new care recipient
- */
-app.post('/care-recipients', async (req, res) => {
-  try {
-    const { name, userId, dateOfBirth, medicalConditions, emergencyContact, notes } = req.body;
-    
-    if (!name || !userId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Name and user ID are required'
-      });
-    }
-    
-    const careRecipient = new CareRecipient({
-      name,
-      userId,
-      dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
-      medicalConditions: medicalConditions || [],
-      emergencyContact: emergencyContact || {},
-      notes: notes || '',
-      isActive: true
-    });
-    
-    await careRecipient.save();
-    
-    res.json({
-      success: true,
-      careRecipient
-    });
-  } catch (error) {
-    console.error('Error creating care recipient:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to create care recipient',
       details: error.message
     });
   }
@@ -1509,6 +1502,195 @@ app.delete('/care-recipients/:careRecipientId', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to delete care recipient',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Create a new care recipient (Scanner database)
+ */
+app.post('/care-recipients', async (req, res) => {
+  try {
+    const { name, dateOfBirth, medicalConditions, emergencyContact, notes } = req.body;
+    
+    if (!name || !name.trim()) {
+      return res.status(400).json({
+        success: false,
+        error: 'Care recipient name is required'
+      });
+    }
+    
+    console.log('Creating new care recipient:', name);
+    
+    // Create a default user ObjectId for Scanner-created care recipients
+    const defaultUserId = new mongoose.Types.ObjectId('507f1f77bcf86cd799439011');
+    
+    const careRecipientData = {
+      name: name.trim(),
+      userId: defaultUserId, // Use a valid ObjectId
+      dateOfBirth,
+      medicalConditions: medicalConditions || [],
+      emergencyContact,
+      notes: notes || '',
+      isActive: true
+    };
+    
+    const newCareRecipient = new CareRecipient(careRecipientData);
+    await newCareRecipient.save();
+    
+    console.log('Care recipient created successfully:', newCareRecipient._id);
+    
+    res.status(201).json({
+      success: true,
+      data: {
+        id: newCareRecipient._id,
+        _id: newCareRecipient._id,
+        name: newCareRecipient.name,
+        userId: newCareRecipient.userId,
+        dateOfBirth: newCareRecipient.dateOfBirth,
+        medicalConditions: newCareRecipient.medicalConditions,
+        emergencyContact: newCareRecipient.emergencyContact,
+        notes: newCareRecipient.notes,
+        createdAt: newCareRecipient.createdAt,
+        updatedAt: newCareRecipient.updatedAt
+      }
+    });
+  } catch (error) {
+    console.error('Error creating care recipient:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to create care recipient',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Endpoint to get all care recipients (Scanner database)
+ */
+app.get('/care-recipients', async (req, res) => {
+  try {
+    console.log('Getting all care recipients from Scanner database...');
+    
+    const careRecipients = await CareRecipient.find({ isActive: true }).sort({ createdAt: -1 });
+    
+    console.log(`Found ${careRecipients.length} care recipients`);
+    
+    const formattedRecipients = careRecipients.map(recipient => ({
+      _id: recipient._id,
+      name: recipient.name,
+      userId: recipient.userId,
+      dateOfBirth: recipient.dateOfBirth,
+      medicalConditions: recipient.medicalConditions,
+      emergencyContact: recipient.emergencyContact,
+      notes: recipient.notes,
+      createdAt: recipient.createdAt,
+      updatedAt: recipient.updatedAt
+    }));
+    
+    res.json(formattedRecipients);
+  } catch (error) {
+    console.error('Error getting care recipients:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get care recipients',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Endpoint to get medications for a care recipient (Scanner database)
+ */
+app.get('/medications/:careRecipientId', async (req, res) => {
+  try {
+    const { careRecipientId } = req.params;
+    
+    console.log(`Getting medications for care recipient: ${careRecipientId}`);
+    
+    const medications = await Medication.find({ 
+      careRecipientId: careRecipientId,
+      isActive: true 
+    }).sort({ createdAt: -1 });
+    
+    console.log(`Found ${medications.length} medications for care recipient ${careRecipientId}`);
+    
+    // Format medications for frontend
+    const formattedMedications = medications.map(med => {
+      console.log(`Formatting medication: ${med.name}, Image URL: ${med.image?.url || 'No image'}`);
+      return {
+        _id: med._id,
+        name: med.name,
+        dosage: med.dosage,
+        usedTo: med.usedTo,
+        sideEffects: med.sideEffects,
+        warnings: med.warnings,
+        schedule: med.schedule,
+        image: med.image?.url || '', // Extract URL from image object
+        dosages: med.dosages || [],
+        createdAt: med.createdAt,
+        confidence: med.scanData?.confidence || 0
+      };
+    });
+    
+    res.json(formattedMedications);
+  } catch (error) {
+    console.error('Error getting medications:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get medications',
+      details: error.message
+    });
+  }
+});
+
+/**
+ * Endpoint to get all care recipients with their medications (Scanner database)
+ */
+app.get('/care-recipients-with-medications', async (req, res) => {
+  try {
+    console.log('Getting all care recipients with medications...');
+    
+    const careRecipients = await CareRecipient.find({ isActive: true }).sort({ createdAt: -1 });
+    
+    const recipientsWithMedications = await Promise.all(
+      careRecipients.map(async (recipient) => {
+        const medications = await Medication.find({ 
+          careRecipientId: recipient._id,
+          isActive: true 
+        }).sort({ createdAt: -1 });
+        
+        const formattedMedications = medications.map(med => ({
+          _id: med._id,
+          name: med.name,
+          dosage: med.dosage,
+          usedTo: med.usedTo,
+          sideEffects: med.sideEffects,
+          warnings: med.warnings,
+          schedule: med.schedule,
+          image: med.image?.url || '', // Extract URL from image object
+          dosages: med.dosages || [],
+          createdAt: med.createdAt,
+          confidence: med.scanData?.confidence || 0
+        }));
+        
+        return {
+          _id: recipient._id,
+          name: recipient.name,
+          medications: formattedMedications,
+          createdAt: recipient.createdAt
+        };
+      })
+    );
+    
+    console.log(`Returning ${recipientsWithMedications.length} care recipients with medications`);
+    res.json(recipientsWithMedications);
+  } catch (error) {
+    console.error('Error getting care recipients with medications:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get care recipients with medications',
       details: error.message
     });
   }

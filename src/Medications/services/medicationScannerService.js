@@ -136,21 +136,33 @@ class MedicationService {
    */
   async getCareRecipients() {
     try {
+      console.log('Scanner Service: Getting care recipients from Forum database (authoritative source)...');
+      
+      // Use Forum API since it has user authentication and is the authoritative source
       const response = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients`, {
         method: 'GET',
-        credentials: 'include',
+        credentials: 'include', // Include JWT cookie for authentication
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache', // Prevent caching
         },
+        cache: 'no-store', // Force fresh data
       });
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error('Scanner Service: Failed to fetch care recipients from Forum database:', errorText);
         throw new Error(`Failed to fetch care recipients: ${errorText}`);
       }
 
       const data = await response.json();
-      console.log('Scanner Service: getCareRecipients response:', data);
+      console.log('Scanner Service: getCareRecipients response from Forum database:', data);
+      
+      // Debug: Log the actual IDs being returned
+      if (Array.isArray(data) && data.length > 0) {
+        console.log('Scanner Service: Care recipient IDs from API:', data.map(r => ({ id: r._id, name: r.name })));
+      }
+      
       return data;
     } catch (error) {
       console.error('Error fetching care recipients:', error);
@@ -165,21 +177,49 @@ class MedicationService {
    */
   async createCareRecipient(recipientData) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients`, {
+      console.log('Scanner Service: Creating care recipient in both databases:', recipientData);
+      
+      // First, create in Forum API (requires authentication) - this is the authoritative source
+      console.log('Scanner Service: Creating care recipient in Forum database...');
+      const forumResponse = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients`, {
         method: 'POST',
-        credentials: 'include',
+        credentials: 'include', // Include JWT cookie
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(recipientData),
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to create care recipient: ${errorText}`);
+      if (!forumResponse.ok) {
+        const errorText = await forumResponse.text();
+        console.error('Scanner Service: Failed to create care recipient in Forum database:', errorText);
+        throw new Error(`Failed to create care recipient in Forum database: ${errorText}`);
       }
 
-      return await response.json();
+      const forumResult = await forumResponse.json();
+      console.log('Scanner Service: Successfully created care recipient in Forum database:', forumResult);
+
+      // Then, create in Scanner API for medications storage
+      console.log('Scanner Service: Creating care recipient in Scanner database...');
+      const scannerResponse = await fetch(`${SCANNER_API_BASE_URL}/care-recipients`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(recipientData),
+      });
+
+      if (!scannerResponse.ok) {
+        const errorText = await scannerResponse.text();
+        console.warn('Scanner Service: Failed to create care recipient in Scanner database (continuing with Forum version):', errorText);
+        // Don't throw error here - we have the Forum version which is authoritative
+      } else {
+        const scannerResult = await scannerResponse.json();
+        console.log('Scanner Service: Successfully created care recipient in Scanner database:', scannerResult);
+      }
+
+      // Return the Forum database result (authoritative)
+      return forumResult;
     } catch (error) {
       console.error('Error creating care recipient:', error);
       throw error;
@@ -251,6 +291,9 @@ class MedicationService {
    */
   async getMedications(careRecipientId = null) {
     try {
+      console.log(`Scanner Service: Getting medications from Forum database for care recipient ${careRecipientId}...`);
+      
+      // Use Forum API for consistency and proper authentication
       let url = `${FORUM_API_BASE_URL}/medication/medications`;
       if (careRecipientId) {
         url += `?careRecipientId=${careRecipientId}`;
@@ -258,21 +301,71 @@ class MedicationService {
 
       const response = await fetch(url, {
         method: 'GET',
-        credentials: 'include',
+        credentials: 'include', // Include JWT cookie for authentication
         headers: {
           'Content-Type': 'application/json',
+          'Cache-Control': 'no-cache', // Prevent caching
         },
+        cache: 'no-store', // Force fresh data
       });
 
       if (!response.ok) {
         const errorText = await response.text();
+        console.error(`Scanner Service: HTTP ${response.status} error fetching medications:`, errorText);
         throw new Error(`Failed to fetch medications: ${errorText}`);
       }
 
-      return await response.json();
+      const responseData = await response.json();
+      console.log(`Scanner Service: Raw response for care recipient ${careRecipientId}:`, responseData);
+      console.log(`Scanner Service: Response type:`, typeof responseData);
+      console.log(`Scanner Service: Response is array:`, Array.isArray(responseData));
+      
+      // Handle both response formats: direct array or wrapped in object
+      let medications = []; // Initialize to empty array to prevent undefined errors
+      if (Array.isArray(responseData)) {
+        console.log(`Scanner Service: Using direct array format`);
+        medications = responseData;
+      } else if (responseData && responseData.success && Array.isArray(responseData.medications)) {
+        console.log(`Scanner Service: Using success.medications format`);
+        medications = responseData.medications;
+      } else if (responseData && Array.isArray(responseData.data)) {
+        console.log(`Scanner Service: Using data array format`);
+        medications = responseData.data;
+      } else {
+        // Fallback to empty array if format is unexpected
+        console.warn('Scanner Service: Unexpected response format, using empty array. Response was:', responseData);
+        medications = [];
+      }
+      
+      console.log(`Scanner Service: Medications before final check:`, medications);
+      console.log(`Scanner Service: Medications type:`, typeof medications);
+      console.log(`Scanner Service: Medications is array:`, Array.isArray(medications));
+      
+      // CRITICAL: Ensure medications is always an array - use more defensive programming
+      if (!Array.isArray(medications)) {
+        console.error(`Scanner Service: CRITICAL ERROR - medications is not an array after parsing. Type: ${typeof medications}, Value:`, medications);
+        medications = [];
+      }
+      
+      // Double-check medications is still an array (paranoid check)
+      const safeMedications = Array.isArray(medications) ? medications : [];
+      
+      console.log(`Scanner Service: Retrieved ${safeMedications.length} medications for care recipient ${careRecipientId}`);
+      
+      // Log image URLs for debugging - ensure medications is an array before forEach
+      if (safeMedications.length > 0) {
+        safeMedications.forEach(med => {
+          console.log(`Scanner Service: Medication ${med.name} has image: ${med.image || 'No image'}`);
+        });
+      } else {
+        console.log('Scanner Service: No medications to iterate over');
+      }
+      
+      return safeMedications;
     } catch (error) {
       console.error('Error fetching medications:', error);
-      throw error;
+      // Return empty array instead of throwing to prevent app crashes
+      return [];
     }
   }
 
@@ -468,7 +561,17 @@ class MedicationService {
       console.log('Scanner Service: Starting scan and save with file:', imageFile);
       console.log('Scanner Service: Care recipient ID:', careRecipientId);
 
-      // First, scan the medication image using Scanner API
+      // First, upload the image to Cloudinary
+      console.log('Scanner Service: Uploading image to Cloudinary...');
+      const uploadResult = await this.uploadImage(imageFile);
+      
+      if (!uploadResult || !uploadResult.data || !uploadResult.data.url) {
+        throw new Error('Failed to upload image to Cloudinary');
+      }
+
+      console.log('Scanner Service: Image uploaded successfully:', uploadResult.data.url);
+
+      // Then, scan the medication image using Scanner API
       console.log('Scanner Service: Scanning medication image...');
       const scanResult = await this.scanMedicationImage(imageFile);
       
@@ -480,18 +583,21 @@ class MedicationService {
       console.log('Scanner Service: Formatting medication data...');
       const medicationData = this.formatMedicationData(scanResult);
       
-      // Add the care recipient ID
+      // Add the care recipient ID and uploaded image URL
       medicationData.careRecipientId = careRecipientId;
+      medicationData.image = uploadResult.data.url;
+      medicationData.imagePublicId = uploadResult.data.public_id;
 
       // Save using Forum API (with JWT authentication)
-      console.log('Scanner Service: Saving scanned medication via Forum API');
+      console.log('Scanner Service: Saving scanned medication via Forum API with image URL:', medicationData.image);
       const savedMedication = await this.createMedication(medicationData);
       
       console.log('Scanner Service: Successfully saved scanned medication');
       return {
         success: true,
         medication: savedMedication,
-        scanData: scanResult
+        scanData: scanResult,
+        imageData: uploadResult.data
       };
     } catch (error) {
       console.error('Scanner Service: Save error:', error);

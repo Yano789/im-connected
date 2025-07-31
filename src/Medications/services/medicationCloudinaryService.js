@@ -19,6 +19,7 @@ class MedicationCloudinaryService {
       // Use the dedicated medication endpoint
       const response = await fetch(`${FORUM_API_BASE_URL}/api/v1/medication/upload-image`, {
         method: 'POST',
+        credentials: 'include', // Include JWT cookie for authentication
         body: formData,
       });
 
