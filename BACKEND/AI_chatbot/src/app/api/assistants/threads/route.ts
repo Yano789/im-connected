@@ -1,4 +1,4 @@
-import { openai } from "@/app/openai";
+/*import { openai } from "@/app/openai";
 
 export const runtime = "nodejs";
 
@@ -6,4 +6,47 @@ export const runtime = "nodejs";
 export async function POST() {
   const thread = await openai.beta.threads.create();
   return Response.json({ threadId: thread.id });
+}*/
+
+
+import { openai } from "@/app/openai";
+
+export const runtime = "nodejs";
+
+const ALLOWED_ORIGINS = new Set([
+  "http://localhost",
+  "http://localhost:5173",
+  "http://localhost:5001",
+  "http://localhost:80",
+]);
+
+function makeCorsHeaders(origin: string | null) {
+  const allowed = origin && ALLOWED_ORIGINS.has(origin) ? origin : "null";
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  };
 }
+
+export async function OPTIONS(request: Request) {
+  return new Response(null, {
+    status: 204,
+    headers: makeCorsHeaders(request.headers.get("origin")),
+  });
+}
+
+export async function POST(request: Request) {
+  const origin = request.headers.get("origin");
+  const thread = await openai.beta.threads.create();
+  const body = JSON.stringify({ threadId: thread.id });
+
+  return new Response(body, {
+    status: 200,
+    headers: {
+      ...makeCorsHeaders(origin),
+      "Content-Type": "application/json",
+    },
+  });
+}
+
