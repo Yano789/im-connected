@@ -1,0 +1,41 @@
+# Docker ignore file
+node_modules
+npm-debug.log
+.git
+.gitignore
+README.md
+.env
+.nyc_output
+coverage
+.DS_Store
+*.log
+.vscode
+.idea
+
+# Build artifacts
+dist
+build
+.next
+
+# Test files
+**/__test__/**
+**/*.test.js
+**/*.test.jsx
+**/*.spec.js
+**/*.spec.jsx
+coverage
+
+# Development files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Uploads (these will be handled by volumes)
+BACKEND/Forum/uploads/*
+BACKEND/Scanner/uploads/*
+uploads/*
+
+# Temporary files
+*.tmp
+*.temp

@@ -1,0 +1,38 @@
+# Development Docker Compose Override
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      target: frontend-build
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  forum-backend:
+    volumes:
+      - ./BACKEND/Forum/src:/app/src
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  scanner-backend:
+    volumes:
+      - ./BACKEND/Scanner:/app
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  ai-chatbot:
+    volumes:
+      - ./BACKEND/AI_chatbot/src:/app
+    environment:
+      - NODE_ENV=development
+    command: npm run dev
+
+  mongodb:
+    ports:
+      - "27017:27017"  # Expose MongoDB for development tools
