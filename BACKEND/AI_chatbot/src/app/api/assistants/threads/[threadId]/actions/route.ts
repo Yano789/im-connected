@@ -1,4 +1,4 @@
-import { openai } from "@/app/openai";
+/*import { openai } from "@/app/openai";
 
 // Send a new message to a thread
 export async function OPTIONS() {
@@ -36,4 +36,53 @@ export async function POST(request, { params: { threadId } }) {
   //return new Response(stream.toReadableStream());
 
   return response;
+}*/
+
+// e.g., app/api/your-route/route.ts
+
+
+import { openai } from "@/app/openai";
+
+export const runtime = "nodejs";
+
+const ALLOWED_ORIGINS = new Set([
+  "http://localhost",
+  "http://localhost:5173",
+  "http://localhost:5001",
+  "http://localhost:80",
+]);
+
+function makeCorsHeaders(origin: string | null) {
+  const allowed = origin && ALLOWED_ORIGINS.has(origin) ? origin : "null";
+  return {
+    "Access-Control-Allow-Origin": allowed,
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+
+  };
 }
+
+export async function OPTIONS(request: Request) {
+  return new Response(null, {
+    status: 204,
+    headers: makeCorsHeaders(request.headers.get("origin")),
+  });
+}
+
+export async function POST(
+  request: Request,
+  { params: { threadId } }: { params: { threadId: string } }
+) {
+  const { toolCallOutputs, runId } = await request.json();
+
+  const stream = openai.beta.threads.runs.submitToolOutputsStream(
+    threadId,
+    runId,
+    { tool_outputs: toolCallOutputs }
+  );
+
+  return new Response(stream.toReadableStream(), {
+    headers: makeCorsHeaders(request.headers.get("origin")),
+  });
+}
+

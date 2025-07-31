@@ -66,7 +66,7 @@ const ChatWindow = ({
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [threadId, setThreadId] = useState(null);
-  const [language, setLanguage] = useState(null);
+  //const [language, setLanguage] = useState(null);
 
   // automatically scroll to bottom of chat
   const messagesEndRef = useRef(null);
@@ -103,7 +103,7 @@ const ChatWindow = ({
       } catch (err) {
         console.error("Thread‑ID flow error:", err.message);
       }
-      try {
+      /*try {
         const langRes = await fetch(
           "http://localhost:5001/api/v1/user/language",
           { method: "GET", credentials: "include" }
@@ -116,7 +116,7 @@ const ChatWindow = ({
         setPreferredLanguage(language);
       } catch (err) {
         console.error("Language retrieval error:", err.message);
-      }
+      }*/
     })();
   }, []);
 
