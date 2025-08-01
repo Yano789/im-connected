@@ -1,110 +1,251 @@
-@import "tailwindcss";
+.X {
+  position: relative;
+  line-height: 26px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
 
-@layer components {
-  .X {
-    @apply relative leading-[26px] cursor-pointer hover:text-red-600 transition-colors duration-200;
-  }
+.X:hover {
+  color: #dc2626; 
+}
 
-  .viewPostDetails {
-    @apply relative leading-[26px] text-xl;
-  }
+.viewPostDetails {
+  position: relative;
+  line-height: 26px;
+  font-size: 1.25rem; 
+}
 
-  .viewPostPostedDiv {
-    @apply flex flex-row items-center justify-end gap-5 text-base;
-  }
+.viewPostPostedDiv {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  font-size: 1rem; 
+}
 
-  .viewPostTitleParent {
-    @apply self-stretch flex flex-row items-center justify-between gap-0;
-  }
+.viewPostTitleParent {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+}
 
-  .viewPostUsername,
-  .name {
-    @apply relative leading-4 font-semibold cursor-default;
-  }
+.viewPostUsername,
+.name {
+  position: relative;
+  line-height: 1rem; 
+  font-weight: 600; 
+  cursor: default;
+}
 
-  .bookmarkIcon {
-    @apply w-[30px] relative max-h-full object-cover cursor-pointer hover:brightness-90 transition duration-200;
-  }
+.bookmarkIcon {
+  width: 30px;
+  position: relative;
+  max-height: 100%;
+  object-fit: cover;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
 
-  .viewPostName {
-    @apply self-stretch flex flex-row items-center justify-between gap-0 text-base text-black;
-  }
+.bookmarkIcon:hover {
+  filter: brightness(90%);
+}
 
-  .tag {
-    @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border flex flex-row items-center justify-center px-5 py-2.5 rounded-[20px] border-solid border-[#1e1e1e]
-           cursor-pointer hover:bg-[#ffdad3] transition-colors duration-200;
-  }
+.viewPostName {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+  font-size: 1rem;
+  color: black;
+}
 
-  .viewPostTags {
-    @apply flex flex-row items-start justify-start gap-2.5 text-xl text-[#1e1e1e];
-  }
+.tag {
+  box-shadow: 5px 5px 4px rgba(0,0,0,0.25);
+  background-color: #fff2f0;
+  border: 1px solid #1e1e1e;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem; 
+  border-radius: 20px;
+  border-style: solid;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 
-  .viewPostTitleDiv {
-    @apply self-stretch flex flex-col items-start justify-start gap-2.5;
-  }
+.tag:hover {
+  background-color: #ffdad3;
+}
 
-  .viewPostData {
-    @apply self-stretch flex flex-col items-start justify-start text-2xl text-[#2b2b2b];
-  }
+.viewPostTags {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.625rem; 
+  font-size: 1.25rem; 
+  color: #1e1e1e;
+}
 
-  .viewPostDescription {
-    @apply w-full h-fit flex-1 relative;
-  }
+.viewPostTitleDiv {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.625rem;
+}
 
-  .viewPostDescriptionDiv {
-    @apply self-stretch bg-[#fff2f0] flex flex-col items-center justify-center p-2.5 rounded-[5px];
-  }
+.viewPostData {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  font-size: 1.5rem; 
+  color: #2b2b2b;
+}
 
-  .commentsIcon,
-  .likesIcon {
-    @apply w-[30px] relative h-[30px] object-cover;
-  }
+.viewPostDescription {
+  width: 100%;
+  height: fit-content;
+  flex: 1 1 auto;
+  position: relative;
+}
 
-  .commentsNumber,
-  .likesNumber {
-    @apply flex flex-row items-center justify-center gap-2.5 cursor-default;
-  }
+.viewPostDescriptionDiv {
+  align-self: stretch;
+  background-color: #fff2f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem;
+  border-radius: 5px;
+}
 
-  .viewPostStatsDiv {
-    @apply self-stretch flex flex-row items-center justify-start gap-2.5 text-center;
-  }
+.commentsIcon,
+.likesIcon {
+  width: 30px;
+  height: 30px;
+  position: relative;
+  object-fit: cover;
+}
 
-  .addAComment {
-    @apply relative;
-  }
+.commentsNumber,
+.likesNumber {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  cursor: default;
+}
 
-  .viewPostButton {
-    @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#c8b8db] border flex flex-row items-center justify-end p-2.5 rounded-2xl border-solid border-[#1e1e1e]
-           cursor-pointer hover:bg-[#ab97c3] transition-colors duration-200;
-  }
+.viewPostStatsDiv {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.625rem;
+  text-align: center;
+}
 
-  .viewPostBody {
-    @apply self-stretch flex flex-col items-start justify-start gap-5 text-left text-base transition;
-  }
+.addAComment {
+  position: relative;
+}
 
-  .viewPostDiv {
-    @apply w-full h-fit relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border flex flex-col items-start justify-start gap-2.5 text-center text-xl text-black p-5 rounded-[5px] border-solid border-[#1e1e1e]
-           transition-shadow duration-300 hover:shadow-lg;
-  }
+.viewPostButton {
+  box-shadow: 5px 5px 4px rgba(0,0,0,0.25);
+  background-color: #c8b8db;
+  border: 1px solid #1e1e1e;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.625rem;
+  border-radius: 1.5rem; 
+  border-style: solid;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 
-  .viewPostUsername,
-  .viewDatePosted,
-  .name,
-  .tag,
-  .commentsNumber,
-  .likesNumber {
-    @apply text-base sm:text-sm md:text-base;
-  }
+.viewPostButton:hover {
+  background-color: #ab97c3;
+}
+
+.viewPostBody {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1.25rem;
+  text-align: left;
+  font-size: 1rem; 
+  transition: all 0.3s ease;
+}
+
+.viewPostDiv {
+  width: 100%;
+  height: fit-content;
+  position: relative;
+  box-shadow: 5px 5px 4px rgba(0,0,0,0.25);
+  background-color: #fffdf9;
+  border: 1px solid #1e1e1e;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.625rem;
+  text-align: center;
+  font-size: 1.25rem;
+  color: black;
+  padding: 1.25rem;
+  border-radius: 5px;
+  border-style: solid;
+  transition: box-shadow 0.3s;
+}
+
+.viewPostDiv:hover {
+  box-shadow: 0 10px 15px rgba(0,0,0,0.2);
+}
+
+.viewPostUsername,
+.viewDatePosted,
+.name,
+.tag,
+.commentsNumber,
+.likesNumber {
+  font-size: 1rem; 
+  font-size: 0.875rem; 
+  font-size: 1rem; 
+}
+
 .viewPostImagesDiv {
-  @apply w-full overflow-x-auto;
+  width: 100%;
+  overflow-x: auto;
 }
 
 .viewPostImages {
-  @apply flex flex-row gap-3;
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
 }
 
 .viewPostImage {
-  @apply w-1/3 h-auto object-cover rounded shrink-0;
-}
-
+  width: 33.3333%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 0.25rem; 
+  flex-shrink: 0;
 }

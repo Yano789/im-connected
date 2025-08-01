@@ -1,36 +1,68 @@
-@import "tailwindcss";
+.cardDiv {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  position: relative;
+  box-shadow: 0px 20px 0px #ff7e7e, 0px 13px 20px rgba(0, 0, 0, 0.25);
+  background-color: #fffdf9;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: left;
+  color: #383838;
+  padding: 1.25rem; 
+  border-radius: 20px;
+  gap: 0.5rem;
+  user-select: none;
+  transition: transform 200ms ease-in-out;
+}
 
-@layer components {
-  .cardDiv {
-    @apply
-      w-full max-w-full h-full relative
-      shadow-[0px_20px_0px_#ff7e7e,0px_13px_20px_rgba(0,0,0,0.25)]
-      bg-[#fffdf9] flex flex-col items-start justify-start box-border
-      cursor-pointer text-left text-[#383838] p-5 rounded-[20px] gap-2
-      select-none
-      transition-transform duration-200 ease-in-out
-      active:scale-[0.97]
-      hover:scale-[1.05]
-      hover:shadow-[0px_30px_10px_#ff7e7e,0px_20px_40px_rgba(0,0,0,0.35)];
-  }
+.cardDiv:active {
+  transform: scale(0.97);
+}
 
+.cardDiv:hover {
+  transform: scale(1.05);
+  box-shadow: 0px 30px 10px #ff7e7e, 0px 20px 40px rgba(0, 0, 0, 0.35);
+}
+
+.card-header {
+  width: 100%;
+  position: relative;
+  font-size: 1.25rem;
+  font-weight: bold;
+  touch-action: manipulation;
+}
+
+@media (min-width: 1024px) {
   .card-header {
-    @apply
-      self-stretch relative
-      text-xl lg:text-2xl font-bold
-      touch-manipulation;
-  }
-
-  .card-subheader {
-    @apply
-      self-stretch relative
-      text-lg lg:text-xl font-bold
-      touch-manipulation;
-  }
-  .cardDetails{ 
-    @apply flex flex-row w-full h-fit items-start justify-between gap-5; 
+    font-size: 1.5rem; 
   }
 }
 
+.card-subheader {
+  width: 100%;
+  position: relative;
+  font-size: 1.125rem; 
+  font-weight: bold;
+  touch-action: manipulation;
+}
 
+@media (min-width: 1024px) {
+  .card-subheader {
+    font-size: 1.25rem; 
+  }
+}
 
+.cardDetails {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: fit-content;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.25rem; 
+}

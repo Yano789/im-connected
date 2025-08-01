@@ -1,107 +1,354 @@
-@import "tailwindcss";
+.postMain {
+  width: 100%;
+  max-width: 865px;
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
+  background-color: #fffdf9;
+  border: 1px solid #1e1e1e;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  font-size: 1rem; /* base */
+  color: black;
+  padding: 1.25rem; /* p-5 */
+  border-radius: 5px;
+  transition: box-shadow 0.3s;
+}
 
-@layer components {
+@media (min-width: 640px) {
   .postMain {
-    @apply w-full max-w-[865px] shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border flex flex-col items-start justify-start
-           text-left text-base sm:text-lg md:text-xl text-black p-5 rounded-[5px] border-solid border-[#1e1e1e]
-           transition-shadow duration-300 hover:shadow-lg;
+    font-size: 1.125rem; /* sm:text-lg */
   }
-  .postData {
-    @apply self-stretch flex flex-col items-start justify-start gap-5;
+}
+@media (min-width: 768px) {
+  .postMain {
+    font-size: 1.25rem; /* md:text-xl */
   }
-  .createPostDiv {
-    @apply self-stretch flex flex-row items-start justify-between gap-0 text-2xl text-[#2b2b2b];
-  }
-  .createPost {
-    @apply font-semibold cursor-default;
-  }
-  .x {
-    @apply relative leading-[26px] cursor-pointer text-gray-700 hover:text-red-600 transition-colors duration-200 select-none;
-  }
-  .postTitleDiv {
-    @apply self-stretch h-[82px] flex flex-col items-start justify-start gap-2.5 text-[#2b2b2b];
-  }
-  .postTitle,
-  .addText {
-    @apply relative leading-[26px] font-semibold;
-  }
+}
+.postMain:hover {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3); /* hover:shadow-lg approximation */
+}
+
+.postData {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1.25rem; /* gap-5 */
+}
+
+.createPostDiv {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0;
+  font-size: 1.5rem; /* text-2xl */
+  color: #2b2b2b;
+}
+
+.createPost {
+  font-weight: 600;
+  cursor: default;
+}
+
+.x {
+  position: relative;
+  line-height: 26px;
+  cursor: pointer;
+  color: #4a4a4a; /* gray-700 */
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.x:hover {
+  color: #e02424; /* red-600 */
+}
+
+.postTitleDiv {
+  align-self: stretch;
+  height: 82px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.625rem; /* gap-2.5 */
+  color: #2b2b2b;
+}
+
+.postTitle,
+.addText {
+  position: relative;
+  line-height: 26px;
+  font-weight: 600;
+}
+
+.createPostWrapper {
+  width: 100%;
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
+  background-color: #fff2f0;
+  border: 1px solid #1e1e1e;
+  border-radius: 5px;
+  padding: 0.625rem; /* p-2.5 */
+  font-size: 0.875rem; /* text-sm */
+  color: black;
+  resize: none;
+  outline: none;
+  transition: box-shadow 0.2s;
+}
+
+@media (min-width: 640px) {
   .createPostWrapper {
-    @apply w-full shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border border-[#1e1e1e] rounded-[5px] p-2.5
-           text-sm sm:text-base resize-none text-black
-           focus:outline-none focus:ring-2 focus:ring-[#c8b8db] focus:border-transparent
-           transition-shadow duration-200;
+    font-size: 1rem; /* sm:text-base */
   }
-  .addTextDiv {
-    @apply self-stretch flex flex-col items-start justify-start gap-2.5;
-  }
+}
 
+.createPostWrapper:focus {
+  box-shadow: 0 0 0 2px #c8b8db; /* focus:ring-2 + focus:ring-[#c8b8db] */
+  border-color: transparent;
+}
+
+.addTextDiv {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.625rem;
+}
+
+.addTextWrapper {
+  width: 100%;
+  height: 12rem; /* h-48 */
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
+  background-color: #fff2f0;
+  border: 1px solid #1e1e1e;
+  border-radius: 5px;
+  padding: 0.625rem;
+  font-size: 0.875rem;
+  color: black;
+  resize: none;
+  outline: none;
+  transition: box-shadow 0.2s;
+}
+
+@media (min-width: 640px) {
   .addTextWrapper {
-    @apply w-full h-48 shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border border-[#1e1e1e] rounded-[5px] p-2.5
-           text-sm sm:text-base resize-none text-black
-           focus:outline-none focus:ring-2 focus:ring-[#c8b8db] focus:border-transparent
-           transition-shadow duration-200;
+    font-size: 1rem;
   }
-  .selectTagsAssociated {
-    @apply self-stretch relative leading-4 font-semibold text-[#2b2b2b] mb-2;
-  }
+}
 
+.addTextWrapper:focus {
+  box-shadow: 0 0 0 2px #c8b8db;
+  border-color: transparent;
+}
+
+.selectTagsAssociated {
+  align-self: stretch;
+  position: relative;
+  line-height: 1rem; /* leading-4 */
+  font-weight: 600;
+  color: #2b2b2b;
+  margin-bottom: 0.5rem; /* mb-2 */
+}
+
+.tags {
+  width: 100%;
+  max-width: 865px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 1rem; /* gap-x-4 gap-y-4 */
+  color: #1e1e1e;
+}
+
+@media (min-width: 640px) {
   .tags {
-    @apply w-full max-w-[865px] grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-4 text-[#1e1e1e];
+    grid-template-columns: repeat(3, 1fr);
   }
+}
 
-  .newPostTag {
-    @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fff2f0] border border-[#1e1e1e] flex flex-row items-center justify-center p-3 rounded-[20px]
-           cursor-pointer transition-colors duration-200 hover:bg-[#ffdad3];
+@media (min-width: 768px) {
+  .tags {
+    grid-template-columns: repeat(4, 1fr);
   }
+}
 
-  .newPostTagSelected {
-    @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#C8B8DB] border border-[#1e1e1e] flex flex-row items-center justify-center p-3 rounded-[20px]
-           cursor-pointer transition-colors duration-200 hover:bg-[#b3a7ce];
-  }
+.newPostTag {
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
+  background-color: #fff2f0;
+  border: 1px solid #1e1e1e;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem; /* p-3 */
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
 
+.newPostTag:hover {
+  background-color: #ffdad3;
+}
+
+.newPostTagSelected {
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
+  background-color: #c8b8db;
+  border: 1px solid #1e1e1e;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.newPostTagSelected:hover {
+  background-color: #b3a7ce;
+}
+
+.tagText {
+  position: relative;
+  line-height: 1rem;
+  word-break: break-word;
+  font-size: 0.875rem;
+  user-select: none;
+}
+
+@media (min-width: 640px) {
   .tagText {
-    @apply relative leading-4 break-words text-sm sm:text-base select-none;
+    font-size: 1rem;
   }
-  .postButtonsDiv {
-    @apply self-stretch flex flex-row items-center justify-center gap-[100px] text-2xl text-[#333];
-  }
+}
+
+.postButtonsDiv {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 100px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.buttonStyle1,
+.buttonStyle2 {
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
+  border: 1px solid #1e1e1e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem; /* p-5 */
+  border-radius: 1rem; /* rounded-2xl */
+  font-size: 0.875rem;
+  font-weight: 500;
+  background-color: #c8b8db;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  user-select: none;
+}
+
+@media (min-width: 640px) {
   .buttonStyle1,
   .buttonStyle2 {
-    @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] border border-[#1e1e1e] flex items-center justify-center p-5 rounded-2xl
-           text-sm sm:text-base md:text-lg bg-[#c8b8db] text-black font-medium cursor-pointer
-           transition-colors duration-200 hover:bg-[#ab97c3] select-none;
+    font-size: 1rem;
   }
+}
 
+@media (min-width: 768px) {
+  .buttonStyle1,
   .buttonStyle2 {
-    @apply bg-[#fff2f0] hover:bg-[#ffdad3];
+    font-size: 1.125rem;
   }
+}
 
-  .addMediaOptionalWrapper {
-    @apply self-stretch flex-1 relative h-fit;
-  }
+.buttonStyle1:hover,
+.buttonStyle2:hover {
+  background-color: #ab97c3;
+}
 
-  .dragAndDropOrUploadMediaParent {
-    @apply border border-dashed border-[#1e1e1e] flex flex-col items-center justify-center gap-2.5 p-5 rounded-[10px];
-  }
+.buttonStyle2 {
+  background-color: #fff2f0;
+}
 
-  .uploadToCloud {
-    @apply w-[20px] h-[20px] relative object-cover cursor-pointer hover:brightness-90 transition duration-200;
-  }
-  /* Spinner overlay container */
-  .spinner-overlay {
-    @apply fixed inset-0 z-[1000] bg-white flex items-center justify-center;
-  }
+.buttonStyle2:hover {
+  background-color: #ffdad3;
+}
 
-  /* Spinner circle */
-  .spinner {
-    @apply w-12 h-12 border-4 border-gray-300 border-t-purple-400 rounded-full animate-spin;
-  }
+.addMediaOptionalWrapper {
+  align-self: stretch;
+  flex: 1 1 auto;
+  position: relative;
+  height: auto; /* h-fit */
+}
 
-  /* Toast message dropdown */
-  .toast-message {
-    @apply fixed top-5 right-5 z-[1001] bg-[#ab97c3] text-black px-4 py-3 rounded shadow-lg text-base border-1 border-black;
-    animation: slideDown 0.3s ease forwards;
-  }
+.dragAndDropOrUploadMediaParent {
+  border: 1px dashed #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 1.25rem;
+  border-radius: 10px;
+}
+
+.uploadToCloud {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  object-fit: cover;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.uploadToCloud:hover {
+  filter: brightness(0.9);
+}
+
+/* Spinner overlay container */
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Spinner circle */
+.spinner {
+  width: 3rem;
+  height: 3rem;
+  border: 4px solid #d1d5db; /* gray-300 */
+  border-top-color: #7c3aed; /* purple-400 */
+  border-radius: 9999px;
+  animation: spin 1s linear infinite;
+}
+
+/* Toast message dropdown */
+.toast-message {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 1001;
+  background-color: #ab97c3;
+  color: black;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+  font-size: 1rem;
+  border: 1px solid black;
+  animation: slideDown 0.3s ease forwards;
 }
 
 /* Slide down animation */
@@ -113,5 +360,12 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Spin animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

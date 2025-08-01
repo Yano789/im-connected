@@ -1,16 +1,49 @@
-@import "tailwindcss";
-@layer components{
-    .showPostsRelated {
-    @apply relative leading-6;
-    }
-    .topicTitle {
-    @apply flex flex-row items-end justify-start;
-    }
-    .topicTags {
-    @apply flex flex-col flex-wrap *:items-start justify-start gap-2.5 text-center text-lg;
-    }
-    .topicSelector {
-    @apply relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#fffdf9] border box-border w-fit flex flex-col items-start text-xl justify-start text-left  text-[#1e1e1e] pl-5 pr-[25px] py-5 rounded-[5px] border-solid border-black gap-5;
-    }
+.showPostsRelated {
+  position: relative;
+  line-height: 1.5rem; 
+}
 
+.topicTitle {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.topicTags {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 0.625rem; 
+  text-align: center;
+  font-size: 1.125rem; 
+}
+
+
+.topicTags > * {
+  align-items: flex-start;
+}
+
+.topicSelector {
+  position: relative;
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
+  background-color: #fffdf9;
+  border: 1px solid black;
+  box-sizing: border-box;
+  width: fit-content;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-size: 1.25rem; 
+  justify-content: flex-start;
+  text-align: left;
+  color: #1e1e1e;
+  padding-left: 1.25rem; 
+  padding-right: 1.5625rem; 
+  padding-top: 1.25rem; 
+  padding-bottom: 1.25rem;
+  border-radius: 5px;
+  border-style: solid;
+  gap: 1.25rem; 
 }

@@ -1,52 +1,156 @@
-@import "tailwindcss";
-
-@layer components{
-
 .applicationIcon {
-  @apply w-10 relative h-10 object-cover;
+  width: 2.5rem; 
+  position: relative;
+  height: 2.5rem;
+  object-fit: cover;
 }
+
 .connected {
-  @apply font-semibold;
+  font-weight: 600;
 }
+
 .imconnected {
-  @apply relative;
+  position: relative;
 }
+
 .sitelogo {
-  @apply flex flex-row items-center justify-start gap-2.5 text-[32px];
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.625rem; 
+  font-size: 32px;
 }
+
 .typeHereTo {
-  @apply w-full leading-[22px] h-full p-2.5;
+  width: 100%;
+  line-height: 22px;
+  height: 100%;
+  padding: 0.625rem; 
 }
-.title {  
-  @apply self-stretch flex flex-row items-center justify-between gap-0;
+
+.title {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
 }
+
 .search {
-  @apply relative flex-1 min-w-[300px] max-w-[700px] bg-[#c8b8db] h-fit flex flex-row items-center justify-start rounded-lg p-1
-    transition-shadow duration-200 ease-in-out hover:shadow-md focus-within:shadow-lg z-10;
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 300px;
+  max-width: 700px;
+  background-color: #c8b8db;
+  height: fit-content;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  border-radius: 0.5rem; 
+  padding: 0.25rem; 
+  transition: box-shadow 0.2s ease-in-out;
+  z-index: 10;
+}
+
+.search:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.search:focus-within {
+  box-shadow: 0 6px 8px rgba(0,0,0,0.15);
 }
 
 .dashboard {
-  @apply relative leading-6;
+  position: relative;
+  line-height: 1.5rem; 
 }
+
 .buttonStyle1 {
-  @apply shadow-[5px_5px_4px_rgba(0,0,0,0.25)] bg-[#f1c5c0] border flex flex-row items-center justify-center cursor-pointer whitespace-nowrap px-5 py-2.5 rounded-[15px] border-solid border-[#c8b8db] text-sm sm:text-base md:text-lg;
+  box-shadow: 5px 5px 4px rgba(0,0,0,0.25);
+  background-color: #f1c5c0;
+  border: 1px solid #c8b8db;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: 0.625rem 1.25rem; 
+  border-radius: 15px;
+  border-style: solid;
+  font-size: 0.875rem; 
 }
+
 .headerMain {
-  @apply flex h-fit w-full max-w-screen flex-wrap transition-all duration-300 ease-in-out items-center justify-center gap-5 px-5 py-0 flex-col sm:flex-row;
+  display: flex;
+  height: fit-content;
+  width: 100%;
+  max-width: 100vw; 
+  flex-wrap: wrap;
+  transition: all 0.3s ease-in-out;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem; 
+  padding: 0 1.25rem; 
+  padding-top: 0;
+  padding-bottom: 0;
+  flex-direction: column;
 }
+
+@media (min-width: 640px) {
+  .headerMain {
+    flex-direction: row; 
+  }
+}
+
 .header {
-  @apply w-full h-fit relative min-h-fit bg-[#ab97c3] flex items-start justify-start p-3 box-border text-left text-base text-[#2d2d2d] overflow-visible;
+  width: 100%;
+  height: fit-content;
+  position: relative;
+  min-height: fit-content;
+  background-color: #ab97c3;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0.75rem;
+  box-sizing: border-box;
+  text-align: left;
+  font-size: 1rem; 
+  color: #2d2d2d;
+  overflow: visible;
 }
+
 .searchDropdown {
-  @apply absolute top-full left-0 w-full bg-white shadow-lg mt-2 rounded-lg z-20 max-h-60 overflow-y-auto flex flex-col;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  background-color: white;
+  box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+  margin-top: 0.5rem; 
+  border-radius: 0.5rem; 
+  z-index: 20;
+  max-height: 15rem; 
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
+
 .searchEntry {
-  @apply px-4 py-2 hover:bg-gray-100 cursor-pointer text-base text-black;
+  padding: 1rem 1rem; 
+  cursor: pointer;
+  font-size: 1rem;
+  color: black;
 }
+
+.searchEntry:hover {
+  background-color: #f3f4f6; 
+}
+
 .highlightMatch {
-  @apply font-bold text-[#ab97c3];
-}
-
-
-
+  font-weight: 600;
+  color: #ab97c3;
 }

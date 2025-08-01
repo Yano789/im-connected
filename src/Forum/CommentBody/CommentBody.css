@@ -1,33 +1,115 @@
-@import "tailwindcss";
+.commentSection {
+  width: 100%;
+  height: fit-content;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; 
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 0.5rem;
+}
 
-@layer components {
+@media (min-width: 640px) {
   .commentSection {
-    @apply w-full h-fit flex flex-col gap-4 items-start justify-start p-2 sm:p-3;
-  }
-  .addAComment {
-    @apply text-base sm:text-lg font-semibold text-left text-[#2d2d2d];
-  }
-
-  .addComment {
-    @apply w-full min-h-[80px] sm:min-h-[100px] text-base sm:text-sm rounded-md p-3 sm:p-2 resize-y 
-           border border-[#1e1e1e] bg-[#fff2f0] shadow-[2px_2px_4px_rgba(0,0,0,0.15)] 
-           text-[#333] placeholder:text-gray-400 focus:outline-none 
-           focus:ring-2 focus:ring-[#c8b8db] focus:border-transparent transition;
-  }
-
-  .viewPostButton {
-    @apply px-4 py-2 text-base sm:text-sm rounded-md bg-[#c8b8db] hover:bg-[#ab97c3] 
-           text-black font-medium transition-colors duration-200;
-  }
-  .viewPostCommentsDiv {
-    @apply w-full flex flex-col items-start justify-start gap-4 sm:gap-3 mt-4;
-  }
-  .viewPostComment {
-    @apply text-base sm:text-sm font-semibold text-left text-[#2d2d2d];
-  }
-
-  .nestedComments {
-    @apply ml-3 sm:ml-4 mt-2 pl-2 border-l border-[#ccc] flex flex-col gap-2;
+    padding: 0.75rem; 
   }
 }
 
+.addAComment,
+.viewPostComment {
+  font-size: 1rem; 
+  font-weight: 600; 
+  text-align: left;
+  color: #2d2d2d;
+}
+
+@media (min-width: 640px) {
+  .addAComment,
+  .viewPostComment {
+    font-size: 1.125rem; 
+  }
+}
+
+.addComment {
+  width: 100%;
+  min-height: 80px;
+  font-size: 1rem;
+  border-radius: 0.375rem;
+  padding: 0.75rem;
+  resize: vertical;
+  border: 1px solid #1e1e1e;
+  background-color: #fff2f0;
+  color: #333;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.15);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.addComment::placeholder {
+  color: #9ca3af; 
+}
+
+.addComment:focus {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #c8b8db;
+}
+
+@media (min-width: 640px) {
+  .addComment {
+    min-height: 100px;
+    font-size: 0.875rem; 
+    padding: 0.5rem; 
+  }
+}
+
+.viewPostButton {
+  padding: 0.5rem 1rem; 
+  font-size: 1rem;
+  border-radius: 0.375rem;
+  background-color: #c8b8db;
+  color: black;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+}
+
+@media (min-width: 640px) {
+  .viewPostButton {
+    font-size: 0.875rem; 
+  }
+}
+
+.viewPostButton:hover {
+  background-color: #ab97c3;
+}
+
+.viewPostCommentsDiv {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1rem; 
+  margin-top: 1rem; 
+}
+
+@media (min-width: 640px) {
+  .viewPostCommentsDiv {
+    gap: 0.75rem;
+  }
+}
+
+.nestedComments {
+  margin-left: 0.75rem; /
+  margin-top: 0.5rem; 
+  padding-left: 0.5rem; 
+  border-left: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; 
+}
+
+@media (min-width: 640px) {
+  .nestedComments {
+    margin-left: 1rem; 
+  }
+}

@@ -1,41 +1,100 @@
-@import "tailwindcss";
+.draftEntryDiv {
+  width: 100%;
+  position: relative;
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
+  background-color: #fff2f0;
+  border: 1px solid #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  box-sizing: border-box;
+  gap: 0.625rem;
+  text-align: left;
+  font-size: 1rem;
+  color: black;
+  padding: 0.75rem;
+  border-radius: 1.25rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
 
-@layer components {
-  .draftEntryDiv {
-    @apply w-full relative
-           shadow-[5px_5px_4px_rgba(0,0,0,0.25)]
-           bg-[#fff2f0]
-           border border-[#1e1e1e]
-           flex flex-col items-start justify-start
-           box-border gap-2.5 text-left
-           text-base text-black p-3
-           rounded-[20px] 
-           cursor-pointer
-           transition-colors duration-200
-           hover:bg-[#ffdad3];
-  }
+.draftEntryDiv:hover {
+  background-color: #ffdad3;
+}
 
+.draftTitle {
+  position: relative;
+  font-size: 1.25rem;
+  line-height: 1.5rem;
+  font-weight: 600;
+  color: #2b2b2b;
+}
+
+@media (min-width: 640px) {
   .draftTitle {
-    @apply relative text-xl leading-6 font-semibold text-[#2b2b2b] sm:text-lg md:text-xl;
+    font-size: 1.125rem; 
   }
+}
 
+@media (min-width: 768px) {
+  .draftTitle {
+    font-size: 1.25rem; 
+  }
+}
+
+.draftText {
+  align-self: stretch;
+  position: relative;
+  line-height: 1.5rem;
+  max-width: 500px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+  font-size: 0.875rem;
+  color: #374151; 
+}
+
+@media (min-width: 640px) {
   .draftText {
-    @apply self-stretch relative leading-6 max-w-[500px] overflow-hidden text-ellipsis whitespace-normal line-clamp-5
-           text-sm sm:text-base
-           text-gray-800;
+    font-size: 1rem;
   }
+}
 
-  .draftDateDiv {
-    @apply self-stretch flex flex-row items-center justify-between gap-0;
-  }
+.draftDateDiv {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+}
 
+.draftDate {
+  position: relative;
+  line-height: 1.5rem;
+  color: #4b5563; 
+  font-size: 0.875rem;
+}
+
+@media (min-width: 640px) {
   .draftDate {
-    @apply relative leading-6 text-gray-600 text-sm sm:text-base;
+    font-size: 1rem;
   }
+}
 
-  .draftDelete {
-    @apply w-10 relative h-10 object-cover
-           cursor-pointer
-           hover:brightness-90 transition duration-200;
-  }
+.draftDelete {
+  width: 2.5rem;
+  height: 2.5rem;
+  position: relative;
+  object-fit: cover;
+  cursor: pointer;
+  transition: filter 0.2s ease;
+}
+
+.draftDelete:hover {
+  filter: brightness(90%);
 }

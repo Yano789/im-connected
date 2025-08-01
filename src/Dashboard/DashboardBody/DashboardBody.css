@@ -1,15 +1,34 @@
-@import "tailwindcss";
+.dashboard-div {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-@layer components {
-  .dashboard-div {
-    @apply w-full h-full flex justify-center items-center;
-  }
+.dashboard-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem; 
+  max-width: 1280px; 
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem; 
+}
 
+@media (min-width: 768px) {
   .dashboard-grid {
-    @apply flex flex-col gap-10 max-w-screen-xl w-full items-center justify-center p-2.5 md:grid md:grid-cols-2 md:grid-rows-2 md:gap-10;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 2.5rem; 
   }
+}
 
-  .dashboardItem {
-    @apply w-full h-full flex justify-center;
-  }
+.dashboardItem {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
 }

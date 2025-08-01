@@ -1,21 +1,45 @@
-@import "tailwindcss";
-
-@layer components{
-    .myDrafts {
-    @apply relative leading-6;
-    }
-    .draftsTitle {
-    @apply flex flex-col items-start justify-start gap-2 text-xl text-[#1e1e1e];
-    }
-
-    .draftsMain {
-    @apply flex-1 flex flex-col items-start justify-start gap-5;
-    }
-    .draftsDiv {
-  @apply w-1/3 h-fit min-h-screen relative shadow-[5px_5px_4px_rgba(0,0,0,0.25)] 
-         bg-[#fffdf9] border box-border flex flex-col items-start justify-start 
-         text-left text-base text-black px-5 py-5 rounded-[5px] border-solid border-black;
+.myDrafts {
+  position: relative;
+  line-height: 1.5rem; 
 }
 
+.draftsTitle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  font-size: 1.25rem; 
+  color: #1e1e1e;
+}
 
+.draftsMain {
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 1.25rem;
+}
+
+.draftsDiv {
+  width: 33.333333%;
+  height: fit-content;
+  min-height: 100vh;
+  position: relative;
+  box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
+  background-color: #fffdf9;
+  border-width: 1px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  text-align: left;
+  font-size: 1rem;
+  color: black;
+  padding: 1.25rem 1.25rem;
+  border-radius: 5px;
+  border-style: solid;
+  border-color: black;
 }

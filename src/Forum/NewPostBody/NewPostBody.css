@@ -1,10 +1,32 @@
-@import "tailwindcss";
-@layer components{
-    .newPostDiv {
-      @apply w-full min-h-screen flex flex-col lg:flex-row justify-center items-start gap-8 md:gap-12 pt-6 md:pt-10 px-4 md:px-10;
-    }
-    .newPostBody{
-      @apply w-fit min-h-screen;
-    }
+.newPostDiv {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 2rem; 
+  padding-top: 1.5rem; 
+  padding-left: 1rem; 
+  padding-right: 1rem;
+}
 
+@media (min-width: 768px) {
+  .newPostDiv {
+    gap: 3rem; 
+    padding-top: 2.5rem; 
+    padding-left: 2.5rem; 
+    padding-right: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .newPostDiv {
+    flex-direction: row; 
+  }
+}
+
+.newPostBody {
+  width: fit-content;
+  min-height: 100vh;
 }

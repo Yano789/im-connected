@@ -1,19 +1,85 @@
-@import "tailwindcss";
+.forumMain {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 100%;
+}
 
-@layer components {
+@media (min-width: 768px) {
   .forumMain {
-    @apply flex flex-col md:flex-row w-full max-w-full;
+    flex-direction: row;
   }
+}
 
+.forumLeftBar {
+  width: 100%;
+  order: 1;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 1.25rem; 
+  padding: 1.25rem; 
+  overflow: hidden;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
   .forumLeftBar {
-    @apply w-full md:w-1/5 order-1 md:order-1 flex-shrink-0 flex flex-row sm:flex-col gap-5 sm:gap-10 p-5 overflow-hidden min-w-0;
+    flex-direction: column;
+    gap: 2.5rem; 
   }
+}
 
+@media (min-width: 768px) {
+  .forumLeftBar {
+    width: 20%; 
+    order: 1;  
+  }
+}
+
+.forumRightBar {
+  width: 100%;
+  order: 2;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.25rem; 
+  padding: 1.25rem; 
+  overflow: hidden;
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
   .forumRightBar {
-    @apply w-full md:w-1/5 order-2 md:order-3 flex-shrink-0 flex flex-row items-center justify-start sm:flex-col gap-5 sm:gap-10 p-5 overflow-hidden min-w-0;
+    flex-direction: column;
+    gap: 2.5rem;
   }
+}
 
+@media (min-width: 768px) {
+  .forumRightBar {
+    width: 20%; 
+    order: 3; 
+  }
+}
+
+.forumBody {
+  width: 100%;
+  order: 3;
+  flex: 1 1 0%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem; 
+  padding: 1.25rem;
+  min-width: 0;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
   .forumBody {
-    @apply w-full md:w-3/5 order-3 md:order-2 flex-1 flex flex-col gap-5 p-5 min-w-0 overflow-hidden;
+    width: 60%;
+    order: 2;  
   }
 }
