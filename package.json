@@ -7,6 +7,7 @@
     "dev": "vite",
     "start": "nodemon BACKEND/Forum/src/index.cjs",
     "scanner": "cd BACKEND/Scanner && npm run dev",
+    "chatbot":"cd BACKEND/AI_chatbot/src && npm run dev",
     "dev:all": "concurrently \"npm run dev\" \"npm run scanner\" \"npm run start\" \"cd BACKEND/AI_chatbot/src && npm run dev\"",
     "test": "jest",
     "backendtest:forum": "jest BACKEND/Forum/src",
