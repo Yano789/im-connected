@@ -21,6 +21,19 @@ function ForumBody() {
     sort: "latest",
   });
 
+  const tagKeyMap = {
+  "All": "Tag1",
+  "Physical Disability & Chronic Illness": "Tag2",
+  "Personal Mental Health": "Tag3",
+  "Subsidies and Govt Support": "Tag4",
+  "Pediatric Care": "Tag5",
+  "End of Life Care": "Tag6",
+  "Financial & Legal Help": "Tag7",
+  "Mental Disability": "Tag8",
+  "Hospitals and Clinic": "Tag9"
+};
+
+
   const updateQuery = (newParams) => {
     setQuery((prev) => ({
       ...prev,
@@ -101,7 +114,7 @@ function ForumBody() {
               postUser={post.username}
               postDate={new Date(post.createdAt).toLocaleDateString()}
               postTitle={post.title}
-              postTags={post.tags}
+              postTags={post.tags.map((tag) => t(tagKeyMap[tag] || tag))}
               postDescription={post.content}
               postComment={post.comments}
               postLikes={post.likes}

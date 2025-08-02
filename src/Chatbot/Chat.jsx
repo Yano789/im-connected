@@ -1,5 +1,5 @@
 //import styles from "./page.css"; // use simple styles for demonstration purposes
-import "./page.css";
+import "./Chat.css";
 import ChatWindow from "./components/chatWindow";
 import { summarize_text } from "./utils/summary";
 import Header from "../TopHeader/Header/Header";
@@ -30,11 +30,9 @@ const ChatPage = () => {
   return (
     <>
       <Header />
-      <main className="main">
         <div className="container">
           <ChatWindow functionCallHandler={functionCallHandler}/>
         </div>
-      </main>
     </>
   );
 };

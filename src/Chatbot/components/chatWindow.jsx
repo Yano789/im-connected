@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import SendIcon from "../../assets/send-icon.png";
 import UserAvatar from "../../assets/user-avatar.png";
 import ChatBotIcon from "../../assets/ChatbotIcon.png";
-import "./chatStyles.css";
+import "./chatWindow.css";
 import { AssistantStream } from "openai/lib/AssistantStream.mjs";
+import { useTranslation } from "react-i18next";
 
 
 const UserMessage = ({ text }) => {
@@ -62,6 +63,8 @@ const Message = ({ role, text }) => {
 const ChatWindow = ({
   functionCallHandler = () => Promise.resolve(""), // default to return empty string
 }) => {
+
+  const {t} = useTranslation();
   const [userInput, setUserInput] = useState("");
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
@@ -283,8 +286,8 @@ const ChatWindow = ({
 
   return (
     <div>
-      <div className="Title"> AI Chatbot <span className="Title2"> Companion </span></div>
-      <div className="SubTitle"> safe, secure, anonymized </div>
+      <div className="Title"> {t("AI Chatbot")} <span className="Title2"> {t("Companion")} </span></div>
+      <div className="SubTitle"> {t("Safe")} </div>
       <div className="chatContainer">
         <div className="messages">
           {messages.map((msg, index) => (
@@ -301,7 +304,7 @@ const ChatWindow = ({
             className="input"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
-            placeholder="Enter your question"
+            placeholder={t("Enter your question")}
           />
           <button
             type="submit"

@@ -58,6 +58,11 @@
     "Save as Draft": "Save as Draft", 
     "Add Text": "Add Text", 
     "No Saved Posts": "No saved posts found", 
-    "Posted": "Posted:"
+    "Posted": "Posted:", 
+    "AI Chatbot": "AI Chatbot",
+    "Companion": "Companion",
+    "Safe": "Safe, secure, anonymized",
+    "Enter your question": "Enter your question"
+
 
 }

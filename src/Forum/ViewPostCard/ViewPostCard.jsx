@@ -13,7 +13,7 @@ function ViewPostCard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const postId = searchParams.get("postId");
 
@@ -27,16 +27,28 @@ function ViewPostCard() {
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(0);
 
+  const tagKeyMap = {
+    All: "Tag1",
+    "Physical Disability & Chronic Illness": "Tag2",
+    "Personal Mental Health": "Tag3",
+    "Subsidies and Govt Support": "Tag4",
+    "Pediatric Care": "Tag5",
+    "End of Life Care": "Tag6",
+    "Financial & Legal Help": "Tag7",
+    "Mental Disability": "Tag8",
+    "Hospitals and Clinic": "Tag9",
+  };
+
   useEffect(() => {
     if (!postId) return;
 
     fetch(
       `http://localhost:5001/api/v1/post/getPost/${encodeURIComponent(postId)}`,
       {
-        method: 'GET',
-        credentials: 'include', 
+        method: "GET",
+        credentials: "include",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       }
     )
@@ -56,13 +68,16 @@ function ViewPostCard() {
 
   const fetchComments = useCallback(() => {
     if (!postId) return;
-    fetch(`http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/`, {
-      method: 'GET',
-      credentials: 'include', 
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    fetch(
+      `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/`,
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch comments.");
         return res.json();
@@ -78,9 +93,9 @@ function ViewPostCard() {
   const handleLikeToggle = async (e) => {
     e.stopPropagation();
     try {
-      const url = `http://localhost:5001/api/v1/like/${encodeURIComponent(postId)}/${
-        liked ? "unlike" : "like"
-      }`;
+      const url = `http://localhost:5001/api/v1/like/${encodeURIComponent(
+        postId
+      )}/${liked ? "unlike" : "like"}`;
       const method = liked ? "DELETE" : "POST";
 
       const res = await fetch(url, {
@@ -88,7 +103,8 @@ function ViewPostCard() {
         credentials: "include",
       });
 
-      if (!res.ok) throw new Error(`Failed to ${liked ? "unlike" : "like"} post`);
+      if (!res.ok)
+        throw new Error(`Failed to ${liked ? "unlike" : "like"} post`);
 
       const data = await res.json();
       setLiked(!liked);
@@ -127,7 +143,7 @@ function ViewPostCard() {
             <div className="viewPostTags">
               {tags.slice(0, 2).map((tag, idx) => (
                 <div className="tag" key={idx}>
-                  <div className="name">{tag}</div>
+                  <div className="name">{t(tagKeyMap[tag] || tag)}</div>
                 </div>
               ))}
             </div>
@@ -142,7 +158,12 @@ function ViewPostCard() {
           <div className="viewPostImagesDiv">
             <div className="viewPostImages">
               {media.map((m, index) => (
-                <img key={index} className="viewPostImage" src={m.url} alt="post" />
+                <img
+                  key={index}
+                  className="viewPostImage"
+                  src={m.url}
+                  alt="post"
+                />
               ))}
             </div>
           </div>
