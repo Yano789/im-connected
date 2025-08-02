@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import './MedicationForm.css';
 import medicationScannerService from '../services/medicationScannerService';
 import medicationCloudinaryService from '../services/medicationCloudinaryService';
+import { useTranslation } from 'react-i18next';
 
 const getPeriodFromTime = (time) => {
     if (!time) return 'Morning';
@@ -13,6 +14,7 @@ const getPeriodFromTime = (time) => {
 };
 
 function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile = null, selectedRecipient = null }) {
+    const { t } = useTranslation();
     // Determine if we are editing an existing medication or creating a new one
     const isEditing = medication !== null && medication !== undefined;
 
@@ -53,7 +55,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
             }
         } catch (error) {
             console.error('Error handling captured file:', error);
-            setScanError('Error processing captured file');
+            setScanError(t('Error processing captured file'));
         }
     }, [capturedFile, isEditing]);
 
@@ -102,7 +104,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                 setPreviewUrl(URL.createObjectURL(file));
                 setScanError('');
             } else {
-                setScanError('Please select a valid image file (JPEG, PNG, WebP) under 10MB');
+                setScanError(t('Please select a valid image file (JPEG, PNG, WebP) under 10MB'));
             }
         }
     };
@@ -121,7 +123,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
         
         if (!targetFile) {
             console.log('No file selected - selectedFile is:', selectedFile);
-            setScanError('Please select an image file first');
+            setScanError(t('Please select an image file first'));
             return;
         }
 
@@ -141,7 +143,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
             console.log('Checking scanner API health...');
             const isApiAvailable = await medicationScannerService.checkApiHealth();
             if (!isApiAvailable) {
-                throw new Error('Scanner service is not available. Please ensure the scanner server is running on port 3001.');
+                throw new Error(t('Scanner service is not available. Please ensure the scanner server is running on port 3001.'));
             }
 
             console.log('Scanner API is available, proceeding with scan...');
@@ -169,19 +171,24 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                     // image: medicationData.image || prevData.image,
                 }));
 
-                setScanSuccess(`Medication "${medicationData.name}" scanned successfully! Confidence: ${Math.round(medicationData.confidence * 100)}% - Form auto-filled. Click "Save Medicine" to store permanently.`);
+                setScanSuccess(t('Medication "{{name}}" scanned successfully! Confidence: {{confidence}}% - Form auto-filled. Click "Save Medicine" to store permanently.', {
+                    name: medicationData.name,
+                    confidence: Math.round(medicationData.confidence * 100)
+                }));
                 
                 // Show additional info if available
                 if (medicationData.brandNames && medicationData.brandNames.length > 0) {
-                    setScanSuccess(prev => prev + ` | Brand names: ${medicationData.brandNames.join(', ')}`);
+                    setScanSuccess(prev => prev + t(' | Brand names: {{brands}}', {
+                        brands: medicationData.brandNames.join(', ')
+                    }));
                 }
             } else {
-                setScanError('No medication information could be extracted from the image. The image may be unclear or not contain medication text. Please try a clearer image or enter information manually.');
+                setScanError(t('No medication information could be extracted from the image. The image may be unclear or not contain medication text. Please try a clearer image or enter information manually.'));
                 console.log('No valid medication data extracted. Scan result:', scanResult);
             }
         } catch (error) {
             console.error('Scanning error:', error);
-            setScanError(`Scanning failed: ${error.message}`);
+            setScanError(t('Scanning failed: {{message}}', { message: error.message }));
         } finally {
             setIsScanning(false);
         }
@@ -251,14 +258,14 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                 if (uploadResult && uploadResult.url) {
                     finalFormData.image = uploadResult.url;
                     finalFormData.imagePublicId = uploadResult.public_id; // Store for potential deletion
-                    setUploadSuccess('Image uploaded successfully to cloud storage!');
+                    setUploadSuccess(t('Image uploaded successfully to cloud storage!'));
                     console.log('Image uploaded successfully:', uploadResult.url);
                 } else {
-                    throw new Error('Failed to upload image - no URL returned');
+                    throw new Error(t('Failed to upload image - no URL returned'));
                 }
             } catch (error) {
                 console.error('Error uploading image to Cloudinary:', error);
-                setUploadError(`Failed to upload image: ${error.message}`);
+                setUploadError(t('Failed to upload image: {{message}}', { message: error.message }));
                 setIsUploading(false);
                 return; // Don't save if image upload fails
             }
@@ -273,22 +280,22 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
     return (
         <form className="details-card form-card" onSubmit={handleSubmit}>
             <div className="form-header">
-                <h2 className="medication-title">{isEditing ? 'Edit Medication' : 'Add New Medication'}</h2>
+                <h2 className="medication-title">{isEditing ? t('Edit Medication') : t('Add New Medication')}</h2>
                 {isEditing && (
                     <button 
                         type="button" 
                         onClick={onDelete} 
                         className="delete-button-top-right" 
-                        title="Delete Medication"
+                        title={t("Delete Medication")}
                     >
-                        Delete
+                        {t("Delete")}
                     </button>
                 )}
             </div>
 
             {/* Medication Scanner Section */}
             <div className="scanner-section">
-                <h3>📷 Scan Medication</h3>
+                <h3>📷 {t("Scan Medication")}</h3>
                 <div className="scanner-controls">
                     <input 
                         type="file" 
@@ -299,8 +306,8 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                     />
                     {selectedFile && (
                         <div className="file-preview">
-                            <img src={previewUrl} alt="Selected medication" className="preview-image" />
-                            <button type="button" onClick={clearFile} className="clear-file-btn">❌ Remove</button>
+                            <img src={previewUrl} alt={t("Selected medication")} className="preview-image" />
+                            <button type="button" onClick={clearFile} className="clear-file-btn">❌ {t("Remove")}</button>
                         </div>
                     )}
                     <div className="scanner-actions">
@@ -310,8 +317,8 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                             disabled={!selectedFile || isScanning}
                             className="scan-button"
                         >
-                            {isScanning ? '🔄 Scanning...' : 
-                             selectedRecipient ? '🔍 Scan & Save to Database' : '🔍 Scan Medication (Preview)'}
+                            {isScanning ? t('🔄 Scanning...') : 
+                             selectedRecipient ? t('🔍 Scan & Save to Database') : t('🔍 Scan Medication (Preview)')}
                         </button>
                     </div>
                 </div>
@@ -319,21 +326,21 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                 {/* Scanner feedback */}
                 {scanError && <div className="scan-error">⚠️ {scanError}</div>}
                 {scanSuccess && <div className="scan-success">✅ {scanSuccess}</div>}
-                {uploadError && <div className="scan-error">⚠️ Upload Error: {uploadError}</div>}
+                {uploadError && <div className="scan-error">⚠️ {t("Upload Error")}: {uploadError}</div>}
                 {uploadSuccess && <div className="scan-success">✅ {uploadSuccess}</div>}
-                {isScanning && <div className="scan-progress">Processing image and extracting medication information...</div>}
+                {isScanning && <div className="scan-progress">{t("Processing image and extracting medication information...")}</div>}
                 
                 <div className="scanner-divider">
-                    <span>OR</span>
+                    <span>{t("OR")}</span>
                 </div>
             </div>
 
             {/* Manual Entry Section */}
             <div className="manual-entry-section">
-                <h3>✏️ Manual Entry</h3>
+                <h3>✏️ {t("Manual Entry")}</h3>
                 
                 <div className="form-group">
-                    <label htmlFor="name">Medication Name *</label>
+                    <label htmlFor="name">{t("Medication Name")} *</label>
                     <input 
                         type="text" 
                         id="name" 
@@ -341,89 +348,89 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                         value={formData.name} 
                         onChange={handleChange}
                         required
-                        placeholder="Enter medication name"
+                        placeholder={t("Enter medication name")}
                     />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="dosage">Dosage</label>
+                    <label htmlFor="dosage">{t("Dosage")}</label>
                     <input 
                         type="text" 
                         id="dosage" 
                         name="dosage" 
                         value={formData.dosage} 
                         onChange={handleChange}
-                        placeholder="e.g., 500mg, 2 tablets"
+                        placeholder={t("e.g., 500mg, 2 tablets")}
                     />
                 </div>
                 
                 <div className="form-group">
-                    <label htmlFor="schedule">Schedule</label>
+                    <label htmlFor="schedule">{t("Schedule")}</label>
                     <input 
                         type="text" 
                         id="schedule" 
                         name="schedule" 
                         value={formData.schedule} 
                         onChange={handleChange}
-                        placeholder="e.g., Once daily, Every 8 hours"
+                        placeholder={t("e.g., Once daily, Every 8 hours")}
                     />
                 </div>
                 
                 <div className="form-group">
-                    <label htmlFor="usedTo">Used to treat</label>
+                    <label htmlFor="usedTo">{t("Used to treat")}</label>
                     <textarea 
                         id="usedTo" 
                         name="usedTo" 
                         value={formData.usedTo} 
                         onChange={handleChange}
-                        placeholder="What this medication is used for"
+                        placeholder={t("What this medication is used for")}
                         rows="3"
                     />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="sideEffects">Side Effects</label>
+                    <label htmlFor="sideEffects">{t("Side Effects")}</label>
                     <textarea 
                         id="sideEffects" 
                         name="sideEffects" 
                         value={formData.sideEffects} 
                         onChange={handleChange}
-                        placeholder="Potential side effects"
+                        placeholder={t("Potential side effects")}
                         rows="3"
                     />
                 </div>
 
                 <div className="form-group">
-                    <label htmlFor="warnings">Warnings & Precautions</label>
+                    <label htmlFor="warnings">{t("Warnings & Precautions")}</label>
                     <textarea 
                         id="warnings" 
                         name="warnings" 
                         value={formData.warnings} 
                         onChange={handleChange}
-                        placeholder="Important warnings and precautions"
+                        placeholder={t("Important warnings and precautions")}
                         rows="3"
                     />
                 </div>
 
                 <div className="form-group">
-                    <label>Image</label>
+                    <label>{t("Image")}</label>
                     <div className="image-preview-container">
                         {(previewUrl || formData.image) && (
                             <img 
                                 src={previewUrl || formData.image} 
-                                alt="Medication Preview" 
+                                alt={t("Medication Preview")} 
                                 className="image-preview" 
                             />
                         )}
                     </div>
                     <label htmlFor="image-upload" className="upload-image-button">
-                        {isEditing ? 'Upload New Image' : 'Upload Image'}
+                        {isEditing ? t('Upload New Image') : t('Upload Image')}
                     </label>
                     <input type="file" id="image-upload" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
                 </div>
 
                 <div className="form-group">
-                    <label>Dosage Times</label>
+                    <label>{t("Dosage Times")}</label>
                     {formData.dosages.map((dosage, index) => (
                         <div key={index} className="dosage-input-row">
                             <input
@@ -434,17 +441,17 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                             <button 
                                     type="button" 
                                     onClick={() => handleRemoveDosage(index)} 
-                                    className="remove-dosage-button">Remove</button>
+                                    className="remove-dosage-button">{t("Remove")}</button>
                             </div>
                     ))}
-                    <button type="button" onClick={handleAddDosage} className="add-dosage-button">+ Add Dosage</button>
+                    <button type="button" onClick={handleAddDosage} className="add-dosage-button">+ {t("Add Dosage")}</button>
                 </div>
             </div>
 
             <div className="form-actions">
-                <button type="button" onClick={onCancel} className="cancel-button">Cancel</button>
+                <button type="button" onClick={onCancel} className="cancel-button">{t("Cancel")}</button>
                 <button type="submit" className="save-button" disabled={isScanning || isUploading}>
-                    {isUploading ? 'Uploading Image...' : isScanning ? 'Processing...' : 'Save Medicine'}
+                    {isUploading ? t('Uploading Image...') : isScanning ? t('Processing...') : t('Save Medicine')}
                 </button>
             </div>
         </form>

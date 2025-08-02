@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './MedicationDetails.css';
+import { useTranslation } from 'react-i18next';
 
 const AnimateContent = ({ children, contentKey }) => (
     <AnimatePresence mode="wait">
@@ -17,6 +18,7 @@ const AnimateContent = ({ children, contentKey }) => (
 );
 
 function MedicationDetails({ medication, onEdit }) {
+    const { t } = useTranslation();
     // Debug: Log what image URL we're receiving
     console.log('MedicationDetails - medication:', medication);
     console.log('MedicationDetails - image URL:', medication?.image);
@@ -24,7 +26,7 @@ function MedicationDetails({ medication, onEdit }) {
     if (!medication) {
         return (
             <div className="details-card">
-                <div className="placeholder"><p>Select a medication to see its details.</p></div>
+                <div className="placeholder"><p>{t("Select a medication to see its details.")}</p></div>
             </div>
         );
     }
@@ -46,7 +48,7 @@ function MedicationDetails({ medication, onEdit }) {
             </AnimateContent>
 
             <div className="detail-section">
-                <h3 className="section-header">Schedule</h3>
+                <h3 className="section-header">{t("Schedule")}</h3>
                 {medication.schedule ? (
                     <AnimateContent contentKey={medication.schedule}>
                         <p className="section-content">{medication.schedule}</p>
@@ -58,28 +60,28 @@ function MedicationDetails({ medication, onEdit }) {
                             animate={activePeriods.has('Morning') ? activeStyle : inactiveStyle}
                             transition={iconTransition}
                         >
-                            <span role="img" aria-label="Morning">☀️</span>Morning
+                            <span role="img" aria-label="Morning">☀️</span>{t("Morning")}
                         </motion.div>
                         <motion.div
                             className={`icon-item ${activePeriods.has('Afternoon') ? 'active' : ''}`}
                             animate={activePeriods.has('Afternoon') ? activeStyle : inactiveStyle}
                             transition={iconTransition}
                         >
-                            <span role="img" aria-label="Afternoon">☀️</span>Afternoon
+                            <span role="img" aria-label="Afternoon">☀️</span>{t("Afternoon")}
                         </motion.div>
                         <motion.div
                             className={`icon-item ${activePeriods.has('Evening') ? 'active' : ''}`}
                             animate={activePeriods.has('Evening') ? activeStyle : inactiveStyle}
                             transition={iconTransition}
                         >
-                            <span role="img" aria-label="Evening">🌙</span>Evening
+                            <span role="img" aria-label="Evening">🌙</span>{t("Evening")}
                         </motion.div>
                         <motion.div
                             className={`icon-item ${activePeriods.has('Night') ? 'active' : ''}`}
                             animate={activePeriods.has('Night') ? activeStyle : inactiveStyle}
                             transition={iconTransition}
                         >
-                            <span role="img" aria-label="Night">🌙</span>Night
+                            <span role="img" aria-label="Night">🌙</span>{t("Night")}
                         </motion.div>
                     </div>
                 )}
@@ -87,7 +89,7 @@ function MedicationDetails({ medication, onEdit }) {
 
             {medication.dosage && (
                 <div className="detail-section">
-                    <h3 className="section-header">Dosage</h3>
+                    <h3 className="section-header">{t("Dosage")}</h3>
                     <AnimateContent contentKey={medication.dosage}>
                         <p className="section-content">{medication.dosage}</p>
                     </AnimateContent>
@@ -95,14 +97,14 @@ function MedicationDetails({ medication, onEdit }) {
             )}
 
             <div className="detail-section">
-                <h3 className="section-header">Used to treat</h3>
+                <h3 className="section-header">{t("Used For")}</h3>
                 <AnimateContent contentKey={medication.usedTo}>
                     <p className="section-content">{medication.usedTo}</p>
                 </AnimateContent>
             </div>
 
             <div className="detail-section">
-                <h3 className="section-header">Side effects</h3>
+                <h3 className="section-header">{t("Side Effects")}</h3>
                 <AnimateContent contentKey={medication.sideEffects}>
                     <p className="section-content">{medication.sideEffects}</p>
                 </AnimateContent>
@@ -110,7 +112,7 @@ function MedicationDetails({ medication, onEdit }) {
 
             {medication.warnings && (
                 <div className="detail-section">
-                    <h3 className="section-header">Warnings & Precautions</h3>
+                    <h3 className="section-header">{t("Warnings")}</h3>
                     <AnimateContent contentKey={medication.warnings}>
                         <p className="section-content">{medication.warnings}</p>
                     </AnimateContent>
@@ -118,20 +120,20 @@ function MedicationDetails({ medication, onEdit }) {
             )}
             
             <div className="detail-section">
-                <h3 className="section-header">Image</h3>
+                <h3 className="section-header">{t("Image")}</h3>
                 <AnimateContent contentKey={medication.image}>
                     {medication.image ? (
                         <img src={medication.image} alt={medication.name} className="medication-image" />
                     ) : (
                         <div className="no-image-placeholder">
-                            <p>No image available</p>
-                            <small>Upload an image when editing this medication</small>
+                            <p>{t("No image available")}</p>
+                            <small>{t("Upload an image when editing this medication")}</small>
                         </div>
                     )}
                 </AnimateContent>
             </div>
 
-            <button className="edit-button" onClick={onEdit}>Edit medicine</button>
+            <button className="edit-button" onClick={onEdit}>{t("Edit medicine")}</button>
         </div>
     );
 }
