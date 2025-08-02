@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import './MedicationLogging.css';
 import MedicationItem from '../MedicationItem/MedicationItem';
+import { useTranslation } from 'react-i18next';
+
 
 function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddNew, onToggleDose }) {
     const [isCameraActive, setIsCameraActive] = useState(false);
@@ -14,6 +16,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
     const videoRef = useRef(null);
     const canvasRef = useRef(null);
     const streamRef = useRef(null);
+    const { t } = useTranslation();
 
     // Helper to determine if we're in "adding new" mode
     const isAddingNew = !selectedMedicationId;
@@ -120,16 +123,16 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
             setIsLoadingCamera(false);
             setIsCameraActive(false);
             setDebugInfo('');
-            let errorMessage = 'Could not access camera. ';
+            let errorMessage = t('Could not access camera. ');
             
             if (error.name === 'NotAllowedError') {
-                errorMessage += 'Please allow camera permissions and try again.';
+                errorMessage += t('Please allow camera permissions and try again.');
             } else if (error.name === 'NotFoundError') {
-                errorMessage += 'No camera found on this device.';
+                errorMessage += t('No camera found on this device.');
             } else if (error.name === 'NotSupportedError') {
-                errorMessage += 'Camera is not supported on this browser.';
+                errorMessage += t('Camera is not supported on this browser.');
             } else {
-                errorMessage += error.message || 'Please check your camera and try again.';
+                errorMessage += error.message || t('Please check your camera and try again.');
             }
             
             setCameraError(errorMessage);
@@ -351,8 +354,8 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
 
     return (
         <div className="card logging-card">
-            <h2 className="card-header">Medication Logging</h2>
-            <p className="sub-header">Has your care recipient taken:</p>
+            <h2 className="card-header">{t("Medication Logging")}</h2>
+            <p className="sub-header">{t("Has your care recipient taken:")}</p>
 
             <div className="medication-list">
                 {medications.map((med) => (
@@ -372,20 +375,20 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                     onClick={() => onAddNew()}
                 >
                     <div className="add-icon">+</div>
-                    <span>Add more medication</span>
+                    <span>{t("Add more medication")}</span>
                 </button>
             </div>
             
             {!isCameraActive ? (
                 <div>
                     <div className="action-buttons">
-                        <button className="upload-button" onClick={handleFileUpload}>Upload Image</button>
+                        <button className="upload-button" onClick={handleFileUpload}>{t("Upload Image")}</button>
                         <button 
                             className="camera-button" 
                             onClick={startCamera}
                             disabled={isLoadingCamera}
                         >
-                            {isLoadingCamera ? 'Starting Camera...' : 'Use Camera'}
+                            {isLoadingCamera ? t("Starting Camera...") : t("Use Camera")}
                         </button>
                     </div>
                     {cameraError && (
@@ -395,7 +398,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                     )}
                     {isLoadingCamera && (
                         <div className="camera-loading">
-                            📷 Initializing camera... Please allow camera permissions if prompted.
+                            📷 {t("Initializing camera... Please allow camera permissions if prompted.")}
                         </div>
                     )}
                 </div>
@@ -403,7 +406,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                 <div className="camera-container">
                     {isLoadingCamera && (
                         <div className="camera-loading-overlay">
-                            📷 Starting camera...
+                            📷 {t("Starting camera...")}
                             {debugInfo && <div className="debug-info">{debugInfo}</div>}
                             <button 
                                 className="force-continue-button"
@@ -412,7 +415,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                                     setDebugInfo('');
                                 }}
                             >
-                                Camera working? Click to continue
+                                {t("Camera working? Click to continue")}
                             </button>
                         </div>
                     )}
@@ -472,14 +475,14 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                         
                         {/* Camera instructions overlay */}
                         <div className="camera-instructions">
-                            📋 For medication boxes: Hold steady, ensure text is clear and well-lit
+                            📋 {t("For medication boxes: Hold steady, ensure text is clear and well-lit")}
                         </div>
                         
                         {/* Debug overlay showing video element status */}
                         <div className="video-debug-overlay">
-                            <div>Video Element: {videoRef.current ? 'Found' : 'Missing'}</div>
-                            <div>Camera: {facingMode === 'user' ? 'Front' : 'Back'}</div>
-                            <div>Flipped: {isFlipped ? 'Yes' : 'No'}</div>
+                            <div>{t("Video Element:")} {videoRef.current ? t("Found") : t("Missing")}</div>
+                            <div>{t("Camera:")} {facingMode === 'user' ? t("Front") : t("Back")}</div>
+                            <div>{t("Flipped:")} {isFlipped ? t("Yes") : t("No")}</div>
                             {streamRef.current && (
                                 <div>Stream: {streamRef.current.getVideoTracks().length} tracks active</div>
                             )}
@@ -496,33 +499,33 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                             onClick={capturePhoto}
                             disabled={isLoadingCamera}
                         >
-                            📷 Capture
+                            📷 {t("Capture")}
                         </button>
                         <button 
                             className="switch-camera-button" 
                             onClick={switchCamera}
                             disabled={isLoadingCamera}
-                            title={`Switch to ${facingMode === 'user' ? 'back' : 'front'} camera`}
+                            title={`${t("Switch to")} ${facingMode === 'user' ? t("back") : t("front")} ${t("camera")}`}
                         >
-                            🔄 {facingMode === 'user' ? 'Back' : 'Front'}
+                            🔄 {facingMode === 'user' ? t("Back") : t("Front")}
                         </button>
                         <button 
                             className="flip-button" 
                             onClick={flipImage}
                             disabled={isLoadingCamera}
-                            title="Flip image horizontally"
+                            title={t("Flip image horizontally")}
                         >
-                            ↔️ Flip
+                            ↔️ {t("Flip")}
                         </button>
                         <button 
                             className="test-button" 
                             onClick={testVideoElement}
                             disabled={isLoadingCamera}
-                            title="Test Video"
+                            title={t("Test Video")}
                         >
-                            🔧 Test
+                            🔧 {t("Test")}
                         </button>
-                        <button className="cancel-camera-button" onClick={cancelCamera}>❌ Cancel</button>
+                        <button className="cancel-camera-button" onClick={cancelCamera}>❌ {t("Cancel")}</button>
                     </div>
                 </div>
             )}
@@ -530,7 +533,7 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
             {/* Captured Image Preview */}
             {capturedImage && (
                 <div className="captured-image-container">
-                    <h3>📸 Photo Captured</h3>
+                    <h3>📸 {t("Photo Captured")}</h3>
                     <div className="captured-image-preview">
                         <img src={capturedImage} alt="Captured medication" className="captured-image" />
                     </div>
@@ -539,19 +542,19 @@ function MedicationLogging({ medications, onSelect, selectedMedicationId, onAddN
                             className="use-photo-button" 
                             onClick={useCapturedPhoto}
                         >
-                            ✅ Use This Photo
+                            ✅ {t("Use This Photo")}
                         </button>
                         <button 
                             className="retake-button" 
                             onClick={retakePhoto}
                         >
-                            🔄 Retake
+                            🔄 {t("Retake")}
                         </button>
                         <button 
                             className="discard-button" 
                             onClick={discardPhoto}
                         >
-                            ❌ Discard
+                            ❌ {t("Discard")}
                         </button>
                     </div>
                 </div>

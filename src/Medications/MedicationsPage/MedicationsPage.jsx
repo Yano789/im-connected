@@ -7,8 +7,10 @@ import MedicationLogging from '../MedicationLogging/MedicationLogging';
 import MedicationDetails from '../MedicationDetails/MedicationDetails';
 import MedicationForm from '../MedicationForm/MedicationForm';
 import medicationScannerService from '../services/medicationScannerService';
+import { useTranslation } from 'react-i18next';
 
 function MedicationsPage() {
+    const { t } = useTranslation()
     const [careRecipients, setCareRecipients] = useState([]);
     const [selectedRecipientId, setSelectedRecipientId] = useState(null);
     const [selectedMedicationId, setSelectedMedicationId] = useState(null);
@@ -28,6 +30,22 @@ function MedicationsPage() {
     // Load care recipients from scanner database on component mount
     useEffect(() => {
         loadCareRecipients();
+    }, []);
+
+    // Add language change listener to force re-render when language changes
+    useEffect(() => {
+        const handleLanguageChange = () => {
+            console.log('Language changed, reloading care recipients');
+            // Force re-render by reloading data
+            loadCareRecipients();
+        };
+
+        // Listen for custom language change events (if your profile page dispatches them)
+        window.addEventListener('languageChanged', handleLanguageChange);
+        
+        return () => {
+            window.removeEventListener('languageChanged', handleLanguageChange);
+        };
     }, []);
 
     const loadCareRecipients = async () => {
@@ -81,7 +99,7 @@ function MedicationsPage() {
             }
         } catch (error) {
             console.error('Error loading care recipients:', error);
-            setError('Failed to load care recipients');
+            setError(t('Failed to load care recipients'));
             setCareRecipients([]);
         } finally {
             setLoading(false);
@@ -119,7 +137,7 @@ function MedicationsPage() {
             setSelectedRecipientId(newRecipient.id);
         } catch (error) {
             console.error('Failed to save new care recipient:', error);
-            alert('Failed to save new care recipient. Please try again.');
+            alert(t('Failed to save new care recipient. Please try again.'));
         }
     };
 
@@ -212,7 +230,7 @@ function MedicationsPage() {
             setCapturedFile(null);
         } catch (error) {
             console.error('Failed to save medication:', error);
-            alert('Failed to save medication. Please try again.');
+            alert(t('Failed to save medication. Please try again.'));
         }
     };
 
@@ -224,7 +242,9 @@ function MedicationsPage() {
         if (!recipient) return;
         
         const confirmDelete = window.confirm(
-            `Are you sure you want to delete "${recipient.name}" and all their medications? This action cannot be undone.`
+            t('Are you sure you want to delete "{{name}}" and all their medications? This action cannot be undone.', {
+                name: recipient.name
+            })
         );
         
         if (!confirmDelete) return;
@@ -244,7 +264,7 @@ function MedicationsPage() {
             console.log(`Care recipient "${recipient.name}" and all medications deleted successfully`);
         } catch (error) {
             console.error('Failed to delete care recipient:', error);
-            alert('Failed to delete care recipient. Please try again.');
+            alert(t('Failed to delete care recipient. Please try again.'));
         }
     };
 
@@ -265,7 +285,7 @@ function MedicationsPage() {
             console.log(`Medication "${selectedMedication.name}" deleted successfully`);
         } catch (error) {
             console.error('Failed to delete medication:', error);
-            alert('Failed to delete medication. Please try again.');
+            alert(t('Failed to delete medication. Please try again.'));
         }
     };
 
@@ -329,7 +349,7 @@ function MedicationsPage() {
                             />
                         ) : (
                             <div className="no-medication-selected">
-                                <p>Select a medication to view details, or add a new one</p>
+                                <p>{t("Select a medication to view details, or add a new one")}</p>
                             </div>
                         )
                     ) : (

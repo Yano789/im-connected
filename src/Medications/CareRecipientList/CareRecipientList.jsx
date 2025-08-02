@@ -1,7 +1,9 @@
 import React from 'react';
 import './CareRecipientList.css';
+import { useTranslation } from 'react-i18next';
 
 function CareRecipientList({ recipients, onSelect, selectedRecipientId, onDelete, isAdding, onAdd, onSaveNew, newName, setNewName  }) {
+    const { t } = useTranslation();
     
     const handleKeyDown = (event) => {
         if (event.key === 'Enter') {
@@ -11,7 +13,7 @@ function CareRecipientList({ recipients, onSelect, selectedRecipientId, onDelete
     
     return (
         <div className="card">
-            <h2 className="card-header">My Care Recipients</h2>
+            <h2 className="card-header">{t("My Care Recipients")}</h2>
             <div className="recipient-list">
                 {recipients.map((recipient, index) => {
                     const isSelected = recipient.id === selectedRecipientId && !isAdding;
@@ -25,7 +27,7 @@ function CareRecipientList({ recipients, onSelect, selectedRecipientId, onDelete
                             <span>{recipient.name}</span>
                             <div className="recipient-buttons">
                                 <button className={isSelected ? 'show-button' : 'switch-button'}>
-                                    {isSelected ? 'Showing' : 'Switch'}
+                                    {isSelected ? t('Showing') : t('Switch')}
                                 </button>
                                 {onDelete && (
                                     <button 
@@ -34,7 +36,7 @@ function CareRecipientList({ recipients, onSelect, selectedRecipientId, onDelete
                                             e.stopPropagation(); // Prevent selecting the recipient
                                             onDelete(recipient.id);
                                         }}
-                                        title="Delete care recipient"
+                                        title={t("Delete care recipient")}
                                     >
                                         ×
                                     </button>
@@ -50,19 +52,19 @@ function CareRecipientList({ recipients, onSelect, selectedRecipientId, onDelete
                         <input
                             type="text"
                             autoFocus
-                            placeholder="New Recipient's Name..."
+                            placeholder={t("New Recipient's Name...")}
                             value={newName}
                             onChange={(e) => setNewName(e.target.value)}
                             onKeyDown={handleKeyDown}
                         />
-                        <button onClick={onSaveNew} className="save-new-button">Save</button>
+                        <button onClick={onSaveNew} className="save-new-button">{t("Save")}</button>
                     </div>
                 )}
             </div>
             
             {!isAdding && (
                 <button className="add-recipient-button" onClick={onAdd}>
-                    Add Care Recipient
+                    {t("Add Care Recipient")}
                 </button>
             )}       
         </div>
