@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./NewPostCard.css";
 import MediaUploader from "../MediaUploader/MediaUploader.jsx";
+import { useTranslation } from "react-i18next";
 
 function NewPostCard({ onDraftAdded, renderDraft }) {
   const [selectedTags, setSelectedTags] = useState([]);
@@ -19,16 +20,20 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
   const [mediaFiles, setMediaFiles] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const {t} = useTranslation();
 
   const tags = [
-    "Physical Disability & Chronic Illness",
-    "Personal Mental Health",
-    "End of Life Care",
-    "Financial & Legal Help",
-    "Mental Disability",
-    "Hospitals and Clinics",
-    "Pediatric Care",
-    "Subsidies and Govt Support",
+    {
+      key: "Physical Disability & Chronic Illness",
+      label: t("Tag1"),
+    },
+    { key: "Personal Mental Health", label: t("Tag2"), },
+    { key: "End of Life Care", label: t("Tag3"), },
+    { key: "Financial & Legal Help", llabel: t("Tag4"), },
+    { key: "Mental Disability", label: t("Tag5"), },
+    { key: "Hospitals and Clinics", label: t("Tag6"),},
+    { key: "Pediatric Care", label: t("Tag7"), },
+    { key: "Subsidies and Govt Support", label: t("Tag8"), },
   ];
 
   const resetForm = () => {
@@ -176,25 +181,25 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
         }}
       >
         <div className="createPostDiv">
-          <div className="createPost">Create Post</div>
+          <div className="createPost">{("Create Post")}</div>
           <div className="x" onClick={() => navigate("/forum")}>
             X
           </div>
         </div>
 
         <div className="postTitleDiv">
-          <div className="postTitle">Title</div>
+          <div className="postTitle">{("Title")}</div>
           <textarea
             className="createPostWrapper"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Suggest a name for this Text"
+            placeholder={t("Suggest Title Text")}
           />
         </div>
 
         <div className="postData">
           <div className="selectTagsAssociated">
-            Select Tags (Max 2) associated with this post:
+            {t("Select Tags")}
           </div>
           <div className="tags">
             {tags.map((tag) => (
@@ -216,16 +221,14 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
         </div>
 
         <div className="addTextDiv">
-          <div className="addText">Add Text</div>
+          <div className="addText">{t("Add Text")}</div>
           <textarea
             className="addTextWrapper"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder="Add your post's contents here"
+            placeholder={("Add Post Contents")}
           />
         </div>
-
-        {/* Pass existingMedia and handlers to MediaUploader */}
         <MediaUploader
           existingMedia={existingMedia}
           onRemoveExistingMedia={handleRemoveExistingMedia}
@@ -243,7 +246,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
               handleSubmit(false);
             }}
           >
-            <div className="tagText">Post</div>
+            <div className="tagText">{t("Post")}</div>
           </button>
 
           <button
@@ -254,7 +257,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
               handleSubmit(true);
             }}
           >
-            <div className="tagText">Save as Draft</div>
+            <div className="tagText">{t("Save as Draft")}</div>
           </button>
         </div>
       </form>

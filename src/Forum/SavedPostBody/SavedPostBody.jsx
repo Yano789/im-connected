@@ -2,13 +2,15 @@ import ToPost from "../ToPost/ToPost";
 import ForumCard from "../ForumCard/ForumCard";
 import "./SavedPostBody.css";
 import { useState, useEffect } from "react";
-import Bookmark from "../Bookmark/Bookmark"; // adjust path if needed
+import Bookmark from "../Bookmark/Bookmark"; 
+import { useTranslation } from "react-i18next";
 
 function SavedPostBody() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [likedPostIds, setLikedPostIds] = useState(new Set()); // Added liked posts state
+  const [likedPostIds, setLikedPostIds] = useState(new Set()); 
+  const {t} = useTranslation();
 
   useEffect(() => {
     const fetchSavedPosts = async () => {
@@ -16,7 +18,7 @@ function SavedPostBody() {
       try {
         const response = await fetch(`http://localhost:5001/api/v1/saved`, {
           method: "GET",
-          credentials: "include", // send cookies for auth
+          credentials: "include", 
         });
 
         if (!response.ok) throw new Error("Failed to fetch saved posts");
@@ -55,7 +57,7 @@ function SavedPostBody() {
       </div>
       <div className="forumBody">
         {loading ? (
-          <p>Loading...</p>
+          <p>{("Loading")}</p>
         ) : error ? (
           <p>Error: {error}</p>
         ) : posts.length > 0 ? (
@@ -71,7 +73,7 @@ function SavedPostBody() {
               postComment={post.comments}
               postLikes={post.likes}
               postMedia={post.media}
-              initiallyLiked={likedPostIds.has(post.postId)} // <-- Pass liked state here
+              initiallyLiked={likedPostIds.has(post.postId)} 
               ActionButton={() => (
                 <Bookmark
                   postId={post.postId}
@@ -86,7 +88,7 @@ function SavedPostBody() {
             />
           ))
         ) : (
-          <p>No saved posts found.</p>
+          <p>{("No Saved Posts")}</p>
         )}
       </div>
     </div>

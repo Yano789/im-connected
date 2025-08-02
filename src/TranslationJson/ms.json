@@ -46,6 +46,19 @@
     "Comments": "Ulasan", 
     "Post": "Siaran",
     "Add a Comment": "Tambah Ulasan",
-    "Write something": "Tulis sesuatu..."
+    "Write something": "Tulis sesuatu...",
+    "Loading": "Memuatkan...",
+    "No posts available": "Tiada siaran tersedia",
+    "Add Media": "Seret dan lepaskan media di sini, atau klik untuk memuat naik (maks 5)",
+        "Create Post": "Buat Catatan",
+    "Title": "Tajuk",
+    "Suggest Title Text":  "Cadangkan nama siaran ini", 
+    "Select Tags": "Pilih Teg (Maks 2) yang dikaitkan dengan siaran ini", 
+    "Add Post Contents": "Tambahkan kandungan siaran anda di sini", 
+    "Save as Draft": "Simpan sebagai Draf", 
+    "Add Text": "Tambah Teks",
+        "No Saved Posts": "Tiada catatan disimpan ditemui", 
+    "Posted": "Disiarkan:"
+
 
 }

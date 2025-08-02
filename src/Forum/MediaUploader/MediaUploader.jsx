@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import "./MediaUploader.css";
+import { useTranslation } from "react-i18next";
 
 function MediaUploader({
   existingMedia = [],
@@ -9,6 +10,7 @@ function MediaUploader({
   onRemoveNewFile,
 }) {
   const fileInputRef = useRef(null);
+  const {t} = useTranslation();
 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
@@ -33,7 +35,7 @@ function MediaUploader({
         onDragOver={handleDragOver}
         onClick={() => fileInputRef.current.click()}
       >
-        Drag and drop media here, or click to upload (max 5)
+        {t("Add Media")}
         <input
           type="file"
           accept="image/*,video/*"

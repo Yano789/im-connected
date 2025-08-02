@@ -5,6 +5,7 @@ import ToPost from "../ToPost/ToPost";
 import TopicSelector from "../TopicSelector/TopicSelector";
 import Bookmark from "../Bookmark/Bookmark";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 function ForumBody() {
   const [posts, setPosts] = useState([]);
@@ -12,6 +13,7 @@ function ForumBody() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [likedPostIds, setLikedPostIds] = useState(new Set());
+  const {t} = useTranslation();
 
   const [query, setQuery] = useState({
     filter: "default",
@@ -88,7 +90,7 @@ function ForumBody() {
 
       <div className="forumBody">
         {loading ? (
-          <p>Loading...</p>
+          <p>{t("Loading")}</p>
         ) : error ? (
           <p>Error: {error}</p>
         ) : posts.length > 0 ? (
@@ -114,7 +116,7 @@ function ForumBody() {
             />
           ))
         ) : (
-          <p>No posts available.</p>
+          <p>{t("No posts available")}</p>
         )}
       </div>
 

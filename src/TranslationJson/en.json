@@ -46,5 +46,18 @@
     "Comments": "Comments", 
     "Post": "Post",
     "Add a Comment": "Add a Comment",
-    "Write something": "Write something..."
+    "Write something": "Write something...",
+    "Loading": "Loading...",
+    "No posts available": "No posts available",
+    "Add Media": "Drag and drop media here, or click to upload (max 5)",
+    "Create Post": "Create Post",
+    "Title": "Title",
+    "Suggest Title Text":  "Suggest a name of this post", 
+    "Select Tags": "Select Tags (Max 2) associated with this post:", 
+    "Add Post Contents": "Add your post's contents here", 
+    "Save as Draft": "Save as Draft", 
+    "Add Text": "Add Text", 
+    "No Saved Posts": "No saved posts found", 
+    "Posted": "Posted:"
+
 }

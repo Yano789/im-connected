@@ -7,11 +7,13 @@ import UnlikesIcon from "../../assets/Unlikes.png";
 
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 function ViewPostCard() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
+  const {t} = useTranslation();
 
   const postId = searchParams.get("postId");
 
@@ -32,7 +34,7 @@ function ViewPostCard() {
       `http://localhost:5001/api/v1/post/getPost/${encodeURIComponent(postId)}`,
       {
         method: 'GET',
-        credentials: 'include', // Include cookies (JWT token) in the request
+        credentials: 'include', 
         headers: {
           'Content-Type': 'application/json',
         },
@@ -56,7 +58,7 @@ function ViewPostCard() {
     if (!postId) return;
     fetch(`http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/`, {
       method: 'GET',
-      credentials: 'include', // Include cookies (JWT token) in the request
+      credentials: 'include', 
       headers: {
         'Content-Type': 'application/json',
       },
@@ -112,7 +114,7 @@ function ViewPostCard() {
               </div>
               <div className="viewPostDetails">{title}</div>
               <div className="viewPostPostedDiv">
-                <div className="viewDatePosted">Posted:</div>
+                <div className="viewDatePosted">{t("Posted")}</div>
                 <div className="viewDatePosted">
                   {new Date(createdAt).toLocaleDateString()}
                 </div>
