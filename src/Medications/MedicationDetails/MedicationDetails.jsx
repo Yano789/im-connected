@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import './MedicationDetails.css';
 import { useTranslation } from 'react-i18next';
+import medicationTranslationService from '../services/medicationTranslationService';
 
 const AnimateContent = ({ children, contentKey }) => (
     <AnimatePresence mode="wait">
@@ -18,10 +19,35 @@ const AnimateContent = ({ children, contentKey }) => (
 );
 
 function MedicationDetails({ medication, onEdit }) {
-    const { t } = useTranslation();
-    // Debug: Log what image URL we're receiving
-    console.log('MedicationDetails - medication:', medication);
-    console.log('MedicationDetails - image URL:', medication?.image);
+    const { t, i18n } = useTranslation();
+    const [translatedMedication, setTranslatedMedication] = useState(null);
+    const [isTranslating, setIsTranslating] = useState(false);
+    
+    // Translate medication data when medication or language changes
+    useEffect(() => {
+        const translateMedicationData = async () => {
+            if (!medication) {
+                setTranslatedMedication(null);
+                return;
+            }
+            
+            setIsTranslating(true);
+            try {
+                const translated = await medicationTranslationService.translateMedication(medication);
+                setTranslatedMedication(translated);
+            } catch (error) {
+                console.error('MedicationDetails: Failed to translate medication:', error);
+                setTranslatedMedication(medication); // Fallback to original
+            } finally {
+                setIsTranslating(false);
+            }
+        };
+
+        translateMedicationData();
+    }, [medication, i18n.language]); // Re-translate when medication or language changes
+    
+    // Use translated medication or original medication
+    const displayMedication = translatedMedication || medication;
     
     if (!medication) {
         return (
@@ -30,9 +56,18 @@ function MedicationDetails({ medication, onEdit }) {
             </div>
         );
     }
+
+    // Show loading state while translating
+    if (isTranslating) {
+        return (
+            <div className="details-card">
+                <div className="placeholder"><p>{t("Loading...")} 🌐</p></div>
+            </div>
+        );
+    }
     
     const activePeriods = new Set(
-        medication.dosages
+        displayMedication.dosages
             ?.filter(dosage => dosage.taken)
             ?.map(dosage => dosage.period) || []
     );
@@ -43,15 +78,15 @@ function MedicationDetails({ medication, onEdit }) {
 
     return (
         <div className="details-card">
-            <AnimateContent contentKey={medication.name}>
-                <h2 className="medication-title">{medication.name}</h2>
+            <AnimateContent contentKey={displayMedication.name}>
+                <h2 className="medication-title">{displayMedication.name}</h2>
             </AnimateContent>
 
             <div className="detail-section">
                 <h3 className="section-header">{t("Schedule")}</h3>
-                {medication.schedule ? (
-                    <AnimateContent contentKey={medication.schedule}>
-                        <p className="section-content">{medication.schedule}</p>
+                {displayMedication.schedule ? (
+                    <AnimateContent contentKey={displayMedication.schedule}>
+                        <p className="section-content">{displayMedication.schedule}</p>
                     </AnimateContent>
                 ) : (
                     <div className="schedule-icons">
@@ -87,43 +122,43 @@ function MedicationDetails({ medication, onEdit }) {
                 )}
             </div>
 
-            {medication.dosage && (
+            {displayMedication.dosage && (
                 <div className="detail-section">
                     <h3 className="section-header">{t("Dosage")}</h3>
-                    <AnimateContent contentKey={medication.dosage}>
-                        <p className="section-content">{medication.dosage}</p>
+                    <AnimateContent contentKey={displayMedication.dosage}>
+                        <p className="section-content">{displayMedication.dosage}</p>
                     </AnimateContent>
                 </div>
             )}
 
             <div className="detail-section">
                 <h3 className="section-header">{t("Used For")}</h3>
-                <AnimateContent contentKey={medication.usedTo}>
-                    <p className="section-content">{medication.usedTo}</p>
+                <AnimateContent contentKey={displayMedication.usedTo}>
+                    <p className="section-content">{displayMedication.usedTo}</p>
                 </AnimateContent>
             </div>
 
             <div className="detail-section">
                 <h3 className="section-header">{t("Side Effects")}</h3>
-                <AnimateContent contentKey={medication.sideEffects}>
-                    <p className="section-content">{medication.sideEffects}</p>
+                <AnimateContent contentKey={displayMedication.sideEffects}>
+                    <p className="section-content">{displayMedication.sideEffects}</p>
                 </AnimateContent>
             </div>
 
-            {medication.warnings && (
+            {displayMedication.warnings && (
                 <div className="detail-section">
                     <h3 className="section-header">{t("Warnings")}</h3>
-                    <AnimateContent contentKey={medication.warnings}>
-                        <p className="section-content">{medication.warnings}</p>
+                    <AnimateContent contentKey={displayMedication.warnings}>
+                        <p className="section-content">{displayMedication.warnings}</p>
                     </AnimateContent>
                 </div>
             )}
             
             <div className="detail-section">
                 <h3 className="section-header">{t("Image")}</h3>
-                <AnimateContent contentKey={medication.image}>
-                    {medication.image ? (
-                        <img src={medication.image} alt={medication.name} className="medication-image" />
+                <AnimateContent contentKey={displayMedication.image}>
+                    {displayMedication.image ? (
+                        <img src={displayMedication.image} alt={displayMedication.name} className="medication-image" />
                     ) : (
                         <div className="no-image-placeholder">
                             <p>{t("No image available")}</p>

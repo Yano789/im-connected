@@ -75,6 +75,7 @@ function MedicationsPage() {
                                     usedTo: med.usedTo,
                                     sideEffects: med.sideEffects,
                                     warnings: med.warnings,
+                                    schedule: med.schedule,
                                     image: med.image || '', // Use the actual image URL from Scanner database
                                     dosages: med.dosages || [{ period: 'Morning', time: '08:00', taken: false }]
                                 };
