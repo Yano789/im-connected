@@ -440,7 +440,6 @@ const searchPosts = async (data) => {
         if (preferredLang) {
             for (let post of posts) {
                 post.title = await translate(post.title, preferredLang);
-                post.content = await translate(post.content, preferredLang);
             }
         }
 
