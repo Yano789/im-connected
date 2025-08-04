@@ -35,7 +35,7 @@ describe("createNewUser", () => {
         }));
 
         const user = await createNewUser(mockData);
-        expect(User.findOne).toHaveBeenCalledTimes(2);
+        expect(User.findOne).toHaveBeenCalledTimes(3);
         expect(hashData).toHaveBeenCalledWith("password123");
         expect(saveMock).toHaveBeenCalled();
         expect(user.password).toBe("hashedpassword");

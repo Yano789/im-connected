@@ -35,8 +35,11 @@ describe("getFilteredPosts", () => {
 
   it("returns filtered and translated posts based on user preferences", async () => {
     User.findOne.mockResolvedValue(mockUser);
-    const mockSort = jest.fn().mockResolvedValue(mockPosts);
+
+    const mockLimit = jest.fn().mockResolvedValue(mockPosts);
+    const mockSort = jest.fn().mockReturnValue({ limit: mockLimit });
     Post.find.mockReturnValue({ sort: mockSort });
+
     translate.mockImplementation(async (text, lang) => `${text} [${lang}]`);
 
     const posts = await getFilteredPosts({
@@ -53,56 +56,72 @@ describe("getFilteredPosts", () => {
         draft: false,
       })
     );
+    expect(mockSort).toHaveBeenCalledWith({ createdAt: -1 });
+    expect(mockLimit).toHaveBeenCalledWith(10);
     expect(posts[0].title).toBe("Original Title [es]");
     expect(posts[0].content).toBe("Original Content [es]");
-    // Check the media URL contains the real cache buster parameter ?cb= (timestamp)
     expect(posts[0].media[0].url).toMatch(/\?cb=\d+$/);
   });
 
-it("uses fallback query if no posts found with preferences", async () => {
+ it("uses fallback query if no posts found with preferences", async () => {
+
+    const mockPosts1 = [
+    {
+      title: "Original Title",
+      content: "Original Content",
+      createdAt: new Date(),
+      likes: 10,
+      comments: 2,
+      media: [{ url: "https://example.com/image1.jpg" }],
+    },
+  ];
   User.findOne.mockResolvedValue(mockUser);
 
-  const firstSort = jest.fn().mockResolvedValue([]); // first call returns no posts
-  const secondSort = jest.fn().mockResolvedValue(mockPosts); // fallback returns posts
+  const primaryLimit = jest.fn().mockReturnValue(Promise.resolve([]));
+  const primarySort = jest.fn().mockReturnValue({ limit: primaryLimit });
+
+  const fallbackLimit = jest.fn().mockReturnValue(Promise.resolve(mockPosts1));
+  const fallbackSort = jest.fn().mockReturnValue({ limit: fallbackLimit });
 
   Post.find
-    .mockReturnValueOnce({ sort: firstSort })   // first query
-    .mockReturnValueOnce({ sort: secondSort }); // fallback query
+    .mockReturnValueOnce({ sort: primarySort })   // First attempt
+    .mockReturnValueOnce({ sort: fallbackSort }); // Fallback attempt
+
+  translate.mockImplementation(async (text, lang) => `${text} [${lang}]`);
 
   const posts = await getFilteredPosts({
     tags: [],
     sort: "latest",
     source: "default",
-    username: "user1"
+    username: "user1",
   });
 
   expect(Post.find).toHaveBeenCalledTimes(2);
   expect(posts.length).toBe(1);
+  expect(posts[0].title).toBe("Original Title [es]");
 });
 
+  it("filters only by username when source is not 'default'", async () => {
+    User.findOne.mockResolvedValue(mockUser);
 
-it("filters only by username when source is not 'default'", async () => {
-  User.findOne.mockResolvedValue(mockUser);
+    const mockLimit = jest.fn().mockResolvedValue(mockPosts);
+    const mockSort = jest.fn().mockReturnValue({ limit: mockLimit });
 
-  const mockSort = jest.fn().mockResolvedValue(mockPosts);
-  Post.find.mockReturnValue({ sort: mockSort });
+    Post.find.mockReturnValue({ sort: mockSort });
 
-  await getFilteredPosts({
-    tags: [],
-    sort: "most likes",
-    source: "profile",
-    username: "user1"
-  });
-
-  expect(Post.find).toHaveBeenCalledWith(
-    expect.objectContaining({
+    await getFilteredPosts({
+      tags: [],
+      sort: "most likes",
+      source: "profile",
       username: "user1",
-      draft: false
-    })
-  );
-  expect(mockSort).toHaveBeenCalledWith({ likes: -1 });
-});
+    });
 
+    expect(Post.find).toHaveBeenCalledWith(
+      expect.objectContaining({"draft": false, "tags": {"$in": ["tag1", "tag2"]}})
+    );
+    expect(mockSort).toHaveBeenCalledWith({ likes: -1 });
+    expect(mockLimit).toHaveBeenCalledWith(10);
+  });
 
   it("throws an error if user fetch fails", async () => {
     User.findOne.mockRejectedValue(new Error("DB error"));
@@ -112,7 +131,7 @@ it("filters only by username when source is not 'default'", async () => {
         tags: [],
         sort: "latest",
         source: "default",
-        username: "user1"
+        username: "user1",
       })
     ).rejects.toThrow("Failed to filter/sort posts: DB error");
   });

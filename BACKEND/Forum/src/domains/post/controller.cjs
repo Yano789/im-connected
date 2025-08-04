@@ -149,7 +149,7 @@ const deletePost = async (data) => {
 };
 
 
-const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default", username }) => {
+const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default", username ,mode="default"}) => {
     try {
         let filter = {};
         const user = await User.findOne({ username })
@@ -193,13 +193,22 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
         }
 
 
-        if (source !== "default") {
+        if (source === "personalized") {  //gets my post
             filter.username = username;
         }
 
-        let posts = await Post.find({ ...filter, draft: false }).sort(sortOptions);
+        if(source === "all"){ //returns all post 
+            filter={}
+        }
+
+        console.log(filter)
+
+        let num = mode ==="default"? 10 : 5 //mode limiter
+
+        let posts = await Post.find({ ...filter, draft: false }).sort(sortOptions).limit(num);
+        console.log(posts)
         if (posts.length === 0 && source === "default") {
-            posts = await Post.find({ draft: false }).sort(sortOptions);
+            posts = await Post.find({ draft: false }).sort(sortOptions).limit(num);
         }
 
 
@@ -227,6 +236,7 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
 
 
 //used as a general function to slice array according to mode 
+/*
 const modeLimit = async (data) => {
     try {
         let limit = 10;
@@ -241,6 +251,7 @@ const modeLimit = async (data) => {
         throw error
     }
 }
+    */
 
 const getPostWithComment = async (data) => {
     const { postId, username } = data
@@ -453,4 +464,4 @@ const searchPosts = async (data) => {
 
 
 
-module.exports = { createPost, editDraft, deletePost, modeLimit, getFilteredPosts, getPostWithComment, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle,searchPosts,escapeRegex,addCacheBuster};
+module.exports = { createPost, editDraft, deletePost, getFilteredPosts, getPostWithComment, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle,searchPosts,escapeRegex,addCacheBuster};

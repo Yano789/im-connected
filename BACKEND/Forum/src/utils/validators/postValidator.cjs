@@ -66,7 +66,7 @@ const querySchema = Joi.object({
     .default('latest'),
 
   source: Joi.string()
-    .valid('default', 'personalized')
+    .valid('default', 'personalized','all')
     .default('default')
 });
 

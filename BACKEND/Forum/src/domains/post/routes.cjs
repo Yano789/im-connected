@@ -1,5 +1,5 @@
 const express = require("express");
-const {createPost,editDraft,deletePost,modeLimit,getFilteredPosts,getPostWithComment,getAllMyDrafts,getMyDraft,deleteDrafts,getPostByTitle,searchPosts} = require("./controller.cjs");
+const {createPost,editDraft,deletePost,getFilteredPosts,getPostWithComment,getAllMyDrafts,getMyDraft,deleteDrafts,getPostByTitle,searchPosts} = require("./controller.cjs");
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
 const {postDraftSchema,querySchema,paramsSchema,postTitleParamSchema,searchBarParamSchema} = require("./../../utils/validators/postValidator.cjs")
@@ -72,10 +72,10 @@ router.get("/", auth, validateQuery(querySchema), async (req, res) => {
         if (source !== "default" && !username) {
             throw new Error("No Username given for personalized filter");
         }
-        const post = await getFilteredPosts({ tags, sort, source, username })
+        const post = await getFilteredPosts({ tags, sort, source, username,mode })
         console.log("Username passed to getFilteredPosts:", username);
-        const limitedPosts = await modeLimit({ post, mode })
-        res.status(200).json(limitedPosts)
+        /*const limitedPosts = await modeLimit({ post, mode })*/
+        res.status(200).json(post)
     } catch (error) {
         res.status(400).send(error.message)
     }

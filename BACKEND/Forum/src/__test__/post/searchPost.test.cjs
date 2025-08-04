@@ -81,7 +81,6 @@ describe("searchPosts", () => {
     const results = await searchPosts({ search: "hello", username: "testuser" });
 
     expect(translate).toHaveBeenCalledWith("Hello World", "es");
-    expect(translate).toHaveBeenCalledWith("Content A", "es");
     expect(results).toEqual([
       { postId: "1", title: "translated: Hello World" },
     ]);

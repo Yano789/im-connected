@@ -35,6 +35,7 @@ const createNewUser = async (data) => {
         //Check if user already exists
         const existingUserEmail = await User.findOne({ email });
         const existingUsername = await User.findOne({ username });
+        const existingNumber = await User.findOne({number})
 
         if (existingUserEmail) {
             throw Error("User with provided email already exists");
@@ -43,15 +44,16 @@ const createNewUser = async (data) => {
         else if (existingUsername) {
             throw Error("Username has been taken");
         }
+        else if(existingNumber){
+            throw Error("Mobile number has been taken")
+        }
         else {
             //hash password
             const hashedPassword = await hashData(password);
             const newUser = new User({
                 name,
-                name,
                 username,
                 email,
-                number,
                 number,
                 password: hashedPassword,
                 preferences: {
@@ -87,9 +89,55 @@ const updateUserPreferences = async ({ username, preferences }) => {
     } catch (error) {
         throw error;
     }
-
-
 };
+
+
+const updateUserDetails = async(data)=>{
+    try {
+        const {name,username,newUsername,number,email,password} = data
+        const callingUser = await User.find({username})
+        let errorMessage=[];
+        console.log(callingUser)
+        
+        if(username !== newUsername){
+            const preexistingUsername = await User.findOne({username:newUsername})
+            if(preexistingUsername){
+                errorMessage.push("Username is used. Please use another username.\n")
+                //throw Error("Username is used. Please use another username.")
+            }
+        }
+        console.log(callingUser[0].email)
+        if(callingUser[0].email!== email){
+        const preexistingEmail = await User.findOne({email})
+        if(preexistingEmail){
+            errorMessage.push("Email is used! Please choose another email\n")
+            //throw new Error("Email is used! Please choose another email")
+        }
+        }
+
+        if(callingUser[0].number!==number){
+        const preexistingNumber = await User.findOne({number})
+        if(preexistingNumber){
+            errorMessage.push("Number is used! Please choose another mobile number\n")
+            //throw new Error("Number is used! Please choose another mobile number")
+        }
+        }
+        console.log(errorMessage)
+        if(errorMessage.length > 0){
+            throw new Error(errorMessage)
+        }
+
+        
+
+        const hashedPassword = await hashData(password);
+        const newUser = await User.findOneAndUpdate({username:username},{name:name,username:newUsername,email:email,number:number,password:hashedPassword},{new:true});
+        const tokenData = { userId: newUser._id, email: newUser.email, username: newUser.username };
+        const token = await createToken(tokenData);
+        return {token,newUser}
+    } catch (error) {
+        throw error
+    }
+}
 
 const getUser = async (username)=>{
     try {
@@ -104,4 +152,4 @@ const getUser = async (username)=>{
     
 }
 
-module.exports = {createNewUser,authenticateUser, updateUserPreferences,getUser};
+module.exports = {createNewUser,authenticateUser, updateUserPreferences,getUser,updateUserDetails};

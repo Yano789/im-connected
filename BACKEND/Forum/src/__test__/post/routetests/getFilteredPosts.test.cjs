@@ -142,12 +142,10 @@ describe("get Filtered Posts)", () => {
             tags: [],
             sort: "latest",
             source: "default",
-            username: "testUser"
-        });
-        expect(modeLimit).toHaveBeenCalledWith({
-            post: mockPosts,
+            username: "testUser",
             mode: "default"
         });
+
     });
 
     test("should return filtered posts with personalised filter and tags", async () => {
@@ -171,11 +169,8 @@ describe("get Filtered Posts)", () => {
             tags: ["Pediatric Care"],
             sort: "latest",
             source: "personalised",
-            username: "caregiverMom"
-        });
-        expect(modeLimit).toHaveBeenCalledWith({
-            post: mockPosts,
-            mode: "default"
+            username: "caregiverMom",
+            mode:"default"
         });
     });
 });

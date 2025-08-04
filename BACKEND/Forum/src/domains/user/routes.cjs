@@ -1,9 +1,9 @@
 const express = require("express");
-const { createNewUser, authenticateUser, updateUserPreferences, getUser } = require("./controller.cjs");
+const { createNewUser, authenticateUser, updateUserPreferences, getUser,updateUserDetails } = require("./controller.cjs");
 const auth = require("../../middleware/auth.cjs");
 const { sendVerificationOTPEmail } = require("../email_verification/controller.cjs");
 const { validateBody } = require("../../middleware/validate.cjs")
-const { loginSchema, signupSchema, preferencesSchema} = require("../../utils/validators/userValidator.cjs")
+const { loginSchema, signupSchema, preferencesSchema,userDetailsSchema} = require("../../utils/validators/userValidator.cjs")
 const router = express.Router();
 
 
@@ -147,4 +147,27 @@ router.get("/getUser",auth,async(req,res)=>{
   }
 })
 
+router.post("/userDetails",auth,validateBody(userDetailsSchema),async(req,res)=>{
+  try {
+    const username = req.currentUser.username
+    const{name,newUsername,number,email,password} = req.body
+    const {token,newUser} = await updateUserDetails({name,username,newUsername,number,email,password})
+    res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "Strict"
+  });
+const isProduction = process.env.NODE_ENV === "production";
+const cookieOptions = {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "Strict",
+      maxAge: 24 * 60 * 60 * 1000
+    };
+res.cookie("token", token, cookieOptions);
+    return res.status(200).json(newUser)
+  } catch (error) {
+    return res.status(400).send(error.message)
+  }
+})
 module.exports = router;
