@@ -4,6 +4,7 @@ import "./ProfilePage.css";
 import UserInfoCard from "../UserInfoCard/UserInfoCard";
 import PreferencesCard from "../PreferencesCard/PreferencesCard";
 import i18next from "i18next";
+import { applyTextSize } from "../TextSize";
 
 function ProfilePage() {
   const [userData, setUserData] = useState("");
@@ -81,28 +82,39 @@ function ProfilePage() {
       ...prevData,
       preferences: updatedPreferences,
     }));
+
     if (category === "preferredLanguage") {
       i18next.changeLanguage(value);
     }
 
-    try {
-      const response = await fetch("http://localhost:5001/api/v1/user/preferences", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: userData.username,
-          language: updatedPreferences.preferredLanguage,
-          textSize: updatedPreferences.textSize,
-          contentMode: updatedPreferences.contentMode,
-          topics: updatedPreferences.topics || [],
-        }),
-      });
+    if (category === "textSize") {
+      applyTextSize(value);
+    }
 
-      const data = await response.json();
+    try {
+      const response = await fetch(
+        "http://localhost:5001/api/v1/user/preferences",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: userData.username,
+            language: updatedPreferences.preferredLanguage,
+            textSize: updatedPreferences.textSize,
+            contentMode: updatedPreferences.contentMode,
+            topics: updatedPreferences.topics || [],
+          }),
+        }
+      );
+
       if (!response.ok) {
-        console.error("Failed to update preferences:", data.error);
+        const errorData = await response.json(); 
+        console.error(
+          "Failed to update preferences:",
+          errorData.error || errorData
+        );
       }
     } catch (error) {
       console.error("Error updating preferences:", error);

@@ -1,6 +1,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
 @import "tailwindcss";
 
+:root {
+  --user-font-size: 14px;
+}
+
+html {
+  font-size: var(--user-font-size); 
+}
+
+
 body {
   font-family: 'Poppins', sans-serif;
 }

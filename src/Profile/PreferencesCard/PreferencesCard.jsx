@@ -63,10 +63,10 @@ function PreferencesCard({ preferences = {}, onPreferenceChange }) {
             Medium
           </button>
           <button
-            onClick={() => onPreferenceChange("textSize", "Big")}
-            className={textSize === "Big" ? "pref-button selected" : "pref-button"}
+            onClick={() => onPreferenceChange("textSize", "Large")}
+            className={textSize === "Large" ? "pref-button selected" : "pref-button"}
           >
-            Big
+            Large
           </button>
         </div>
       </div>
