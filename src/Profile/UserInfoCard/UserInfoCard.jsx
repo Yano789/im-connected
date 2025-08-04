@@ -1,43 +1,22 @@
 import React from 'react';
 import './UserInfoCard.css';
 
-function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, onAvatarChange, errors   }) {
+function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, errors }) {
     
     // --- FOR EDIT MODE ---
     if (isEditing) {
         return (
             <div className="user-card">
-                <div className="user-avatar-container">
-                    <img src={user.avatar} alt={user.name} className="user-avatar" />
-                    <label htmlFor="avatar-upload" className="avatar-upload-button">
-                        Change Picture
-                    </label>
-                    <input
-                        id="avatar-upload"
-                        type="file"
-                        accept="image/*"
-                        onChange={onAvatarChange}
-                        style={{ display: 'none' }}
-                    />
-                </div>
                 <div className="user-details">
                     <div className="detail-row edit-mode">
                         <label htmlFor="name" className="detail-label">Name:</label>
-                        <input type="text" id="name" name="name" value={user.name} onChange={onChange} />
+                        <input type="text" id="name" name="name" value={user.name || ''} onChange={onChange} />
+                        {errors.name && <p className="error-text">{errors.name}</p>}
                     </div>
                     <div className="detail-row edit-mode">
                         <label htmlFor="username" className="detail-label">Username:</label>
-                        <input type="text" id="username" name="username" value={user.username} onChange={onChange} />
-                    </div>
-                    <div className="detail-row edit-mode">
-                        <label htmlFor="password">New Password:</label>
-                        <input type="password" id="password" name="password" value={user.password} onChange={onChange} />
-                    </div>
-                    <div className="detail-row edit-mode">
-                        <label htmlFor="confirmPassword">Confirm Password:</label>
-                        <input type="password" id="confirmPassword" name="confirmPassword" value={user.confirmPassword} onChange={onChange} />
-                        {/* Show an error message if passwords don't match */}
-                        {errors.password && <p className="error-text">{errors.password}</p>}
+                        <input type="text" id="username" name="username" value={user.username || ''} onChange={onChange} />
+                        {errors.username && <p className="error-text">{errors.username}</p>}
                     </div>
                     <div className="detail-row edit-mode">
                         <label htmlFor="email" className="detail-label">Email Address:</label>
@@ -45,21 +24,20 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, onAvatar
                             type="email" 
                             id="email" 
                             name="email" 
-                            value={user.email} 
+                            value={user.email || ''} 
                             onChange={onChange} 
                             required 
                         />
                         {errors.email && <p className="error-text">{errors.email}</p>}                    
                     </div>
                     <div className="detail-row edit-mode">
-                        <label htmlFor="phone" className="detail-label">Phone Number:</label>
+                        <label htmlFor="number" className="detail-label">Phone Number:</label>
                         <input 
                             type="tel" 
-                            id="phone" 
-                            name="phone" 
-                            value={user.number} 
+                            id="number" 
+                            name="number" 
+                            value={user.number || ''} 
                             onChange={onChange}
-                            pattern="[0-9\s]+" 
                         />
                         {errors.number && <p className="error-text">{errors.number}</p>}
                     </div>
@@ -72,10 +50,6 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, onAvatar
     // --- FOR VIEW MODE ---
     return (
         <div className="user-card">
-            <div className="user-avatar-container">
-                <img src={user.avatar} alt={user.name} className="user-avatar" />
-                <button onClick={onEditClick} className="avatar-edit-button" title="Edit Profile">✏️</button>
-            </div>
             <div className="user-details">
                 <div className="detail-row">
                     <div>
@@ -101,7 +75,7 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, onAvatar
                 <div className="detail-row">
                     <div>
                         <span className="detail-label">Phone Number:</span>
-                        <span className="detail-value">{user.phone}</span>
+                        <span className="detail-value">{user.number}</span>
                     </div>
                      <button onClick={onEditClick} className="edit-icon-button">✏️</button>
                 </div>
