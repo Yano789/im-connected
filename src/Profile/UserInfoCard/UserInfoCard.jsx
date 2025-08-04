@@ -57,11 +57,11 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, onAvatar
                             type="tel" 
                             id="phone" 
                             name="phone" 
-                            value={user.phone} 
+                            value={user.number} 
                             onChange={onChange}
                             pattern="[0-9\s]+" 
                         />
-                        {errors.phone && <p className="error-text">{errors.phone}</p>}
+                        {errors.number && <p className="error-text">{errors.number}</p>}
                     </div>
                 </div>
                 <button onClick={onSave} className="save-profile-button">Save Changes</button>

@@ -11,6 +11,9 @@ coverage
 *.log
 .vscode
 .idea
+**/bin
+**/obj
+**/node_modules
 
 # Build artifacts
 dist
