@@ -25,41 +25,17 @@ const UserPreferences = () => {
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
 
-  // Load saved preferences and apply initial text size when component loads
+  //to set default options - replacing the localstorage since it kept track of pref last time
   useEffect(() => {
-    console.log("useEffect running - loading preferences");
-    const savedPreferences = localStorage.getItem("preferences");
-    console.log("Saved preferences:", savedPreferences);
-    
-    if (savedPreferences) {
-      try {
-        const preferences = JSON.parse(savedPreferences);
-        console.log("Parsed preferences:", preferences);
-        
-        if (preferences.textSize) {
-          console.log("Setting text size to:", preferences.textSize);
-          setSelectedTextSize(preferences.textSize);
-          applyTextSize(preferences.textSize);
-        }
-        if (preferences.language) {
-          console.log("Setting language to:", preferences.language);
-          setSelectedLanguage(preferences.language);
-          i18next.changeLanguage(preferences.language);
-        }
-        if (preferences.contentMode) {
-          setSelectedContentMode(preferences.contentMode);
-        }
-        if (preferences.topics) {
-          setSelectedTopics(preferences.topics);
-        }
-      } catch (error) {
-        console.error("Error loading saved preferences:", error);
-      }
-    } else {
-      // Apply default text size if no saved preferences
-      console.log("No saved preferences, applying default text size:", selectedTextSize);
-      applyTextSize(selectedTextSize);
-    }
+    setSelectedLanguage("en");
+    i18next.changeLanguage("en");
+
+    setSelectedTextSize("Medium");
+    applyTextSize("Medium");
+
+    setSelectedContentMode("Easy Read");
+
+    setSelectedTopics([]);
   }, []);
 
   const languages = [
@@ -135,12 +111,12 @@ const UserPreferences = () => {
   ];
 
   const handleTopicToggle = (topicId) => {
-    // Find the topic by ID to get the English label
+    //find topic by id for eng label
     const allTopics = [...getCareRecipientTopics(), ...getCaregiverTopics()];
     const topic = allTopics.find(t => t.id === topicId);
-    
+
     if (!topic) return;
-    
+
     setSelectedTopics((prev) => {
       if (prev.includes(topic.englishLabel)) {
         //if already selected, remove it
@@ -156,8 +132,7 @@ const UserPreferences = () => {
 
   const handlePreferenceChange = async (category, value) => {
     console.log("handlePreferenceChange called:", category, value);
-    
-    // Update local state immediately
+
     if (category === "language") {
       setSelectedLanguage(value);
       i18next.changeLanguage(value);
@@ -171,7 +146,6 @@ const UserPreferences = () => {
       console.log("Content mode changed to:", value);
     }
 
-    // Save to backend immediately
     const preferences = {
       language: category === "language" ? value : selectedLanguage,
       textSize: category === "textSize" ? value : selectedTextSize,
@@ -191,7 +165,6 @@ const UserPreferences = () => {
 
       if (res.ok) {
         console.log("Preference updated:", category, value);
-        localStorage.setItem("preferences", JSON.stringify(preferences));
       } else {
         console.error("Failed to update preference:", category, value);
       }
@@ -271,11 +244,9 @@ const UserPreferences = () => {
                   {languages.map((lang) => (
                     <button
                       key={lang.id}
-                      className={`language-btn ${
-                        selectedLanguage === lang.id ? "selected" : ""
-                      }`}
-                      onClick={() => handlePreferenceChange("language", lang.id)}
-                    >
+                      className={`language-btn ${selectedLanguage === lang.id ? "selected" : ""
+                        }`}
+                      onClick={() => handlePreferenceChange("language", lang.id)}>
                       {lang.label}
                     </button>
                   ))}
@@ -288,12 +259,10 @@ const UserPreferences = () => {
                   {textSizes.map((size) => (
                     <button
                       key={size.id}
-                      className={`text-size-btn ${
-                        selectedTextSize === size.id ? "selected" : ""
-                      }`}
+                      className={`text-size-btn ${selectedTextSize === size.id ? "selected" : ""
+                        }`}
                       onClick={() => handlePreferenceChange("textSize", size.id)}
-                      style={{ fontSize: size.fontSize }}
-                    >
+                      style={{ fontSize: size.fontSize }}>
                       {size.label}
                     </button>
                   ))}
@@ -302,15 +271,13 @@ const UserPreferences = () => {
 
               <div className="signup-preference-group">
                 <label className="signup-preference-label">{t("Content Mode")}</label>
-                                 <div className="content-mode-options">
-                   {getContentModes().map((mode) => (
+                <div className="content-mode-options">
+                  {getContentModes().map((mode) => (
                     <div
                       key={mode.id}
-                      className={`content-mode-card ${
-                        selectedContentMode === mode.id ? "selected" : ""
-                      }`}
-                      onClick={() => handlePreferenceChange("contentMode", mode.id)}
-                    >
+                      className={`content-mode-card ${selectedContentMode === mode.id ? "selected" : ""
+                        }`}
+                      onClick={() => handlePreferenceChange("contentMode", mode.id)}>
                       <div className="mode-preview">
                         <div className="preview-image"></div>
                         {mode.id === "Easy Read" && (
@@ -344,17 +311,16 @@ const UserPreferences = () => {
                 </div>
 
                 <div className="topics-grid">
-                                     <div className="topics-column">
-                     {getCareRecipientTopics().map((topic) => {
+                  <div className="topics-column">
+                    {getCareRecipientTopics().map((topic) => {
                       const isSelected = selectedTopics.includes(topic.englishLabel);
                       const isDisabled =
                         !isSelected && selectedTopics.length >= 2;
                       return (
                         <button
                           key={topic.id}
-                          className={`topic-btn ${
-                            isSelected ? "selected" : ""
-                          } ${isDisabled ? "disabled" : ""}`}
+                          className={`topic-btn ${isSelected ? "selected" : ""
+                            } ${isDisabled ? "disabled" : ""}`}
                           onClick={() => handleTopicToggle(topic.id)}
                         >
                           <span className="topic-icon">{topic.icon}</span>
@@ -364,21 +330,17 @@ const UserPreferences = () => {
                     })}
                   </div>
 
-                                     <div className="topics-column">
-                     {getCaregiverTopics().map((topic) => {
+                  <div className="topics-column">
+                    {getCaregiverTopics().map((topic) => {
                       const isSelected = selectedTopics.includes(topic.englishLabel);
-                      const isDisabled =
-                        !isSelected && selectedTopics.length >= 2;
-
+                      const isDisabled = !isSelected && selectedTopics.length >= 2;
                       return (
                         <button
                           key={topic.id}
-                          className={`topic-btn ${
-                            isSelected ? "selected" : ""
-                          } ${isDisabled ? "disabled" : ""}`}
+                          className={`topic-btn ${isSelected ? "selected" : ""
+                            } ${isDisabled ? "disabled" : ""}`}
                           onClick={() => handleTopicToggle(topic.id)}
-                          disabled={isDisabled}
-                        >
+                          disabled={isDisabled}>
                           <span className="topic-icon">{topic.icon}</span>
                           <span className="topic-text">{topic.label}</span>
                         </button>
