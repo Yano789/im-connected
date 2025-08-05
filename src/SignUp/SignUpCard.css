@@ -51,7 +51,7 @@
 
 .welcome-subtitle {
   font-size: 12px;
-  color: #333;
+  color: var(--text-colour);
   margin-top: 4px;
   margin-bottom: 0;
 }
@@ -71,7 +71,7 @@
 
 .form-label {
   font-size: 12px;
-  color: #333;
+  color: var(--text-colour);
 }
 
 .form-input {
@@ -139,7 +139,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: var(--border-1)
+  background: var(--border-1);
   border: 1px solid var(--shadow-2);
   border-radius: 8px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -178,7 +178,7 @@
 
 .country-code {
   font-size: 14px;
-  color: var(--shadow-3)
+  color: var(--shadow-3);
   font-family: 'SF Mono', Monaco, monospace;
 }
 
@@ -188,7 +188,7 @@
   display: flex;
   align-items: center;
   font-size: 14px;
-  color: #6b7280;
+  color: var(--area-code);
   border-right: 1px solid var(--shadow-1);
 }
 
@@ -198,7 +198,7 @@
   outline: none;
   padding: 0 8px;
   font-size: 14px;
-  color: #1f2937;
+  color: var(--phone-input);
   height: 38px;
   background: transparent;
 }
@@ -250,7 +250,7 @@
 .forgot-password {
   align-self: flex-end;
   font-size: 12px;
-  color: #555;
+  color: var(--password-toggle);
   text-decoration: underline;
   cursor: pointer;
   user-select: none;
@@ -297,7 +297,7 @@
   border: none;
   border-radius: 12px;
   background-color: var(--button-colour-1);
-  color: #333;
+  color: var(--text-colour);
   font-size: 14px;
   font-weight: 400;
   cursor: pointer;
