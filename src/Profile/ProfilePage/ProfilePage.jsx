@@ -41,18 +41,25 @@ function ProfilePage() {
     setUserData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleProfileSave = () => {
+  const handleProfileSave = async () => {
     const newErrors = {};
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const phoneRegex = /^[0-9\s]+$/;
+    const phoneRegex = /^\+[1-9]\d{6,14}$/;
+    
+    if (!userData.name || !/^[a-zA-Z]*$/.test(userData.name)) {
+      newErrors.name = "Name must contain only letters.";
+    }
+    
+    if (!userData.username) {
+      newErrors.username = "Username is required.";
+    }
+    
     if (!emailRegex.test(userData.email)) {
       newErrors.email = "Please enter a valid email address.";
     }
-    if (!phoneRegex.test(userData.phone)) {
-      newErrors.phone = "Phone number can only contain numbers and spaces.";
-    }
-    if (userData.password && userData.password !== userData.confirmPassword) {
-      newErrors.password = "Passwords do not match.";
+    
+    if (!phoneRegex.test(userData.number)) {
+      newErrors.number = "Phone number must be valid (e.g. +91234567).";
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -60,15 +67,37 @@ function ProfilePage() {
       return;
     }
 
-    setErrors({});
-    setIsEditingProfile(false);
-    console.log("Profile Saved!", userData);
-  };
+    try {
+      const response = await fetch(
+        "http://localhost:5001/api/v1/user/userDetails",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            name: userData.name,
+            newUsername: userData.username,
+            number: userData.number,
+            email: userData.email,
+          }),
+        }
+      );
 
-  const handleAvatarChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const newAvatarUrl = URL.createObjectURL(e.target.files[0]);
-      setUserData((prevData) => ({ ...prevData, avatar: newAvatarUrl }));
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUserData(updatedUser);
+        setErrors({});
+        setIsEditingProfile(false);
+        console.log("Profile updated successfully!");
+      } else {
+        const errorData = await response.text();
+        setErrors({ general: errorData });
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setErrors({ general: "Failed to update profile. Please try again." });
     }
   };
 
@@ -99,6 +128,7 @@ function ProfilePage() {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: "include",
           body: JSON.stringify({
             username: userData.username,
             language: updatedPreferences.preferredLanguage,
@@ -126,6 +156,11 @@ function ProfilePage() {
       <Header />
       <div className="profile-page-container">
         <div className="profile-greeting">
+          {errors.general && (
+            <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>
+              {errors.general}
+            </div>
+          )}
           <h1>
             How are you{" "}
             <span className="profile-name">
@@ -142,7 +177,6 @@ function ProfilePage() {
               onChange={handleProfileChange}
               onSave={handleProfileSave}
               onEditClick={() => setIsEditingProfile(true)}
-              onAvatarChange={handleAvatarChange}
               errors={errors}
             />
           </div>

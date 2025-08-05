@@ -150,8 +150,8 @@ router.get("/getUser",auth,async(req,res)=>{
 router.post("/userDetails",auth,validateBody(userDetailsSchema),async(req,res)=>{
   try {
     const username = req.currentUser.username
-    const{name,newUsername,number,email,password} = req.body
-    const {token,newUser} = await updateUserDetails({name,username,newUsername,number,email,password})
+    const{name,newUsername,number,email} = req.body
+    const {token,newUser} = await updateUserDetails({name,username,newUsername,number,email})
     res.clearCookie("token", {
     httpOnly: true,
     secure: true,

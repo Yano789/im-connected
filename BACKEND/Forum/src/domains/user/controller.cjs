@@ -94,7 +94,7 @@ const updateUserPreferences = async ({ username, preferences }) => {
 
 const updateUserDetails = async(data)=>{
     try {
-        const {name,username,newUsername,number,email,password} = data
+        const {name,username,newUsername,number,email} = data
         const callingUser = await User.find({username})
         let errorMessage=[];
         console.log(callingUser)
@@ -128,9 +128,7 @@ const updateUserDetails = async(data)=>{
         }
 
         
-
-        const hashedPassword = await hashData(password);
-        const newUser = await User.findOneAndUpdate({username:username},{name:name,username:newUsername,email:email,number:number,password:hashedPassword},{new:true});
+        const newUser = await User.findOneAndUpdate({username:username},{name:name,username:newUsername,email:email,number:number},{new:true});
         const tokenData = { userId: newUser._id, email: newUser.email, username: newUser.username };
         const token = await createToken(tokenData);
         return {token,newUser}
