@@ -32,7 +32,7 @@ const UserPreferences = () => {
   const textSizes = [
     { id: "Small", label: "Small", fontSize: "18px" },
     { id: "Medium", label: "Medium", fontSize: "24px" },
-    { id: "Big", label: "Big", fontSize: "32px" },
+    { id: "Large", label: "Big", fontSize: "32px" },
   ];
 
   const contentModes = [
