@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 import "./userPreferences.css";
@@ -11,8 +11,11 @@ import MentalHealth from "../assets/MentalHealth.png";
 import Money from "../assets/Money.png";
 import Wheelchair from "../assets/Wheelchair.png";
 import i18next from "i18next";
+import { useTranslation } from "react-i18next";
+import { applyTextSize } from "../Profile/TextSize";
 
 const UserPreferences = () => {
+  const { t } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [selectedTextSize, setSelectedTextSize] = useState("Medium");
   const [selectedContentMode, setSelectedContentMode] = useState("Easy Read");
@@ -21,6 +24,43 @@ const UserPreferences = () => {
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
+
+  // Load saved preferences and apply initial text size when component loads
+  useEffect(() => {
+    console.log("useEffect running - loading preferences");
+    const savedPreferences = localStorage.getItem("preferences");
+    console.log("Saved preferences:", savedPreferences);
+    
+    if (savedPreferences) {
+      try {
+        const preferences = JSON.parse(savedPreferences);
+        console.log("Parsed preferences:", preferences);
+        
+        if (preferences.textSize) {
+          console.log("Setting text size to:", preferences.textSize);
+          setSelectedTextSize(preferences.textSize);
+          applyTextSize(preferences.textSize);
+        }
+        if (preferences.language) {
+          console.log("Setting language to:", preferences.language);
+          setSelectedLanguage(preferences.language);
+          i18next.changeLanguage(preferences.language);
+        }
+        if (preferences.contentMode) {
+          setSelectedContentMode(preferences.contentMode);
+        }
+        if (preferences.topics) {
+          setSelectedTopics(preferences.topics);
+        }
+      } catch (error) {
+        console.error("Error loading saved preferences:", error);
+      }
+    } else {
+      // Apply default text size if no saved preferences
+      console.log("No saved preferences, applying default text size:", selectedTextSize);
+      applyTextSize(selectedTextSize);
+    }
+  }, []);
 
   const languages = [
     { id: "en", label: "English" },
@@ -32,72 +72,132 @@ const UserPreferences = () => {
   const textSizes = [
     { id: "Small", label: "Small", fontSize: "18px" },
     { id: "Medium", label: "Medium", fontSize: "24px" },
-    { id: "Big", label: "Big", fontSize: "32px" },
+    { id: "Large", label: "Large", fontSize: "32px" },
   ];
 
-  const contentModes = [
-    { id: "Easy Read", label: "Easy Reader Mode" },
-    { id: "Default", label: "Default Mode" },
+  const getContentModes = () => [
+    { id: "Easy Read", label: t("Easy Reader Mode") },
+    { id: "Default", label: t("Default Mode") },
   ];
 
-  const careRecipientTopics = [
+  const getCareRecipientTopics = () => [
     {
       id: "physical-disability",
-      label: "Physical Disability & Chronic Illness",
+      label: t("Physical Disability & Chronic Illness"),
+      englishLabel: "Physical Disability & Chronic Illness",
       icon: <img src={Wheelchair} alt="Wheelchair" />,
     },
     {
       id: "end-of-life",
-      label: "End of Life Care",
+      label: t("End of Life Care"),
+      englishLabel: "End of Life Care",
       icon: <img src={Elderly} alt="Elderly" />,
     },
     {
       id: "mental-disability",
-      label: "Mental Disability",
+      label: t("Mental Disability"),
+      englishLabel: "Mental Disability",
       icon: <img src={Depression} alt="Depression" />,
     },
     {
       id: "pediatric-care",
-      label: "Pediatric Care",
+      label: t("Pediatric Care"),
+      englishLabel: "Pediatric Care",
       icon: <img src={Children} alt="Children" />,
     },
   ];
 
-  const caregiverTopics = [
+  const getCaregiverTopics = () => [
     {
       id: "personal-mental-health",
-      label: "Personal Mental Health",
+      label: t("Personal Mental Health"),
+      englishLabel: "Personal Mental Health",
       icon: <img src={MentalHealth} alt="MentalHealth" />,
     },
     {
       id: "financial-legal",
-      label: "Financial & Legal Help",
+      label: t("Financial & Legal Help"),
+      englishLabel: "Financial & Legal Help",
       icon: <img src={Money} alt="Money" />,
     },
     {
       id: "hospitals",
-      label: "Hospitals and Clinics",
+      label: t("Hospitals and Clinics"),
+      englishLabel: "Hospitals and Clinics",
       icon: <img src={Hospital} alt="Hospital" />,
     },
     {
       id: "subsidies-govt",
-      label: "Subsidies and Govt Support",
+      label: t("Subsidies and Govt Support"),
+      englishLabel: "Subsidies and Govt Support",
       icon: <img src={Govt} alt="Govt" />,
     },
   ];
 
-  const handleTopicToggle = (topicLabel) => {
+  const handleTopicToggle = (topicId) => {
+    // Find the topic by ID to get the English label
+    const allTopics = [...getCareRecipientTopics(), ...getCaregiverTopics()];
+    const topic = allTopics.find(t => t.id === topicId);
+    
+    if (!topic) return;
+    
     setSelectedTopics((prev) => {
-      if (prev.includes(topicLabel)) {
+      if (prev.includes(topic.englishLabel)) {
         //if already selected, remove it
-        return prev.filter((label) => label !== topicLabel);
+        return prev.filter((label) => label !== topic.englishLabel);
       } else if (prev.length < 2) {
         //if less than 2 selected, add it
-        return [...prev, topicLabel];
+        return [...prev, topic.englishLabel];
       }
       //if 2 are already selected and this isn't one of them, do nothing
       return prev;
     });
+  };
+
+  const handlePreferenceChange = async (category, value) => {
+    console.log("handlePreferenceChange called:", category, value);
+    
+    // Update local state immediately
+    if (category === "language") {
+      setSelectedLanguage(value);
+      i18next.changeLanguage(value);
+      console.log("Language changed to:", value);
+    } else if (category === "textSize") {
+      setSelectedTextSize(value);
+      applyTextSize(value);
+      console.log("Text size changed to:", value);
+    } else if (category === "contentMode") {
+      setSelectedContentMode(value);
+      console.log("Content mode changed to:", value);
+    }
+
+    // Save to backend immediately
+    const preferences = {
+      language: category === "language" ? value : selectedLanguage,
+      textSize: category === "textSize" ? value : selectedTextSize,
+      contentMode: category === "contentMode" ? value : selectedContentMode,
+      topics: selectedTopics,
+    };
+
+    try {
+      const res = await fetch("http://localhost:5001/api/v1/user/preferences", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ username, ...preferences }),
+      });
+
+      if (res.ok) {
+        console.log("Preference updated:", category, value);
+        localStorage.setItem("preferences", JSON.stringify(preferences));
+      } else {
+        console.error("Failed to update preference:", category, value);
+      }
+    } catch (err) {
+      console.error("Error updating preference:", err);
+    }
   };
 
   const handleContinue = async (e) => {
@@ -153,19 +253,19 @@ const UserPreferences = () => {
   };
 
   return (
-    <div className="preferences-container">
+    <div className="preferences-container" key={selectedLanguage}>
       <div className="signup-preferences-card">
         <div className="preferences-content">
           <div className="header-section">
-            <h1 className="greeting">Hi {username}!</h1>
-            <p className="subtitle">We want to get to know you better</p>
+            <h1 className="greeting">{t("Hi")} {username}!</h1>
+            <p className="subtitle">{t("We want to get to know you better")}</p>
           </div>
 
           <div className="main-content">
             <div className="left-column">
               <div className="signup-preference-group">
                 <label className="signup-preference-label">
-                  Preferred Language
+                  {t("Preferred Language")}
                 </label>
                 <div className="language-options">
                   {languages.map((lang) => (
@@ -174,10 +274,7 @@ const UserPreferences = () => {
                       className={`language-btn ${
                         selectedLanguage === lang.id ? "selected" : ""
                       }`}
-                      onClick={() => {
-                        setSelectedLanguage(lang.id);
-                        i18next.changeLanguage(lang.id);
-                      }}
+                      onClick={() => handlePreferenceChange("language", lang.id)}
                     >
                       {lang.label}
                     </button>
@@ -186,7 +283,7 @@ const UserPreferences = () => {
               </div>
 
               <div className="signup-preference-group">
-                <label className="signup-preference-label">Text Size</label>
+                <label className="signup-preference-label">{t("Text Size")}</label>
                 <div className="text-size-options">
                   {textSizes.map((size) => (
                     <button
@@ -194,7 +291,7 @@ const UserPreferences = () => {
                       className={`text-size-btn ${
                         selectedTextSize === size.id ? "selected" : ""
                       }`}
-                      onClick={() => setSelectedTextSize(size.id)}
+                      onClick={() => handlePreferenceChange("textSize", size.id)}
                       style={{ fontSize: size.fontSize }}
                     >
                       {size.label}
@@ -204,15 +301,15 @@ const UserPreferences = () => {
               </div>
 
               <div className="signup-preference-group">
-                <label className="signup-preference-label">Content Mode</label>
-                <div className="content-mode-options">
-                  {contentModes.map((mode) => (
+                <label className="signup-preference-label">{t("Content Mode")}</label>
+                                 <div className="content-mode-options">
+                   {getContentModes().map((mode) => (
                     <div
                       key={mode.id}
                       className={`content-mode-card ${
                         selectedContentMode === mode.id ? "selected" : ""
                       }`}
-                      onClick={() => setSelectedContentMode(mode.id)}
+                      onClick={() => handlePreferenceChange("contentMode", mode.id)}
                     >
                       <div className="mode-preview">
                         <div className="preview-image"></div>
@@ -238,18 +335,18 @@ const UserPreferences = () => {
             <div className="right-column">
               <div className="signup-preference-group">
                 <label className="signup-preference-label">
-                  Topics Interested In
+                  {t("Topics Interested In")}
                 </label>
 
                 <div className="topics-header">
-                  <span>For Care Recipient</span>
-                  <span>For Caregiver</span>
+                  <span>{t("For Care Recipient")}</span>
+                  <span>{t("For Caregiver")}</span>
                 </div>
 
                 <div className="topics-grid">
-                  <div className="topics-column">
-                    {careRecipientTopics.map((topic) => {
-                      const isSelected = selectedTopics.includes(topic.label);
+                                     <div className="topics-column">
+                     {getCareRecipientTopics().map((topic) => {
+                      const isSelected = selectedTopics.includes(topic.englishLabel);
                       const isDisabled =
                         !isSelected && selectedTopics.length >= 2;
                       return (
@@ -258,7 +355,7 @@ const UserPreferences = () => {
                           className={`topic-btn ${
                             isSelected ? "selected" : ""
                           } ${isDisabled ? "disabled" : ""}`}
-                          onClick={() => handleTopicToggle(topic.label)}
+                          onClick={() => handleTopicToggle(topic.id)}
                         >
                           <span className="topic-icon">{topic.icon}</span>
                           <span className="topic-text">{topic.label}</span>
@@ -267,9 +364,9 @@ const UserPreferences = () => {
                     })}
                   </div>
 
-                  <div className="topics-column">
-                    {caregiverTopics.map((topic) => {
-                      const isSelected = selectedTopics.includes(topic.label);
+                                     <div className="topics-column">
+                     {getCaregiverTopics().map((topic) => {
+                      const isSelected = selectedTopics.includes(topic.englishLabel);
                       const isDisabled =
                         !isSelected && selectedTopics.length >= 2;
 
@@ -279,7 +376,7 @@ const UserPreferences = () => {
                           className={`topic-btn ${
                             isSelected ? "selected" : ""
                           } ${isDisabled ? "disabled" : ""}`}
-                          onClick={() => handleTopicToggle(topic.label)}
+                          onClick={() => handleTopicToggle(topic.id)}
                           disabled={isDisabled}
                         >
                           <span className="topic-icon">{topic.icon}</span>
@@ -295,7 +392,7 @@ const UserPreferences = () => {
 
           <div className="footer-section">
             <button className="continue-btn" onClick={handleContinue}>
-              Continue
+              {t("Continue")}
             </button>
           </div>
         </div>

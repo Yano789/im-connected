@@ -1,1 +1,4 @@
-{}
+{
+  "/api/assistants/threads/route": "app/api/assistants/threads/route.js",
+  "/api/assistants/threads/[threadId]/messages/route": "app/api/assistants/threads/[threadId]/messages/route.js"
+}

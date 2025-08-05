@@ -24,8 +24,7 @@ function PreferencesCard({ preferences = {}, onPreferenceChange }) {
             onClick={() => onPreferenceChange("preferredLanguage", "zh")}
             className={
               preferredLanguage === "zh" ? "pref-button selected" : "pref-button"
-            }
-          >
+            }>
             中文
           </button>
           <button
