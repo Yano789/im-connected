@@ -1,8 +1,8 @@
 .post {
   width: 100%;
-  background-color: #fffdf9;
+  background-color: var(--border-1);
   padding: 1.25rem; 
-  border: 1px solid #1e1e1e;
+  border: 1px solid var(--border-2);
   box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
   border-radius: 5px;
   display: flex;
@@ -86,8 +86,8 @@
 }
 
 .tagItem {
-  background-color: #fff2f0;
-  border: 1px solid #1e1e1e;
+  background-color: var(--button-colour-2);
+  border: 1px solid var(--border-2);
   padding: 0.5rem 1rem; 
   border-radius: 20px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1); 

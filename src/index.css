@@ -14,13 +14,12 @@
   --header-colour: #ab97c3; /* purple */
   --accent-colour-1: #c8b8db; /* search bar light purple */
   --accent-colour-2: #956bff; /* dark purple */
-  --accent-colour-3: #ffffff;
   --shadow-1: #e5e7eb; /* blueish grey used for login */
   --shadow-2: #f9fafb; /* light grey */
   --shadow-3: #6b7280; /* dark grey */
   --border-1: #FFFDF9;  /* white */
   --border-2: #2d2d2d;  /* black */
-  --placeholder-colour: #9ca3af;
+  --placeholder-colour: #9ca3af; /* grey */
   --success-text: #10b981;  /* green */
   --error-text: #BA1111; /* red */
   --med-accent: #DB7570; /* salmon pink */
