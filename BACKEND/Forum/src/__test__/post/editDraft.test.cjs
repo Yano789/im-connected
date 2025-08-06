@@ -98,7 +98,7 @@ describe("editing drafts", () => {
       save: mockSave
     };
 
-    Post.findOne.mockResolvedValue(mockDraft);
+    Post.findOne.mockResolvedValueOnce(mockDraft);
     cloudinary.uploader.destroy.mockResolvedValueOnce({ result: "ok" });
 
     const result = await editDraft({
@@ -107,7 +107,9 @@ describe("editing drafts", () => {
       newMedia: [{ public_id: "new_file", type: "image" }]
     });
 
+    expect(cloudinary.uploader.destroy).toHaveBeenCalledTimes(1);
     expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("remove_me", { resource_type: "video" });
+
     expect(result.media).toEqual([
       { public_id: "keep_me", type: "image" },
       { public_id: "new_file", type: "image" }
@@ -115,26 +117,72 @@ describe("editing drafts", () => {
     expect(mockSave).toHaveBeenCalled();
   });
 
-  test("measures time for cloudinary and save", async () => {
+  test("handles multiple media removals", async () => {
     const mockSave = jest.fn().mockResolvedValue(true);
+
     const mockDraft = {
       postId: "post123",
       username: "user1",
       draft: true,
-      media: [],
+      media: [
+        { public_id: "remove1", type: "image" },
+        { public_id: "remove2", type: "video" },
+        { public_id: "keep", type: "image" }
+      ],
       save: mockSave
     };
-    Post.findOne.mockResolvedValue(mockDraft);
+
+    Post.findOne.mockResolvedValueOnce(mockDraft);
     cloudinary.uploader.destroy.mockResolvedValue({ result: "ok" });
 
-    const timeSpy = jest.spyOn(console, "time");
-    const timeEndSpy = jest.spyOn(console, "timeEnd");
-
-    await editDraft({
+    const result = await editDraft({
       ...baseData,
-      mediaToRemove: [],
+      mediaToRemove: ["remove1", "remove2"],
       newMedia: []
     });
 
+    expect(cloudinary.uploader.destroy).toHaveBeenCalledTimes(2);
+    expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("remove1", { resource_type: "image" });
+    expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("remove2", { resource_type: "video" });
+
+    expect(result.media).toEqual([
+      { public_id: "keep", type: "image" }
+    ]);
+    expect(mockSave).toHaveBeenCalled();
+  });
+
+  test("handles errors in cloudinary destroy without failing", async () => {
+    const mockSave = jest.fn().mockResolvedValue(true);
+
+    const mockDraft = {
+      postId: "post123",
+      username: "user1",
+      draft: true,
+      media: [
+        { public_id: "remove_me", type: "image" }
+      ],
+      save: mockSave
+    };
+
+    Post.findOne.mockResolvedValueOnce(mockDraft);
+    cloudinary.uploader.destroy.mockRejectedValueOnce(new Error("Cloudinary error"));
+
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+
+    const result = await editDraft({
+      ...baseData,
+      mediaToRemove: ["remove_me"],
+      newMedia: []
+    });
+
+    expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("remove_me", { resource_type: "image" });
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect.stringContaining("Error deleting media remove_me"),
+      expect.any(Error)
+    );
+    expect(result.media).toEqual([]);
+    expect(mockSave).toHaveBeenCalled();
+
+    consoleErrorSpy.mockRestore();
   });
 });

@@ -26,13 +26,15 @@ router.post("/create", auth, upload.array("media", 5), normalizeTagsMiddleware, 
         console.log(createdPost)
         res.status(200).json(createdPost);
     } catch (error) {
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                await cloudinary.uploader.destroy(file.filename, { resource_type: "auto" });
-            }
+    if (req.files && req.files.length > 0) {
+        for (const file of req.files) {
+            await cloudinary.uploader.destroy(file.filename, { resource_type: "auto" });
         }
-        res.status(400).send(error.message);
     }
+    // Send JSON error response
+    res.status(400).json({ error: error.message || error.toString() });
+}
+
 });
 
 

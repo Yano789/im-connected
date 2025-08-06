@@ -1,12 +1,13 @@
 jest.mock("../../domains/post/model.cjs");
 jest.mock("../../domains/user/model.cjs");
 jest.mock("../../domains/translation/controller.cjs");
+jest.mock("../../utils/cacheBuster.cjs");
 
 const { Post } = require("../../domains/post/model.cjs");
 const User = require("../../domains/user/model.cjs");
 const translate = require("../../domains/translation/controller.cjs");
+const addCacheBuster  = require("../../utils/cacheBuster.cjs");
 
-// Import real getFilteredPosts from controller (no mocking of addCacheBuster)
 const { getFilteredPosts } = require("../../domains/post/controller.cjs");
 
 describe("getFilteredPosts", () => {
@@ -31,6 +32,7 @@ describe("getFilteredPosts", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    addCacheBuster.mockImplementation(url => `${url}?cb=1234567890`);  // <-- mock here
   });
 
   it("returns filtered and translated posts based on user preferences", async () => {
@@ -60,7 +62,7 @@ describe("getFilteredPosts", () => {
     expect(mockLimit).toHaveBeenCalledWith(10);
     expect(posts[0].title).toBe("Original Title [es]");
     expect(posts[0].content).toBe("Original Content [es]");
-    expect(posts[0].media[0].url).toMatch(/\?cb=\d+$/);
+    expect(posts[0].media[0].url).toBe("https://example.com/image1.jpg?cb=1234567890");
   });
 
  it("uses fallback query if no posts found with preferences", async () => {

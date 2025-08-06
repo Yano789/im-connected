@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const { TOKEN_KEY } = process.env;
+
 
 const verifyToken = async (req, res, next) => {
     //const token = req?.body?.token || req?.query?.token || req?.headers?.["x-access-token"];
@@ -16,7 +16,7 @@ const verifyToken = async (req, res, next) => {
 
     //verify token
     try {
-        const decodedToken = jwt.verify(token, TOKEN_KEY);
+        const decodedToken = jwt.verify(token, process.env.TOKEN_KEY);
         req.currentUser = decodedToken;
         console.log('Auth middleware - Token valid for user:', decodedToken.username);
         next();

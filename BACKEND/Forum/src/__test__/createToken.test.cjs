@@ -1,24 +1,32 @@
+jest.mock('jsonwebtoken', () => ({
+  sign: jest.fn(), // mock only jwt.sign
+}));
 
 const jwt = require('jsonwebtoken');
-const createToken = require("./../utils/createToken.cjs")
-
+const createToken = require('./../utils/createToken.cjs');
 
 describe("utils.createToken() tests", () => {
-    const tokenData = { userId: 123 }
-    const tokenKey = 'secretKey'
-    const expiresIn = '1h'
-    test("testing createToken()", async () => {
+  const tokenData = { userId: 123 };
+  const tokenKey = 'secretKey';
+  const expiresIn = '1h';
 
-        const token = await createToken(tokenData, tokenKey, expiresIn)
-        expect(typeof token).toBe('string');
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-        const decoded = jwt.verify(token, tokenKey);
-        expect(decoded.userId).toBe(tokenData.userId);
-    })
+  test("should return token from jwt.sign", async () => {
+    jwt.sign.mockReturnValue('mockedToken');
 
-  test('should throw error if key is invalid', async () => {
-    const invalidKey = null;
-    await expect(createToken(tokenData, invalidKey, expiresIn)).rejects.toThrow();
-  })
+    const token = await createToken(tokenData, tokenKey, expiresIn);
 
-})
+    expect(jwt.sign).toHaveBeenCalledWith(tokenData, tokenKey, { expiresIn });
+    expect(token).toBe('mockedToken');
+  });
+
+  test("should throw if jwt.sign throws", async () => {
+    const fakeError = new Error("sign error");
+    jwt.sign.mockImplementation(() => { throw fakeError; });
+
+    await expect(createToken(tokenData, tokenKey, expiresIn)).rejects.toThrow("sign error");
+  });
+});
