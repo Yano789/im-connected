@@ -26,6 +26,7 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV:-production}
       - PORT=${PORT}
+      - AI_CHATBOT_URL=http://ai-chatbot:3000
       - MONGODB_URI=${MONGODB_URI}
       - TOKEN_KEY=${TOKEN_KEY}
       - TOKEN_EXPIRY=${TOKEN_EXPIRY}

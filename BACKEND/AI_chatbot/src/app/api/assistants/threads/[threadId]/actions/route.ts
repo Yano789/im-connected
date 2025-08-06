@@ -50,6 +50,7 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:5173",
   "http://localhost:5001",
   "http://localhost:80",
+  "http://localhost:8080",
 ]);
 
 function makeCorsHeaders(origin: string | null) {
