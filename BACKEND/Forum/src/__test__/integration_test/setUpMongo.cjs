@@ -1,28 +1,33 @@
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-
-let mongoServer;
-
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const path = require("path");
+// Load environment variables from .env.test
+dotenv.config({ path: path.resolve(__dirname, ".env.test") });
+if (process.env.NODE_ENV !== "test") {
+  throw new Error("❌ You are running tests in a non-test environment. Aborting.");
+}
 beforeAll(async () => {
-  process.env.NODE_ENV="test";
-  mongoServer = await MongoMemoryServer.create();
-  const uri = mongoServer.getUri();
+  const uri = process.env.MONGODB_URI;
 
+  if (!uri) {
+    throw new Error("❌ MONGODB_URI is not defined in .env.test");
+  }
+console.log("Connecting to MongoDB at:", process.env.MONGODB_URI);
   await mongoose.connect(uri, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-});
 
-afterEach(async () => {
-  // Clear all collections after each test
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    await collections[key].deleteMany();
-  }
+  console.log("✅ Connected to test MongoDB");
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("Mongo URI:", process.env.MONGODB_URI);
+mongoose.connection.on('connected', () => {
+  console.log("Mongoose connected to", mongoose.connection.host, mongoose.connection.name);
+});
 });
 
 afterAll(async () => {
+
   await mongoose.disconnect();
-  await mongoServer.stop();
+  console.log("🛑 Disconnected from test MongoDB");
 });
