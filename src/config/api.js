@@ -16,7 +16,7 @@ const SCANNER_API_BASE_URL = typeof window !== 'undefined' &&
 const AI_CHATBOT_API_BASE_URL = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:3000'
-  : 'https://ai-chatbot.up.railway.app';
+  : 'https://ai-chatbot-production.up.railway.app';
 
 // API endpoints
 export const API_ENDPOINTS = {
