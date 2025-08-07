@@ -3,6 +3,8 @@
 
 import { API_ENDPOINTS } from '../../config/api.js';
 
+import { API_ENDPOINTS } from '../../config/api.js';
+
 class MedicationDatabaseService {
     constructor() {
         // Use the centralized API configuration
@@ -453,8 +455,8 @@ class MedicationDatabaseService {
             const formData = new FormData();
             formData.append('medicationImage', imageFile);
 
-            // Use the scanner API directly for preview
-            const response = await fetch('http://localhost:3001/scan-medication', {
+            // Use the scanner API endpoints from config
+            const response = await fetch(API_ENDPOINTS.SCANNER_SCAN_MEDICATION, {
                 method: 'POST',
                 body: formData,
             });

@@ -5,11 +5,11 @@ const API_BASE_URL = typeof window !== 'undefined' &&
   : ''; // Empty string for relative paths in production (same domain)
 
 // Scanner API configuration - for OCR scanning functionality
-// In production, scanner service is disabled since it's a separate service not deployed to Railway
+// In production, use the Railway scanner service URL
 const SCANNER_API_BASE_URL = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:3001'
-  : null; // Disabled in production
+  : 'https://scanner-service.up.railway.app';
 
 // API endpoints
 export const API_ENDPOINTS = {
@@ -66,7 +66,7 @@ export const API_ENDPOINTS = {
   MEDICATION_DELETE_IMAGE: `${API_BASE_URL}/api/v1/medication/delete-image`,
   MEDICATION_HEALTH: `${API_BASE_URL}/api/v1/medication/health`,
   
-  // Scanner API endpoints (OCR functionality) - only available in development
+  // Scanner API endpoints (OCR functionality) - available in both development and production
   SCANNER_HEALTH: SCANNER_API_BASE_URL ? `${SCANNER_API_BASE_URL}/health` : null,
   SCANNER_SCAN_MEDICATION: SCANNER_API_BASE_URL ? `${SCANNER_API_BASE_URL}/scan-medication` : null,
   

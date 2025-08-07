@@ -16,9 +16,9 @@ class MedicationService {
    */
   async checkApiHealth() {
     try {
-      // Check if scanner API is available (only in development)
+      // Check if scanner API is available
       if (!API_ENDPOINTS.SCANNER_HEALTH) {
-        console.log('Scanner API is disabled in production environment');
+        console.log('Scanner API endpoint is not configured');
         return false;
       }
 
@@ -60,9 +60,9 @@ class MedicationService {
    */
   async scanMedicationImage(imageFile) {
     try {
-      // Check if scanner API is available (only in development)
+      // Check if scanner API is available
       if (!API_ENDPOINTS.SCANNER_SCAN_MEDICATION) {
-        throw new Error('Scanner service is not available in production. OCR scanning is only available in development mode.');
+        throw new Error('Scanner service is not available. Please check the scanner configuration.');
       }
 
       console.log('Scanner Service: Starting scan with file:', imageFile);
@@ -132,9 +132,9 @@ class MedicationService {
    */
   async checkScannerApiHealth() {
     try {
-      // Check if scanner API is available (only in development)
+      // Check if scanner API is available
       if (!API_ENDPOINTS.SCANNER_HEALTH) {
-        console.log('Scanner API is disabled in production environment');
+        console.log('Scanner API endpoint is not configured');
         return false;
       }
 
