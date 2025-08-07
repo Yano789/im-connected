@@ -8,6 +8,7 @@ import UnlikesIcon from "../../assets/Unlikes.png";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function ViewPostCard() {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ function ViewPostCard() {
     if (!postId) return;
 
     fetch(
-      `http://localhost:5001/api/v1/post/getPost/${encodeURIComponent(postId)}`,
+      API_ENDPOINTS.POST_BY_ID(postId),
       {
         method: "GET",
         credentials: "include",
@@ -69,7 +70,7 @@ function ViewPostCard() {
   const fetchComments = useCallback(() => {
     if (!postId) return;
     fetch(
-      `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/`,
+      API_ENDPOINTS.COMMENT_BY_POST(postId),
       {
         method: "GET",
         credentials: "include",
@@ -93,9 +94,7 @@ function ViewPostCard() {
   const handleLikeToggle = async (e) => {
     e.stopPropagation();
     try {
-      const url = `http://localhost:5001/api/v1/like/${encodeURIComponent(
-        postId
-      )}/${liked ? "unlike" : "like"}`;
+      const url = API_ENDPOINTS.LIKE_ACTION(postId, liked ? "unlike" : "like");
       const method = liked ? "DELETE" : "POST";
 
       const res = await fetch(url, {

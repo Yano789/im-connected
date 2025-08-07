@@ -1,4 +1,5 @@
 import i18next from 'i18next';
+import { API_ENDPOINTS } from '../../config/api.js';
 
 // Language mapping for Google Translate API
 const languageMap = {
@@ -8,9 +9,14 @@ const languageMap = {
     'zh': 'zh'
 };
 
+/**
+ * Medication Translation Service
+ * Handles translation of medication information to user's preferred language
+ * Uses the Forum API for translation services
+ */
 class MedicationTranslationService {
     constructor() {
-        this.baseUrl = 'http://localhost:5001/api/v1/lang'; // Forum API base URL (corrected path)
+        this.baseUrl = API_ENDPOINTS.TRANSLATE; // Forum API translation endpoint
         this.cache = new Map(); // Simple cache to avoid re-translating same text
     }
 

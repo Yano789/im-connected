@@ -6,6 +6,7 @@ import TopicSelector from "../TopicSelector/TopicSelector";
 import Delete from "../Delete/Delete";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function MyPostBody() {
   const [loading, setLoading] = useState(true);
@@ -39,7 +40,7 @@ function MyPostBody() {
       try {
         const params = new URLSearchParams(query).toString();
         const response = await fetch(
-          `http://localhost:5001/api/v1/post/?${params}`,
+          `${API_ENDPOINTS.POST_BASE}/?${params}`,
           {
             method: "GET",
             credentials: "include",
@@ -61,7 +62,7 @@ function MyPostBody() {
   useEffect(() => {
     const fetchLikedPosts = async () => {
       try {
-        const likedRes = await fetch("http://localhost:5001/api/v1/like", {
+        const likedRes = await fetch(API_ENDPOINTS.LIKE_BASE, {
           method: "GET",
           credentials: "include",
         });

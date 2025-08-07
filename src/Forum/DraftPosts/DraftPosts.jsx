@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./DraftPosts.css";
 import DraftEntry from "../DraftEntry/DraftEntry";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function DraftPosts({ refreshTrigger, onDraftSelected }) {
   const [drafts, setDrafts] = useState([]);
@@ -11,7 +12,7 @@ function DraftPosts({ refreshTrigger, onDraftSelected }) {
   const fetchDrafts = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5001/api/v1/post/myDrafts",
+        API_ENDPOINTS.POST_MY_DRAFTS,
         {
           method: "GET",
           credentials: "include",
@@ -42,9 +43,7 @@ function DraftPosts({ refreshTrigger, onDraftSelected }) {
   const handleDeleteDraft = async (postId) => {
     try {
       const response = await fetch(
-        `http://localhost:5001/api/v1/post/myDrafts/${encodeURIComponent(
-          postId
-        )}/delete`,
+        API_ENDPOINTS.POST_DRAFT_DELETE(postId),
         {
           method: "DELETE",
           credentials: "include",
@@ -64,9 +63,7 @@ function DraftPosts({ refreshTrigger, onDraftSelected }) {
   const handleOpenDraft = async (postId) => {
     try {
       const response = await fetch(
-        `http://localhost:5001/api/v1/post/myDrafts/${encodeURIComponent(
-          postId
-        )}`,
+        API_ENDPOINTS.POST_DRAFT_BY_ID(postId),
         {
           method: "GET",
           credentials: "include",

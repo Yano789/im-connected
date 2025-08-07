@@ -5,6 +5,8 @@
 export { summarize_text };*/
 
 
+import { API_ENDPOINTS } from '../../config/api.js';
+
 const summarize_text = async (postTitle): Promise<string> => {
   console.log('I entered summary.ts summarize_text()')
   console.log(`this is what what inputted ${postTitle}`);
@@ -14,7 +16,7 @@ const summarize_text = async (postTitle): Promise<string> => {
 
   const encodedTitle = encodeURIComponent(postTitle.trim());
   const resp = await fetch(
-    `http://localhost:5001/api/v1/post/getPost/title/${encodedTitle}`,
+    API_ENDPOINTS.POST_BY_TITLE(encodedTitle),
     {
       method:      "GET",
       credentials: "include"

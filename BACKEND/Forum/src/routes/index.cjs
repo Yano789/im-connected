@@ -10,6 +10,7 @@ const savedPostRoutes = require("../domains/savedPosts/index.cjs");
 const likedPostRoutes = require("./../domains/likes/index.cjs")
 const medicationRoutes = require("../domains/medication/index.cjs");
 const transalationRoutes =require("./../domains/translation/index.cjs")
+const scannerRoutes = require("../domains/scanner/index.cjs");
 
 router.use("/user",userRoutes);
 router.use("/otp",OTPRoutes);
@@ -21,4 +22,5 @@ router.use("/saved",savedPostRoutes);
 router.use("/like",likedPostRoutes);
 router.use("/medication",medicationRoutes);
 router.use("/lang",transalationRoutes);
+router.use("/scanner",scannerRoutes);
 module.exports = router;

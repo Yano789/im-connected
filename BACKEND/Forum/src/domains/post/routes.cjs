@@ -5,7 +5,7 @@ const {validateBody,validateParams,validateQuery} = require("./../../middleware/
 const {postDraftSchema,querySchema,paramsSchema,postTitleParamSchema,searchBarParamSchema} = require("./../../utils/validators/postValidator.cjs")
 const upload = require("../../config/googleStorage.cjs");
 const normalizeTagsMiddleware = require("./../../middleware/normalizeTags.cjs");
-const { gcsClient } = require("../../config/googleConfig.cjs"); // Update path if needed
+const { gcsClient } = require("../../config/gcsStorage.cjs"); // Consolidated to one config
 const router = express.Router();
 
 //create post/Draft

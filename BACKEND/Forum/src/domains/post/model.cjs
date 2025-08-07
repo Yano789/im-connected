@@ -19,7 +19,7 @@ postId: { type: String, unique: true, index: true },
   media:[{
     url:{type:String,required:true},
     type:{type:String,required:true,enum:["image","video"]},
-    public_id:{type:String,required:true} //for deleting from cloudinary
+    public_id:{type:String,required:true} //for deleting from GCS
   }]
 });
 

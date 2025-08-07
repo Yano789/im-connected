@@ -2,6 +2,7 @@ import "./MedDashboard.css";
 import MedDashboardEntry from "../MedDashboardEntry/MedDashboardEntry";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function DashboardItem() {
   const [medications, setMedications] = useState([]);
@@ -11,7 +12,7 @@ function DashboardItem() {
     const fetchMedications = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5001/api/v1/medication/medications",
+          API_ENDPOINTS.MEDICATION_BASE,
           {
             method: "GET",
             credentials: "include",

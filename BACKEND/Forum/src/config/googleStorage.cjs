@@ -1,10 +1,16 @@
 const multer = require('multer');
-const { gcsClient } = require('./googleConfig.cjs');
-const crypto = require("crypto")
+const { gcsClient } = require('./gcsStorage.cjs');
+const crypto = require("crypto");
 
 class GCSStorage {
   constructor(options) {
     this.options = options;
+    
+    // Validate that gcsClient and bucket are available
+    if (!options.gcsClient || !options.gcsClient.bucket) {
+      throw new Error('Google Cloud Storage client or bucket not properly initialized');
+    }
+    
     this.bucket = options.gcsClient.bucket;
     this.bucketName = options.gcsClient.bucketName;
   }
@@ -49,30 +55,51 @@ class GCSStorage {
         });
 
         stream.on('finish', async () => {
-          // Pass expires as a Date object here
-          const [signedUrl] = await fileUpload.getSignedUrl({
-            version: 'v4',
-            action: 'read',
-            expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
-          });
-          console.log(signedUrl)
+          try {
+            // Generate signed URL for access
+            const [signedUrl] = await fileUpload.getSignedUrl({
+              version: 'v4',
+              action: 'read',
+              expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+            });
+            console.log('Generated signed URL:', signedUrl)
 
-          cb(null, {
-            public_id: fileName,  // full path with extension
-            secure_url: signedUrl,
-            url: signedUrl,
-            resource_type,
-            format,
-            bytes: file.size || 0,
-            folder,
-            original_filename: file.originalname,
-            filename: fileName,
-            bucket: this.bucketName,
-            fieldname: file.fieldname,
-            originalname: file.originalname,
-            mimetype: file.mimetype,
-            size: file.size || 0,
-          });
+            cb(null, {
+              public_id: fileName,  // full path with extension
+              secure_url: signedUrl,
+              url: signedUrl,
+              resource_type,
+              format,
+              bytes: file.size || 0,
+              folder,
+              original_filename: file.originalname,
+              filename: fileName,
+              bucket: this.bucketName,
+              fieldname: file.fieldname,
+              originalname: file.originalname,
+              mimetype: file.mimetype,
+              size: file.size || 0,
+            });
+          } catch (urlError) {
+            console.error('Error generating signed URL:', urlError);
+            // Fallback without signed URL
+            cb(null, {
+              public_id: fileName,
+              secure_url: `gs://${this.bucketName}/${fileName}`,
+              url: `gs://${this.bucketName}/${fileName}`,
+              resource_type,
+              format,
+              bytes: file.size || 0,
+              folder,
+              original_filename: file.originalname,
+              filename: fileName,
+              bucket: this.bucketName,
+              fieldname: file.fieldname,
+              originalname: file.originalname,
+              mimetype: file.mimetype,
+              size: file.size || 0,
+            });
+          }
         });
 
         file.stream.pipe(stream);
