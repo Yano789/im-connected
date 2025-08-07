@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm ci",
+  "framework": "vite",
+  "functions": {
+    "BACKEND/Forum/src/index.cjs": {
+      "runtime": "nodejs18.x"
+    },
+    "BACKEND/Scanner/app.js": {
+      "runtime": "nodejs18.x"
+    },
+    "BACKEND/AI_chatbot/src/index.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/api/forum/(.*)",
+      "dest": "/BACKEND/Forum/src/index.cjs"
+    },
+    {
+      "src": "/api/scanner/(.*)",
+      "dest": "/BACKEND/Scanner/app.js"
+    },
+    {
+      "src": "/api/chatbot/(.*)",
+      "dest": "/BACKEND/AI_chatbot/src/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
+  }
+}
