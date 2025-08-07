@@ -1,26 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "npm run build:vercel",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "installCommand": "npm ci",
   "framework": "vite",
-  "functions": {
-    "api/forum.js": {
-      "runtime": "nodejs18.x",
-      "maxDuration": 30
-    },
-    "api/scanner.js": {
-      "runtime": "nodejs18.x",
-      "maxDuration": 30
-    },
-    "api/assistants/index.js": {
-      "runtime": "nodejs18.x",
-      "maxDuration": 30
-    }
-  },
   "routes": [
     {
-      "src": "/api/forum/(.*)",
+      "src": "/api/v1/(.*)",
       "dest": "/api/forum.js"
     },
     {
@@ -28,31 +14,12 @@
       "dest": "/api/scanner.js"
     },
     {
-      "src": "/api/assistants",
+      "src": "/api/assistants/(.*)",
       "dest": "/api/assistants/index.js"
     },
     {
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "MONGODB_URI": "@mongodb_uri",
-    "TOKEN_KEY": "@token_key",
-    "TOKEN_EXPIRY": "@token_expiry",
-    "AUTH_EMAIL": "@auth_email",
-    "AUTH_PASS": "@auth_pass",
-    "CLOUDINARY_CLOUD_NAME": "@cloudinary_cloud_name",
-    "CLOUDINARY_API_KEY": "@cloudinary_api_key",
-    "CLOUDINARY_API_SECRET": "@cloudinary_api_secret",
-    "OPENAI_API_KEY": "@openai_api_key",
-    "OPENAI_ASSISTANT_ID": "@openai_assistant_id",
-    "GOOGLE_TRANSLATE_API_KEY": "@google_translate_api_key"
-  },
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
-    }
-  }
+  ]
 }

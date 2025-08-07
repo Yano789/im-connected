@@ -6,6 +6,7 @@ import { AuthContext } from "../AuthContext";
 import LoginPeople from "../assets/LoginPeople.png";
 import "./LoginCard.css";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../config/api";
 
 function LoginCard() {
   const [username, setUsername] = useState("");
@@ -40,7 +41,7 @@ function LoginCard() {
     console.log("Sending login request to server:", requestBody);
 
     try {
-      const res = await fetch("http://localhost:5001/api/v1/user", {
+      const res = await fetch(API_ENDPOINTS.USER_LOGIN, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

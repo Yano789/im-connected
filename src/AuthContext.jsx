@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
+import { API_ENDPOINTS } from "./config/api";
 
 export const AuthContext = createContext();
 
@@ -10,7 +11,7 @@ function AuthProvider({ children }) {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch("http://localhost:5001/api/v1/user/check-auth", {
+        const res = await fetch(API_ENDPOINTS.USER_CHECK_AUTH, {
           method: "GET",
           credentials: "include",
         });
@@ -22,6 +23,7 @@ function AuthProvider({ children }) {
           setUser(null);
         }
       } catch (error) {
+        console.error("Auth check failed:", error);
         setUser(null);
       } finally {
         setLoading(false);

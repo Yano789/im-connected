@@ -1,0 +1,32 @@
+// API configuration
+// For Vercel deployment, use relative paths since frontend and backend are on the same domain
+// For local development, use the full localhost URL
+const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+  ? (__API_URL__ || 'http://localhost:5001')
+  : ''; // Empty string for relative paths in production
+
+// API endpoints
+export const API_ENDPOINTS = {
+  // User endpoints
+  USER_LOGIN: `${API_BASE_URL}/api/v1/user`,
+  USER_SIGNUP: `${API_BASE_URL}/api/v1/user/signup`,
+  USER_LOGOUT: `${API_BASE_URL}/api/v1/user/logout`,
+  USER_CHECK_AUTH: `${API_BASE_URL}/api/v1/user/check-auth`,
+  USER_PREFERENCES: `${API_BASE_URL}/api/v1/user/preferences`,
+  USER_DETAILS: `${API_BASE_URL}/api/v1/user/userDetails`,
+  USER_GET: `${API_BASE_URL}/api/v1/user/getUser`,
+  
+  // Email verification endpoints
+  EMAIL_VERIFICATION: `${API_BASE_URL}/api/v1/email_verification`,
+  EMAIL_VERIFICATION_VERIFY: `${API_BASE_URL}/api/v1/email_verification/verify`,
+  
+  // Post endpoints
+  POST_SEARCH: (searchTerm) => `${API_BASE_URL}/api/v1/post/getPost/search/${encodeURIComponent(searchTerm)}`,
+  POST_BASE: `${API_BASE_URL}/api/v1/post`,
+  
+  // Comment endpoints
+  COMMENT_EDIT: (postId, commentId) => `${API_BASE_URL}/api/v1/${encodeURIComponent(postId)}/comment/${encodeURIComponent(commentId)}/edit`,
+  COMMENT_CREATE: (postId) => `${API_BASE_URL}/api/v1/${encodeURIComponent(postId)}/comment/create`,
+};
+
+export { API_BASE_URL };

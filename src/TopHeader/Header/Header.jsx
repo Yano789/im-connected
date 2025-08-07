@@ -6,6 +6,7 @@ import { AuthContext } from "../../AuthContext";
 import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api";
 
 function Header() {
   const { setUser } = useContext(AuthContext);
@@ -32,7 +33,7 @@ function Header() {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch("http://localhost:5001/api/v1/user/logout", {
+      const res = await fetch(API_ENDPOINTS.USER_LOGOUT, {
         method: "POST",
         credentials: "include",
       });
@@ -51,9 +52,7 @@ function Header() {
   const fetchSearchResults = async (searchInput) => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/v1/post/getPost/search/${encodeURIComponent(
-          searchInput
-        )}`,
+        API_ENDPOINTS.POST_SEARCH(searchInput),
         {
           method: "GET",
           credentials: "include",
