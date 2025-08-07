@@ -4,6 +4,7 @@ import "./SavedPostBody.css";
 import { useState, useEffect } from "react";
 import Bookmark from "../Bookmark/Bookmark"; 
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function SavedPostBody() {
   const [posts, setPosts] = useState([]);
@@ -16,7 +17,7 @@ function SavedPostBody() {
     const fetchSavedPosts = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`http://localhost:5001/api/v1/saved`, {
+        const response = await fetch(API_ENDPOINTS.SAVED_POSTS, {
           method: "GET",
           credentials: "include", 
         });
@@ -34,7 +35,7 @@ function SavedPostBody() {
 
     const fetchLikedPosts = async () => {
       try {
-        const likedRes = await fetch("http://localhost:5001/api/v1/like", {
+        const likedRes = await fetch(API_ENDPOINTS.LIKE_BASE, {
           method: "GET",
           credentials: "include",
         });

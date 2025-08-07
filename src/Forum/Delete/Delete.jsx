@@ -1,6 +1,7 @@
 import "./Delete.css";
 import TrashIcon from "../../assets/Trash.png";
 import { useState } from "react";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 
 function Delete({ postToDelete, onDelete }) {
@@ -14,7 +15,7 @@ function Delete({ postToDelete, onDelete }) {
     try {
       setIsDeleting(true);
             const response = await fetch(
-        `http://localhost:5001/api/v1/post/${encodeURIComponent(postToDelete)}/delete`,
+        API_ENDPOINTS.POST_DELETE(postToDelete),
         {
           method: "DELETE",
           credentials: "include",

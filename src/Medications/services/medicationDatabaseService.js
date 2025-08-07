@@ -1,11 +1,14 @@
 // Medication Database Service - Frontend service for medication management
 // This service interfaces with the Forum backend medication API
 
-const API_BASE_URL = 'http://localhost:5001/api';
+import { API_ENDPOINTS } from '../../config/api.js';
+
+import { API_ENDPOINTS } from '../../config/api.js';
 
 class MedicationDatabaseService {
     constructor() {
-        this.baseURL = `${API_BASE_URL}/medication`;
+        // Use the centralized API configuration
+        this.baseURL = API_ENDPOINTS.MEDICATION_BASE.replace('/medications', '') + '/medication';
     }
 
     // =============================================================================
@@ -452,8 +455,8 @@ class MedicationDatabaseService {
             const formData = new FormData();
             formData.append('medicationImage', imageFile);
 
-            // Use the scanner API directly for preview
-            const response = await fetch('http://localhost:3001/scan-medication', {
+            // Use the scanner API endpoints from config
+            const response = await fetch(API_ENDPOINTS.SCANNER_SCAN_MEDICATION, {
                 method: 'POST',
                 body: formData,
             });

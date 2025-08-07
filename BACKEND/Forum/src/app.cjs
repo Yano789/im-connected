@@ -22,16 +22,25 @@ app.use(cors({
     "http://localhost",      // Docker frontend (without port)
     "http://localhost:3000", // Alternative dev port
     "http://localhost:8080", // Nginx proxy
+    "http://localhost:5001", // Backend dev server (for frontend calling backend locally)
     /^https:\/\/.*\.railway\.app$/, // Railway deployments
     "https://imconnected-production.up.railway.app", // Your specific Railway app
   ],
-  credentials: true                // This is REQUIRED for cookies to work
+  credentials: true,                // This is REQUIRED for cookies to work
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept']
 }));
 app.use(bodyParser());
 
 // Serve static files from the public directory (built frontend)
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../../public")));
+  // In Docker, files are copied to ./public relative to the working directory (/app)
+  const publicPath = path.join(__dirname, "../public");
+  app.use(express.static(publicPath));
+  
+  // Debug: Log the public directory path
+  console.log("Serving static files from:", publicPath);
+  console.log("Looking for index.html at:", path.join(publicPath, "index.html"));
 }
 
 app.use("/api/v1",routes);
@@ -39,7 +48,9 @@ app.use("/api/v1",routes);
 // Serve frontend for all non-API routes in production
 if (process.env.NODE_ENV === "production") {
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../../public/index.html"));
+    const indexPath = path.join(__dirname, "../public/index.html");
+    console.log("Attempting to serve index.html from:", indexPath);
+    res.sendFile(indexPath);
   });
 }
 

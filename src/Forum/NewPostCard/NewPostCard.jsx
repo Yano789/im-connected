@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./NewPostCard.css";
 import MediaUploader from "../MediaUploader/MediaUploader.jsx";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function NewPostCard({ onDraftAdded, renderDraft }) {
   const [selectedTags, setSelectedTags] = useState([]);
@@ -95,7 +96,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
       if (isDraft && draftPostId) {
         const encodedPostId = encodeURIComponent(draftPostId);
         response = await fetch(
-          `http://localhost:5001/api/v1/post/myDrafts/${encodedPostId}/edit`,
+          API_ENDPOINTS.POST_EDIT_DRAFT(encodedPostId),
           {
             method: "PUT",
             credentials: "include",
@@ -103,7 +104,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
           }
         );
       } else {
-        response = await fetch("http://localhost:5001/api/v1/post/create", {
+        response = await fetch(API_ENDPOINTS.POST_CREATE, {
           method: "POST",
           credentials: "include",
           body: formData,

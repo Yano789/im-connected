@@ -3,7 +3,7 @@
  * Handles uploading medication images to Cloudinary (same as forum)
  */
 
-const FORUM_API_BASE_URL = 'http://localhost:5001';
+import { API_BASE_URL } from '../../config/api.js';
 
 class MedicationCloudinaryService {
   /**
@@ -17,7 +17,7 @@ class MedicationCloudinaryService {
       formData.append('medicationImage', imageFile);
       
       // Use the dedicated medication endpoint
-      const response = await fetch(`${FORUM_API_BASE_URL}/api/v1/medication/upload-image`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/medication/upload-image`, {
         method: 'POST',
         credentials: 'include', // Include JWT cookie for authentication
         body: formData,
@@ -43,7 +43,7 @@ class MedicationCloudinaryService {
    */
   async deleteMedicationImage(publicId) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/api/v1/medication/delete-image`, {
+      const response = await fetch(`${API_BASE_URL}/api/v1/medication/delete-image`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -70,7 +70,7 @@ class MedicationCloudinaryService {
    */
   async checkServiceHealth() {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/api/v1/medication/health`);
+      const response = await fetch(`${API_BASE_URL}/api/v1/medication/health`);
       return response.ok;
     } catch (error) {
       console.error('Medication upload service not available:', error);

@@ -3,8 +3,9 @@
  * Handles medication scanning via Scanner API and data management via Forum API
  */
 
-const SCANNER_API_BASE_URL = 'http://localhost:3001';
-const FORUM_API_BASE_URL = 'http://localhost:5001/api/v1';
+import { API_BASE_URL, API_ENDPOINTS, SCANNER_API_BASE_URL } from '../../config/api.js';
+
+const FORUM_API_BASE_URL = API_BASE_URL; // Add this to fix the undefined variable
 
 class MedicationService {
   // ==================== SCANNING OPERATIONS ====================
@@ -15,13 +16,19 @@ class MedicationService {
    */
   async checkApiHealth() {
     try {
-      console.log('Checking Scanner API health at:', `${SCANNER_API_BASE_URL}/health`);
+      // Check if scanner API is available
+      if (!API_ENDPOINTS.SCANNER_HEALTH) {
+        console.log('Scanner API endpoint is not configured');
+        return false;
+      }
+
+      console.log('Checking Scanner API health at:', API_ENDPOINTS.SCANNER_HEALTH);
       
       // Create AbortController for timeout handling
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
       
-      const response = await fetch(`${SCANNER_API_BASE_URL}/health`, {
+      const response = await fetch(API_ENDPOINTS.SCANNER_HEALTH, {
         method: 'GET',
         signal: controller.signal,
       });
@@ -53,6 +60,11 @@ class MedicationService {
    */
   async scanMedicationImage(imageFile) {
     try {
+      // Check if scanner API is available
+      if (!API_ENDPOINTS.SCANNER_SCAN_MEDICATION) {
+        throw new Error('Scanner service is not available. Please check the scanner configuration.');
+      }
+
       console.log('Scanner Service: Starting scan with file:', imageFile);
       console.log('Scanner Service: File details:', {
         name: imageFile.name,
@@ -78,9 +90,9 @@ class MedicationService {
         }
       }
 
-      console.log('Scanner Service: Sending request to:', `${SCANNER_API_BASE_URL}/scan-medication`);
+      console.log('Scanner Service: Sending request to:', API_ENDPOINTS.SCANNER_SCAN_MEDICATION);
 
-      const response = await fetch(`${SCANNER_API_BASE_URL}/scan-medication`, {
+      const response = await fetch(API_ENDPOINTS.SCANNER_SCAN_MEDICATION, {
         method: 'POST',
         body: formData,
       });
@@ -120,7 +132,13 @@ class MedicationService {
    */
   async checkScannerApiHealth() {
     try {
-      const response = await fetch(`${SCANNER_API_BASE_URL}/health`);
+      // Check if scanner API is available
+      if (!API_ENDPOINTS.SCANNER_HEALTH) {
+        console.log('Scanner API endpoint is not configured');
+        return false;
+      }
+
+      const response = await fetch(API_ENDPOINTS.SCANNER_HEALTH);
       return response.ok;
     } catch (error) {
       console.error('Scanner API not available:', error);
@@ -139,7 +157,7 @@ class MedicationService {
       console.log('Scanner Service: Getting care recipients from Forum database (authoritative source)...');
       
       // Use Forum API since it has user authentication and is the authoritative source
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_CARE_RECIPIENTS, {
         method: 'GET',
         credentials: 'include', // Include JWT cookie for authentication
         headers: {
@@ -177,11 +195,11 @@ class MedicationService {
    */
   async createCareRecipient(recipientData) {
     try {
-      console.log('Scanner Service: Creating care recipient in both databases:', recipientData);
+      console.log('Scanner Service: Creating care recipient in Forum database:', recipientData);
       
-      // First, create in Forum API (requires authentication) - this is the authoritative source
+      // Create in Forum API (requires authentication) - this is the authoritative source
       console.log('Scanner Service: Creating care recipient in Forum database...');
-      const forumResponse = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients`, {
+      const forumResponse = await fetch(API_ENDPOINTS.MEDICATION_CARE_RECIPIENTS, {
         method: 'POST',
         credentials: 'include', // Include JWT cookie
         headers: {
@@ -199,23 +217,32 @@ class MedicationService {
       const forumResult = await forumResponse.json();
       console.log('Scanner Service: Successfully created care recipient in Forum database:', forumResult);
 
-      // Then, create in Scanner API for medications storage
-      console.log('Scanner Service: Creating care recipient in Scanner database...');
-      const scannerResponse = await fetch(`${SCANNER_API_BASE_URL}/care-recipients`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(recipientData),
-      });
+      // In production, skip Scanner API since it's not available
+      if (API_ENDPOINTS.SCANNER_HEALTH) {
+        // Then, create in Scanner API for medications storage (development only)
+        console.log('Scanner Service: Creating care recipient in Scanner database...');
+        try {
+          const scannerResponse = await fetch(`${SCANNER_API_BASE_URL}/care-recipients`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(recipientData),
+          });
 
-      if (!scannerResponse.ok) {
-        const errorText = await scannerResponse.text();
-        console.warn('Scanner Service: Failed to create care recipient in Scanner database (continuing with Forum version):', errorText);
-        // Don't throw error here - we have the Forum version which is authoritative
+          if (!scannerResponse.ok) {
+            const errorText = await scannerResponse.text();
+            console.warn('Scanner Service: Failed to create care recipient in Scanner database (continuing with Forum version):', errorText);
+            // Don't throw error here - we have the Forum version which is authoritative
+          } else {
+            const scannerResult = await scannerResponse.json();
+            console.log('Scanner Service: Successfully created care recipient in Scanner database:', scannerResult);
+          }
+        } catch (error) {
+          console.warn('Scanner Service: Scanner API not available in development environment:', error.message);
+        }
       } else {
-        const scannerResult = await scannerResponse.json();
-        console.log('Scanner Service: Successfully created care recipient in Scanner database:', scannerResult);
+        console.log('Scanner Service: Skipping Scanner database creation in production environment');
       }
 
       // Return the Forum database result (authoritative)
@@ -234,7 +261,7 @@ class MedicationService {
    */
   async updateCareRecipient(id, name) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients/${id}`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_CARE_RECIPIENT_BY_ID(id), {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -262,7 +289,7 @@ class MedicationService {
    */
   async deleteCareRecipient(id) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients/${id}`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_CARE_RECIPIENT_BY_ID(id), {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -294,7 +321,7 @@ class MedicationService {
       console.log(`Scanner Service: Getting medications from Forum database for care recipient ${careRecipientId}...`);
       
       // Use Forum API for consistency and proper authentication
-      let url = `${FORUM_API_BASE_URL}/medication/medications`;
+      let url = API_ENDPOINTS.MEDICATION_BASE;
       if (careRecipientId) {
         url += `?careRecipientId=${careRecipientId}`;
       }
@@ -378,7 +405,7 @@ class MedicationService {
     try {
       console.log('Scanner Service: Creating medication with data:', medicationData);
       
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/medications`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_BASE, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -410,7 +437,7 @@ class MedicationService {
    */
   async updateMedication(id, updateData) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/medications/${id}`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_BY_ID(id), {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -438,7 +465,7 @@ class MedicationService {
    */
   async deleteMedication(id) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/medications/${id}`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_BY_ID(id), {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -464,7 +491,7 @@ class MedicationService {
    */
   async getUserMedicationData() {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/user-data`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_USER_DATA, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -561,6 +588,11 @@ class MedicationService {
       console.log('Scanner Service: Starting scan and save with file:', imageFile);
       console.log('Scanner Service: Care recipient ID:', careRecipientId);
 
+      // Check if scanner API is available (only in development)
+      if (!API_ENDPOINTS.SCANNER_SCAN_MEDICATION) {
+        throw new Error('Scanner service is not available in production. OCR scanning is only available in development mode.');
+      }
+
       // First, upload the image to Cloudinary
       console.log('Scanner Service: Uploading image to Cloudinary...');
       const uploadResult = await this.uploadImage(imageFile);
@@ -631,7 +663,7 @@ class MedicationService {
       const formData = new FormData();
       formData.append('medicationImage', imageFile);
 
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/upload-image`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_UPLOAD_IMAGE, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -656,7 +688,7 @@ class MedicationService {
    */
   async deleteImage(publicId) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/delete-image`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_DELETE_IMAGE, {
         method: 'DELETE',
         credentials: 'include',
         headers: {

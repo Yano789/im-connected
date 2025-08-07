@@ -2,6 +2,7 @@ import DashboardBody from "../DashboardBody/DashboardBody";
 import Header from "../../TopHeader/Header/Header";
 import { useEffect,useState } from "react";
 import i18next from "i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 function Dashboard() {
   const [loading, setLoading] = useState(true);
 
@@ -9,7 +10,7 @@ function Dashboard() {
     const fetchUserAndSetLanguage = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5001/api/v1/user/getUser",
+          API_ENDPOINTS.USER_GET,
           {
             credentials: "include",
           }
