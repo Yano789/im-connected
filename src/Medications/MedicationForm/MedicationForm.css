@@ -296,12 +296,12 @@
 }
 
 .scan-progress {
-    background-color: #d1ecf1;
+    background-color:  var(--shadow-1);
     color: #0c5460;
     padding: 0.75rem;
     border-radius: 6px;
     margin-top: 0.5rem;
-    border: 1px solid #bee5eb;
+    border: 1px solid var(--forum-accent);
     font-style: italic;
 }
 
@@ -318,27 +318,26 @@
     left: 0;
     right: 0;
     height: 1px;
-    background-color: #dee2e6;
+    background-color: var(--shadow-1);
 }
 
 .scanner-divider span {
-    background-color: #f8f9fa;
+    background-color: var(--border-1);
     padding: 0 1rem;
-    color: #6c757d;
+    color: var(--border-1);
     font-weight: 500;
     position: relative;
 }
 
-/* Manual Entry Section */
 .manual-entry-section {
-    background-color: white;
+    background-color: var(--border-1);
 }
 
 .manual-entry-section h3 {
     margin: 0 0 1.5rem 0;
-    color: #495057;
+    color: var(--border-2);
     font-size: 1.1rem;
-    border-bottom: 1px solid #dee2e6;
+    border-bottom: 1px solid var(--shadow-1);
     padding-bottom: 0.5rem;
 }
 

@@ -23,15 +23,15 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
   const tags = [
     {
       key: "Physical Disability & Chronic Illness",
-      label: t("Tag1"),
+      label: t("Tag2"),
     },
-    { key: "Personal Mental Health", label: t("Tag2") },
-    { key: "End of Life Care", label: t("Tag3") },
-    { key: "Financial & Legal Help", label: t("Tag4") },
-    { key: "Mental Disability", label: t("Tag5") },
-    { key: "Hospitals and Clinics", label: t("Tag6") },
-    { key: "Pediatric Care", label: t("Tag7") },
-    { key: "Subsidies and Govt Support", label: t("Tag8") },
+    { key: "Personal Mental Health", label: t("Tag3") },
+    { key: "End of Life Care", label: t("Tag4") },
+    { key: "Financial & Legal Help", label: t("Tag5") },
+    { key: "Mental Disability", label: t("Tag6") },
+    { key: "Hospitals and Clinics", label: t("Tag7") },
+    { key: "Pediatric Care", label: t("Tag8") },
+    { key: "Subsidies and Govt Support", label: t("Tag9") },
   ];
 
   const resetForm = () => {
@@ -97,7 +97,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
         response = await fetch(
           `http://localhost:5001/api/v1/post/myDrafts/${encodedPostId}/edit`,
           {
-            method: "PUT", // confirm your backend supports this with multipart/form-data
+            method: "PUT",
             credentials: "include",
             body: formData,
           }

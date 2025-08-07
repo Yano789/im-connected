@@ -94,7 +94,7 @@ function AppContent() {
       style={{
         backgroundImage: needsAuthBackground
           ? `url(${LoginSignUpBackground})`
-          : "linear-gradient(to bottom, #FFFDF9 75%, #F1C5C0 100%)",
+          : "linear-gradient(to bottom, #ffffff 50%, #F1D5BB 100%)",
         backgroundSize: needsAuthBackground ? "cover" : "auto",
         backgroundRepeat: needsAuthBackground ? "no-repeat" : "auto",
         backgroundPosition: needsAuthBackground ? "left center" : "auto",
