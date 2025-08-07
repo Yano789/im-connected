@@ -16,6 +16,12 @@ class MedicationService {
    */
   async checkApiHealth() {
     try {
+      // Check if scanner API is available (only in development)
+      if (!API_ENDPOINTS.SCANNER_HEALTH) {
+        console.log('Scanner API is disabled in production environment');
+        return false;
+      }
+
       console.log('Checking Scanner API health at:', API_ENDPOINTS.SCANNER_HEALTH);
       
       // Create AbortController for timeout handling
@@ -54,6 +60,11 @@ class MedicationService {
    */
   async scanMedicationImage(imageFile) {
     try {
+      // Check if scanner API is available (only in development)
+      if (!API_ENDPOINTS.SCANNER_SCAN_MEDICATION) {
+        throw new Error('Scanner service is not available in production. OCR scanning is only available in development mode.');
+      }
+
       console.log('Scanner Service: Starting scan with file:', imageFile);
       console.log('Scanner Service: File details:', {
         name: imageFile.name,
@@ -121,7 +132,13 @@ class MedicationService {
    */
   async checkScannerApiHealth() {
     try {
-      const response = await fetch(`${SCANNER_API_BASE_URL}/health`);
+      // Check if scanner API is available (only in development)
+      if (!API_ENDPOINTS.SCANNER_HEALTH) {
+        console.log('Scanner API is disabled in production environment');
+        return false;
+      }
+
+      const response = await fetch(API_ENDPOINTS.SCANNER_HEALTH);
       return response.ok;
     } catch (error) {
       console.error('Scanner API not available:', error);
@@ -178,9 +195,9 @@ class MedicationService {
    */
   async createCareRecipient(recipientData) {
     try {
-      console.log('Scanner Service: Creating care recipient in both databases:', recipientData);
+      console.log('Scanner Service: Creating care recipient in Forum database:', recipientData);
       
-      // First, create in Forum API (requires authentication) - this is the authoritative source
+      // Create in Forum API (requires authentication) - this is the authoritative source
       console.log('Scanner Service: Creating care recipient in Forum database...');
       const forumResponse = await fetch(API_ENDPOINTS.MEDICATION_CARE_RECIPIENTS, {
         method: 'POST',
@@ -200,23 +217,32 @@ class MedicationService {
       const forumResult = await forumResponse.json();
       console.log('Scanner Service: Successfully created care recipient in Forum database:', forumResult);
 
-      // Then, create in Scanner API for medications storage
-      console.log('Scanner Service: Creating care recipient in Scanner database...');
-      const scannerResponse = await fetch(`${SCANNER_API_BASE_URL}/care-recipients`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(recipientData),
-      });
+      // In production, skip Scanner API since it's not available
+      if (API_ENDPOINTS.SCANNER_HEALTH) {
+        // Then, create in Scanner API for medications storage (development only)
+        console.log('Scanner Service: Creating care recipient in Scanner database...');
+        try {
+          const scannerResponse = await fetch(`${SCANNER_API_BASE_URL}/care-recipients`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(recipientData),
+          });
 
-      if (!scannerResponse.ok) {
-        const errorText = await scannerResponse.text();
-        console.warn('Scanner Service: Failed to create care recipient in Scanner database (continuing with Forum version):', errorText);
-        // Don't throw error here - we have the Forum version which is authoritative
+          if (!scannerResponse.ok) {
+            const errorText = await scannerResponse.text();
+            console.warn('Scanner Service: Failed to create care recipient in Scanner database (continuing with Forum version):', errorText);
+            // Don't throw error here - we have the Forum version which is authoritative
+          } else {
+            const scannerResult = await scannerResponse.json();
+            console.log('Scanner Service: Successfully created care recipient in Scanner database:', scannerResult);
+          }
+        } catch (error) {
+          console.warn('Scanner Service: Scanner API not available in development environment:', error.message);
+        }
       } else {
-        const scannerResult = await scannerResponse.json();
-        console.log('Scanner Service: Successfully created care recipient in Scanner database:', scannerResult);
+        console.log('Scanner Service: Skipping Scanner database creation in production environment');
       }
 
       // Return the Forum database result (authoritative)
@@ -561,6 +587,11 @@ class MedicationService {
     try {
       console.log('Scanner Service: Starting scan and save with file:', imageFile);
       console.log('Scanner Service: Care recipient ID:', careRecipientId);
+
+      // Check if scanner API is available (only in development)
+      if (!API_ENDPOINTS.SCANNER_SCAN_MEDICATION) {
+        throw new Error('Scanner service is not available in production. OCR scanning is only available in development mode.');
+      }
 
       // First, upload the image to Cloudinary
       console.log('Scanner Service: Uploading image to Cloudinary...');
