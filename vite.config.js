@@ -5,7 +5,13 @@ import react from '@vitejs/plugin-react'
 
 
 export default defineConfig({
+<<<<<<< HEAD
   base: process.env.NODE_ENV === 'production' ? '/IM-CONNECTED/' : '/',
+=======
+  server: {
+    host: '0.0.0.0'   // listen on all IPv4 addresses (and often IPv6 too)
+  },
+>>>>>>> 95166c395284cf65c27473509a28b4f2aeea5fe0
   plugins: [
     // other Vite plugins
     react(),

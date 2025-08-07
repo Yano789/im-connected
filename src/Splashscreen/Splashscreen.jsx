@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import HeartLogo from "../assets/HeartLogo.png";
 import SplashChars from "../assets/SplashscreenCharacters.png";
@@ -10,6 +10,7 @@ import GlobeImg from "../assets/Globe.png";
 import PillboxIcon from "../assets/PillboxIconSplashscreen.png";
 import ChatbotIcon from "../assets/ChatbotIconSplashscreen.png";
 import ForumIcon from "../assets/ForumIconSplashscreen.png";
+import { useNavigate } from "react-router-dom";
 
 import "./Splashscreen.css";
 
