@@ -19,6 +19,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google-cloud/storage": "^7.16.0",
     "@google-cloud/translate": "^9.2.0",
     "@lexical/history": "^0.33.1",
     "@lexical/react": "^0.33.1",
@@ -30,7 +31,7 @@
     "concurrently": "^9.1.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.0",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "express-mongo-sanitize": "^2.2.0",
     "framer-motion": "^12.23.7",
