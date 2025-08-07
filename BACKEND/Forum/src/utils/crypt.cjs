@@ -2,13 +2,12 @@ const crypto = require('crypto');
 
 const algorithm = 'aes-256-gcm';
 // Use a default encryption secret if not provided in environment
-const encryptionSecret = process.env.ENCRYPTION_SECRET || 'default-encryption-secret-for-railway-deployment-change-in-production-123456789';
+const encryptionSecret = process.env.ENCRYPTION_SECRET || 'railway-deployment-default-secret-change-in-production-for-security-123456789abcdef';
 
 // Validate that we have a proper encryption secret
 if (!encryptionSecret || encryptionSecret.length < 16) {
-  console.error('ENCRYPTION_SECRET environment variable must be set and at least 16 characters long');
-  console.error('Current value:', encryptionSecret);
-  throw new Error('ENCRYPTION_SECRET environment variable must be set and at least 16 characters long');
+  console.warn('ENCRYPTION_SECRET environment variable should be set in production');
+  console.warn('Using default encryption secret - this should be changed for production');
 }
 
 // Ensure the secret is a string before passing to scryptSync
