@@ -76,6 +76,8 @@ router.get("/", auth, validateQuery(querySchema), async (req, res) => {
         }
         const post = await getFilteredPosts({ tags, sort, source, username,mode })
         console.log("Username passed to getFilteredPosts:", username);
+        console.log(tags)
+        console.log(source)
         /*const limitedPosts = await modeLimit({ post, mode })*/
         res.status(200).json(post)
     } catch (error) {
