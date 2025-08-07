@@ -3,10 +3,10 @@
  * Handles medication scanning via Scanner API and data management via Forum API
  */
 
-import { API_BASE_URL } from '../../config/api.js';
+import { API_BASE_URL, API_ENDPOINTS } from '../../config/api.js';
 
 const SCANNER_API_BASE_URL = 'http://localhost:3001';
-const FORUM_API_BASE_URL = API_BASE_URL;
+const FORUM_API_BASE_URL = API_BASE_URL; // Add this to fix the undefined variable
 
 class MedicationService {
   // ==================== SCANNING OPERATIONS ====================
@@ -141,7 +141,7 @@ class MedicationService {
       console.log('Scanner Service: Getting care recipients from Forum database (authoritative source)...');
       
       // Use Forum API since it has user authentication and is the authoritative source
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_CARE_RECIPIENTS, {
         method: 'GET',
         credentials: 'include', // Include JWT cookie for authentication
         headers: {
@@ -183,7 +183,7 @@ class MedicationService {
       
       // First, create in Forum API (requires authentication) - this is the authoritative source
       console.log('Scanner Service: Creating care recipient in Forum database...');
-      const forumResponse = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients`, {
+      const forumResponse = await fetch(API_ENDPOINTS.MEDICATION_CARE_RECIPIENTS, {
         method: 'POST',
         credentials: 'include', // Include JWT cookie
         headers: {
@@ -236,7 +236,7 @@ class MedicationService {
    */
   async updateCareRecipient(id, name) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients/${id}`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_CARE_RECIPIENT_BY_ID(id), {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -264,7 +264,7 @@ class MedicationService {
    */
   async deleteCareRecipient(id) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/care-recipients/${id}`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_CARE_RECIPIENT_BY_ID(id), {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -296,7 +296,7 @@ class MedicationService {
       console.log(`Scanner Service: Getting medications from Forum database for care recipient ${careRecipientId}...`);
       
       // Use Forum API for consistency and proper authentication
-      let url = `${FORUM_API_BASE_URL}/medication/medications`;
+      let url = API_ENDPOINTS.MEDICATION_BASE;
       if (careRecipientId) {
         url += `?careRecipientId=${careRecipientId}`;
       }
@@ -380,7 +380,7 @@ class MedicationService {
     try {
       console.log('Scanner Service: Creating medication with data:', medicationData);
       
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/medications`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_BASE, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -412,7 +412,7 @@ class MedicationService {
    */
   async updateMedication(id, updateData) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/medications/${id}`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_BY_ID(id), {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -440,7 +440,7 @@ class MedicationService {
    */
   async deleteMedication(id) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/medications/${id}`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_BY_ID(id), {
         method: 'DELETE',
         credentials: 'include',
         headers: {
@@ -466,7 +466,7 @@ class MedicationService {
    */
   async getUserMedicationData() {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/user-data`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_USER_DATA, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -633,7 +633,7 @@ class MedicationService {
       const formData = new FormData();
       formData.append('medicationImage', imageFile);
 
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/upload-image`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_UPLOAD_IMAGE, {
         method: 'POST',
         credentials: 'include',
         body: formData,
@@ -658,7 +658,7 @@ class MedicationService {
    */
   async deleteImage(publicId) {
     try {
-      const response = await fetch(`${FORUM_API_BASE_URL}/medication/delete-image`, {
+      const response = await fetch(API_ENDPOINTS.MEDICATION_DELETE_IMAGE, {
         method: 'DELETE',
         credentials: 'include',
         headers: {

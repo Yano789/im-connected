@@ -53,6 +53,14 @@ export const API_ENDPOINTS = {
   MEDICATION_CARE_RECIPIENTS: `${API_BASE_URL}/api/v1/medication/care-recipients`,
   MEDICATION_CARE_RECIPIENT_BY_ID: (id) => `${API_BASE_URL}/api/v1/medication/care-recipients/${encodeURIComponent(id)}`,
   MEDICATION_BASE: `${API_BASE_URL}/api/v1/medication/medications`,
+  MEDICATION_BY_ID: (id) => `${API_BASE_URL}/api/v1/medication/medications/${encodeURIComponent(id)}`,
+  MEDICATION_USER_DATA: `${API_BASE_URL}/api/v1/medication/user-data`,
+  MEDICATION_UPLOAD_IMAGE: `${API_BASE_URL}/api/v1/medication/upload-image`,
+  MEDICATION_DELETE_IMAGE: `${API_BASE_URL}/api/v1/medication/delete-image`,
+  MEDICATION_BY_ID: (id) => `${API_BASE_URL}/api/v1/medication/medications/${encodeURIComponent(id)}`,
+  MEDICATION_UPLOAD_IMAGE: `${API_BASE_URL}/api/v1/medication/upload-image`,
+  MEDICATION_DELETE_IMAGE: `${API_BASE_URL}/api/v1/medication/delete-image`,
+  MEDICATION_HEALTH: `${API_BASE_URL}/api/v1/medication/health`,
   
   // Language endpoint
   USER_LANGUAGE: `${API_BASE_URL}/api/v1/user/language`,
