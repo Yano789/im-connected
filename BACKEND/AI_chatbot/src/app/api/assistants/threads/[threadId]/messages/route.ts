@@ -85,7 +85,7 @@ const ALLOWED_ORIGINS = new Set([
   "https://ai-chatbot-production-c94d.up.railway.app",
 ]);
 
-function cors(origin: string | null) {
+function makeCorsHeaders(origin: string | null) {
   // In production environment, be more permissive for Railway deployments
   if (process.env.NODE_ENV === 'production') {
     // Allow Railway domains and cross-service communication
@@ -100,9 +100,9 @@ function cors(origin: string | null) {
   }
   
   // Development environment with strict origin checking
-  const o = origin && ALLOWED_ORIGINS.has(origin) ? origin : "*";
+  const allowed = origin && ALLOWED_ORIGINS.has(origin) ? origin : "*";
   return {
-    "Access-Control-Allow-Origin": o,
+    "Access-Control-Allow-Origin": allowed,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
     "Access-Control-Allow-Credentials": "true",
@@ -110,16 +110,33 @@ function cors(origin: string | null) {
 }
 
 export async function OPTIONS(request: Request) {
-  return new Response(null, { status: 204, headers: cors(request.headers.get("origin")) });
+  return new Response(null, { 
+    status: 204, 
+    headers: makeCorsHeaders(request.headers.get("origin")) 
+  });
 }
 
 export async function POST(request: Request, { params }: { params: { threadId: string } }) {
   const origin = request.headers.get("origin");
-  const corsHeaders = cors(origin);
+  const corsHeaders = makeCorsHeaders(origin);
   
   try {
+    console.log("AI Chatbot Messages API called for thread:", params.threadId);
+    
     if (!openai) {
+      console.error("OpenAI client not initialized");
       return new Response(JSON.stringify({ error: "OpenAI API key not configured" }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
+    if (!assistantId) {
+      console.error("Assistant ID not configured");
+      return new Response(JSON.stringify({ error: "Assistant ID not configured" }), {
         status: 500,
         headers: {
           ...corsHeaders,
@@ -130,17 +147,37 @@ export async function POST(request: Request, { params }: { params: { threadId: s
 
     const threadId = params.threadId;
     const { content } = await request.json();
+    
+    console.log("Creating message in thread:", threadId, "with content:", content?.substring(0, 100) + "...");
 
-    await openai.beta.threads.messages.create(threadId, { role: "user", content });
+    // Create the user message
+    await openai.beta.threads.messages.create(threadId, { 
+      role: "user", 
+      content: content 
+    });
+    
+    console.log("Message created, starting stream with assistant:", assistantId);
 
-    const stream = openai.beta.threads.runs.stream(threadId, { assistant_id: assistantId });
+    // Start the assistant run with streaming
+    const stream = openai.beta.threads.runs.stream(threadId, { 
+      assistant_id: assistantId 
+    });
 
+    // Return the stream with proper CORS headers
     return new Response(stream.toReadableStream(), {
-      headers: corsHeaders,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
     });
   } catch (error) {
-    console.error("AI Chatbot API Error:", error);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
+    console.error("AI Chatbot Messages API Error:", error);
+    return new Response(JSON.stringify({ 
+      error: "Internal server error", 
+      details: error.message 
+    }), {
       status: 500,
       headers: {
         ...corsHeaders,
