@@ -87,13 +87,6 @@ export default function SplashScreen() {
               <button className="top-button signin-btn">{t("Log In")}</button>
             </Link>
           </div>
-
-          {/* characters illustration */}
-          <img
-            src={SplashChars}
-            alt="Caregiver characters"
-            className="header-chars"
-          />
         </div>
       </header>
 

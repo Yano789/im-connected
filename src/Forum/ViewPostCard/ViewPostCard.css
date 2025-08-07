@@ -67,7 +67,7 @@
 
 .tag {
   box-shadow: 5px 5px 4px rgba(0,0,0,0.25);
-  background-color: var(--button-colour-2)
+  background-color: var(--button-colour-2);
   border: 1px solid var(--border-2);
   display: flex;
   flex-direction: row;
@@ -80,9 +80,6 @@
   transition: background-color 0.2s;
 }
 
-.tag:hover {
-  background-color: #ffdad3;
-}
 
 .viewPostTags {
   display: flex;

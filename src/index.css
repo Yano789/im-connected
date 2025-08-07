@@ -3,17 +3,17 @@
 
 :root {
   --user-font-size: 14px;
-  --background-colour: #ffffff;
+  --background-colour: #f1eee6; /* peach */
   --text-colour: #2d2d2d; /* black */
-  --button-colour-1: #c8b8db; /* lighter purple */
-  --button-colour-1-onhover: #ab97c3; /* dark purple */
-  --button-colour-1-onselect: #956bff;
-  --button-colour-2: #f1c5c0; /* pink */
-  --button-colour-2-onhover: #FFADAD; /* random pink */
-  --button-colour-2-onselect: #FF7E7E; /* neon pink */
-  --header-colour: #ab97c3; /* purple */
-  --accent-colour-1: #c8b8db; /* search bar light purple */
-  --accent-colour-2: #956bff; /* dark purple */
+  --button-colour-1-onselect: #dfa36a; /* NEW ORANGE*/
+  --button-colour-1-onhover: #EAC099; /*NEW LIGHT ORANGE */
+  --button-colour-1: #F1D5BB; /*PALE ORANGE */
+  --button-colour-2: #cedce0; /* NEW LIGHT BLUE */
+  --button-colour-2-onhover: #B4C9CF; /* NEW LIGHT BLUE */
+  --button-colour-2-onselect: #8fa1a8; /* NEW NAVY BLUE */
+  --header-colour: #cedce0; /* LIGHT BLUE NEW */
+  --accent-colour-1: #F1D5BB; /* NEW LIGHT ORANGE FOR SEARCH*/
+  --accent-colour-2: #f1eee6; /* dark orange NEW */
   --shadow-1: #e5e7eb; /* blueish grey used for login */
   --shadow-2: #f9fafb; /* light grey */
   --shadow-3: #6b7280; /* dark grey */
@@ -30,6 +30,7 @@
   --area-code: #6b7280;  /* lightish grey */
   --phone-input: #1f2937;  /* phone input colour */
   
+
 
 }
 
