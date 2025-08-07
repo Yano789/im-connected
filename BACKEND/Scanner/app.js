@@ -1,13 +1,15 @@
 import dotenv from 'dotenv';
-dotenv.config();
-
-import express from 'express';
 import path from 'path';
-import mongoose from 'mongoose';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load environment variables from the root .env file
+dotenv.config({ path: path.join(__dirname, '../../.env') });
+
+import express from 'express';
+import mongoose from 'mongoose';
 
 // Import configurations
 import { connectDatabase } from './src/config/database.js';

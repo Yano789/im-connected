@@ -234,6 +234,10 @@ class MedicationInfoService {
     const hasLowConfidenceResults = validResults.length > 0 && 
       validResults.every(result => result.confidence < 0.4);
 
+    // Check if FDA results are not helpful (homeopathic/complex formulations)
+    const hasUnhelpfulFDAResults = validResults.length > 0 && 
+      validResults.some(result => this.isUnhelpfulFDAResult(result, originalName));
+
     // Enhanced fallback strategy: Try AI when FDA/online sources fail or provide poor results
     if (validResults.length === 0) {
       console.log(`🤖 No valid results from FDA/online sources for "${originalName}", using OpenAI as fallback database...`);
@@ -244,6 +248,18 @@ class MedicationInfoService {
       } else {
         console.log(`❌ OpenAI fallback did not find reliable information for "${originalName}"`);
         return this.getDefaultMedicationInfo(originalName);
+      }
+    }
+
+    // If FDA results are unhelpful (homeopathic/complex formulations), prefer AI fallback
+    if (hasUnhelpfulFDAResults) {
+      console.log(`🔍 FDA results contain unhelpful formulations for "${originalName}", trying OpenAI fallback for better information...`);
+      const aiResult = await this.getAIChatbotMedicationInfo(originalName);
+      if (aiResult && aiResult.confidence > 0.6) {
+        console.log(`✅ OpenAI provided better information than FDA homeopathic results for "${originalName}" (AI confidence: ${aiResult.confidence})`);
+        return aiResult;
+      } else {
+        console.log(`📊 Using FDA results despite complexity - AI fallback was not more confident for "${originalName}"`);
       }
     }
 
@@ -786,10 +802,25 @@ CRITICAL REQUIREMENTS:
 - Include safety warnings and medical disclaimers
 - Use professional medical terminology
 
-SPECIAL FOCUS ON SIDE EFFECTS AND WARNINGS:
-- For sideEffects: Provide specific, organized list including common (>10%), less common (1-10%), and rare (<1%) side effects. Include both mild and serious reactions.
-- For warnings: Include specific contraindications, drug interactions, pregnancy category, age restrictions, liver/kidney considerations, and monitoring requirements.
-- Be medication-specific, not generic. Reference actual documented adverse events and precautions for this exact medication.
+ENHANCED FOCUS ON SIDE EFFECTS AND WARNINGS:
+For sideEffects: 
+- Provide medication-specific side effects, not generic statements
+- Organize by frequency: Common (>10%), Less common (1-10%), Rare (<1%)
+- Include both physical and behavioral side effects
+- Mention serious side effects that require immediate medical attention
+- Use specific medical terms and symptoms patients can recognize
+- Include timing information when relevant (immediate vs delayed effects)
+
+For warnings:
+- Start with specific contraindications for this exact medication
+- Include drug interactions with specific medication names
+- Pregnancy and breastfeeding specific guidance
+- Age-specific restrictions (pediatric, geriatric)
+- Organ-specific warnings (liver, kidney, heart)
+- Storage and handling requirements
+- Signs that require stopping medication immediately
+- Medical conditions that require special monitoring
+- Laboratory monitoring requirements if applicable
 
 RESPONSE FORMAT (JSON only):
 {
@@ -797,26 +828,31 @@ RESPONSE FORMAT (JSON only):
   "genericName": "official generic/chemical name",
   "brandNames": ["array", "of", "common", "brand", "names"],
   "usedFor": "comprehensive description of medical uses, indications, and conditions treated (2-3 sentences)",
-  "sideEffects": "DETAILED medication-specific side effects organized by frequency: Common (>10%): [list specific effects]. Less common (1-10%): [list specific effects]. Rare (<1%): [list serious/severe effects]. Contact healthcare provider immediately for: [emergency symptoms]",
-  "warnings": "SPECIFIC warnings for this medication including: Contraindications (do not use if...), Drug interactions (avoid with...), Pregnancy/breastfeeding considerations, Age restrictions, Liver/kidney warnings, Storage requirements, Signs to watch for that require immediate medical attention",
-  "dosageInfo": "general dosage forms available (tablets, capsules, liquid) and typical adult dosing guidelines",
-  "drugClass": "pharmacological classification (e.g., 'ACE inhibitor', 'NSAID', 'antibiotic')",
-  "mechanism": "brief explanation of how the medication works in the body",
-  "monitoring": "what should be monitored during treatment (labs, symptoms, etc.)",
-  "correctedName": "if the input was a misspelling, provide the correct medication name here, otherwise null"
+  "sideEffects": "COMPREHENSIVE medication-specific side effects: Common (>10%): [list specific symptoms patients will experience]. Less common (1-10%): [list specific symptoms]. Rare (<1%): [list serious/severe reactions]. Serious reactions requiring immediate medical attention: [specific emergency symptoms]. Report any unusual symptoms to healthcare provider immediately.",
+  "warnings": "MEDICATION-SPECIFIC warnings: Contraindications: Do not use if you have [specific conditions], are taking [specific medications], or are allergic to [specific substances]. Drug interactions: Avoid combining with [specific medication names and classes]. Pregnancy/Breastfeeding: [specific pregnancy category and nursing guidance]. Age restrictions: [specific age limits and considerations]. Organ warnings: [liver/kidney/heart specific precautions]. Storage: [specific temperature and storage requirements]. Stop medication and seek immediate medical care if you experience: [specific warning signs]. Before using: [pre-treatment requirements or tests needed].",
+  "dosageInfo": "available forms and typical dosing guidelines with frequency",
+  "drugClass": "pharmacological classification",
+  "mechanism": "how the medication works in the body",
+  "monitoring": "what should be monitored during treatment",
+  "schedule": "controlled substance schedule if applicable, or dosing frequency guidance",
+  "correctedName": "if input was misspelled, provide correct name, otherwise null"
 }
 
-EXAMPLE FORMAT FOR SIDE EFFECTS:
-"Common (>10%): Nausea, headache, dizziness. Less common (1-10%): Stomach upset, drowsiness, dry mouth. Rare (<1%): Severe allergic reaction, liver problems, heart rhythm changes. Contact healthcare provider immediately for: Difficulty breathing, severe rash, yellowing of skin/eyes, irregular heartbeat."
+SPECIFIC FORMATTING EXAMPLES:
 
-EXAMPLE FORMAT FOR WARNINGS:
-"Contraindications: Do not use if allergic to [drug class], pregnant, have severe liver disease. Drug interactions: Avoid alcohol, blood thinners (warfarin), certain antibiotics. Pregnancy: Category C - use only if benefits outweigh risks. Children: Not recommended under age 12. Liver/kidney: Dose adjustment needed in impaired function. Storage: Keep in cool, dry place. Seek immediate medical attention for: [specific emergency symptoms]."
+For sideEffects (like Ichthammol example):
+"Common (>10%): Skin redness, mild burning sensation at application site. Less common (1-10%): Skin dryness, peeling, temporary staining of skin or clothing. Rare (<1%): Severe allergic reaction, widespread skin irritation. Serious reactions requiring immediate medical attention: Severe swelling, difficulty breathing, widespread rash beyond application area. Report any unusual symptoms to healthcare provider immediately."
+
+For warnings (like Ichthammol example):
+"Contraindications: Do not use if allergic to ichthammol or coal tar derivatives, on broken or infected skin, or in children under 2 years. Drug interactions: May increase absorption of other topical medications applied to same area. Pregnancy/Breastfeeding: Use only if clearly needed; avoid application on large areas during pregnancy and breastfeeding. Storage: Store at room temperature, keep container tightly closed. For external use only. Stop medication and seek medical care if you experience: Signs of infection (increased redness, pus, fever), severe allergic reaction, or if condition worsens after 7 days of use. Before using: Clean affected area thoroughly, test on small skin area first if sensitive skin."
 
 IMPORTANT NOTES:
-- If unsure about any field, indicate "Consult healthcare provider" rather than guessing
-- Always include appropriate medical disclaimers
+- Provide actionable, specific information rather than generic "consult healthcare provider" statements
+- Include practical advice patients can follow
+- Mention specific symptoms to watch for
+- Include storage and application instructions where relevant
 - For controlled substances, emphasize prescription requirements
-- Be especially careful with dosage information - provide ranges, not specific doses
+- Always include appropriate medical disclaimers
 
 Analyze: "${medicationName}"
 
@@ -827,14 +863,14 @@ Respond with JSON only, no additional text:`;
         messages: [
           {
             role: "system",
-            content: "You are a comprehensive medication database assistant providing accurate, evidence-based pharmaceutical information. You serve as a reliable fallback when primary medical databases are unavailable. Your responses must include detailed, medication-specific side effects organized by frequency and comprehensive warnings with specific contraindications and safety precautions. Always emphasize consulting healthcare providers for medical decisions and include appropriate safety disclaimers. Focus on providing actionable, specific information rather than generic statements."
+            content: "You are a comprehensive medication database assistant providing accurate, evidence-based pharmaceutical information. You serve as a reliable fallback when primary medical databases are unavailable. CRITICAL REQUIREMENT: Your responses must include highly specific, medication-specific side effects organized by frequency and comprehensive warnings with detailed contraindications, drug interactions, and safety precautions. Avoid generic statements like 'consult healthcare provider for side effects' - instead provide actual side effects, symptoms, and specific warnings patients need to know. Include practical, actionable information including storage requirements, application instructions, and specific symptoms that require immediate medical attention. Always emphasize consulting healthcare providers for medical decisions but provide comprehensive information as a medical database would."
           },
           {
             role: "user",
             content: prompt
           }
         ],
-        max_tokens: 1200,
+        max_tokens: 1500, // Increased for detailed warnings and side effects
         temperature: 0.1 // Low temperature for consistent, factual responses
       });
 
@@ -870,15 +906,19 @@ Respond with JSON only, no additional text:`;
           originalSearchTerm: medicationName,
           genericName: parsed.genericName || medicationName,
           brandNames: Array.isArray(parsed.brandNames) ? parsed.brandNames : [parsed.brandNames || medicationName],
-          usedFor: this.formatAIUsage(parsed.usedFor),
+          usedFor: this.formatAIUsage(parsed.usedFor), // For internal API consistency
+          usedTo: this.formatAIUsage(parsed.usedFor),   // For OCR service compatibility
           sideEffects: this.formatAISideEffects(parsed.sideEffects),
           warnings: this.formatAIWarnings(parsed.warnings),
           strength: parsed.dosageInfo || 'Consult prescription label or healthcare provider',
+          dosage: parsed.dosageInfo || 'Consult prescription label or healthcare provider', // For OCR service compatibility
+          schedule: parsed.schedule || 'Follow prescription instructions',
           drugClass: parsed.drugClass || 'Contact healthcare provider for classification',
           mechanism: parsed.mechanism || 'Consult healthcare provider for mechanism of action',
           monitoring: parsed.monitoring || 'Follow healthcare provider instructions for monitoring',
           confidence: aiConfidence,
           source: 'OpenAI_Database',
+          sources: ['OpenAI_Database'], // For OCR service compatibility
           dataSource: 'ai_fallback_database',
           searchedAt: new Date().toISOString(),
           note: 'Information provided by OpenAI as fallback database when FDA/primary sources were unavailable. Please verify with healthcare provider and current prescribing information.',
@@ -1126,6 +1166,76 @@ Respond only with the JSON object, no additional text.`;
     }
 
     return this.formatWarningsText(formatted);
+  }
+
+  /**
+   * Detect if FDA results are not helpful (homeopathic/complex formulations)
+   */
+  isUnhelpfulFDAResult(result, searchedMedication) {
+    const genericName = result.genericName?.toLowerCase() || '';
+    const usedFor = result.usedFor?.toLowerCase() || '';
+    const warnings = result.warnings?.toLowerCase() || '';
+    const searchName = searchedMedication.toLowerCase();
+
+    // Check for homeopathic indicators
+    const homeopathicIndicators = [
+      'homeopathic', 'dilution', 'potency', 'x', 'c', 'flower', 'root', 'leafy twig',
+      'whole plant', 'mother tincture', 'trituration'
+    ];
+
+    // Check for complex multi-ingredient formulations
+    const complexFormulationIndicators = [
+      ',', ' and ', ' plus ', 'combination', 'multiple', 'various'
+    ];
+
+    // Check for vague usage descriptions
+    const vageUsageIndicators = [
+      'for viral infections', 'general use', 'various conditions', 'multiple indications'
+    ];
+
+    // Check for generic warnings
+    const genericWarningIndicators = [
+      'use only if cap seal is unbroken', 'if pregnant or breastfeeding, ask',
+      'keep this and all medication out of the reach of children'
+    ];
+
+    // Count indicators
+    let indicatorCount = 0;
+
+    // Check if generic name suggests homeopathic/complex formulation
+    if (homeopathicIndicators.some(indicator => genericName.includes(indicator))) {
+      indicatorCount += 2;
+    }
+
+    // Check if generic name has multiple ingredients (lots of commas)
+    if ((genericName.match(/,/g) || []).length > 3) {
+      indicatorCount += 2;
+    }
+
+    // Check if the main medication name appears buried in a complex list
+    if (genericName.includes(searchName) && genericName.length > searchName.length * 3) {
+      indicatorCount += 1;
+    }
+
+    // Check for vague usage
+    if (vageUsageIndicators.some(indicator => usedFor.includes(indicator))) {
+      indicatorCount += 1;
+    }
+
+    // Check for generic warnings
+    if (genericWarningIndicators.some(indicator => warnings.includes(indicator))) {
+      indicatorCount += 1;
+    }
+
+    // If we have multiple indicators, consider this an unhelpful result
+    const isUnhelpful = indicatorCount >= 3;
+    
+    if (isUnhelpful) {
+      console.log(`🔍 Detected unhelpful FDA result for "${searchedMedication}": indicator count ${indicatorCount}`);
+      console.log(`   Generic name length: ${genericName.length}, Usage: "${usedFor.substring(0, 50)}..."`);
+    }
+
+    return isUnhelpful;
   }
 
   getDefaultMedicationInfo(medicationName) {
