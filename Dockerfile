@@ -1,29 +1,42 @@
-# Frontend Dockerfile
-FROM node:18-alpine as frontend-build
+# Multi-stage build for Railway deployment
+FROM node:20-alpine as frontend-build
+
+# Set memory limit for Node.js
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files for frontend
 COPY package.json package-lock.json* ./
 
-# Install dependencies
-RUN npm ci
+# Install frontend dependencies
+RUN npm install
 
-# Copy source code
+# Copy frontend source code
 COPY . .
 
 # Build the frontend
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+FROM node:20-alpine
 
-# Copy built frontend
-COPY --from=frontend-build /app/dist /usr/share/nginx/html
+# Set memory limit for Node.js
+ENV NODE_OPTIONS="--max-old-space-size=1024"
 
-# Copy nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
+WORKDIR /app
 
-EXPOSE 80
+# Copy backend files
+COPY BACKEND/Forum/ ./
 
-CMD ["nginx", "-g", "daemon off;"]
+# Install backend dependencies
+RUN npm install
+
+# Copy built frontend to serve as static files
+COPY --from=frontend-build /app/dist ./public
+
+# Expose the port
+EXPOSE 5001
+
+# Start the backend server (which will also serve the frontend)
+CMD ["npm", "start"]

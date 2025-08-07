@@ -1,9 +1,7 @@
-// API configuration
-// For Vercel deployment, use relative paths since frontend and backend are on the same domain
-// For local development, use the full localhost URL
+// API configuration for Railway deployment
 const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
   ? (__API_URL__ || 'http://localhost:5001')
-  : ''; // Empty string for relative paths in production
+  : ''; // Empty string for relative paths in production (same domain)
 
 // API endpoints
 export const API_ENDPOINTS = {
