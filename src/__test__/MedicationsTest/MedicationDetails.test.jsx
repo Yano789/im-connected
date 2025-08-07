@@ -1,121 +1,198 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { MemoryRouter } from 'react-router-dom';
-import MedicationsPage from '../../Medications/MedicationsPage/MedicationsPage';
+import MedicationDetails from '../../Medications/MedicationDetails/MedicationDetails';
 
-// Mock Services and Child Components 
-
-// Mock the medication scanner service to simulate API calls
-vi.mock('../../Medications/services/medicationScannerService', () => ({
-  default: {
-    getCareRecipients: vi.fn(),
-    getMedications: vi.fn(),
-    createCareRecipient: vi.fn(),
-    deleteCareRecipient: vi.fn(),
-    createMedication: vi.fn(),
-    updateMedication: vi.fn(),
-    deleteMedication: vi.fn(),
-  },
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key) => key,
+        i18n: { language: 'en' }
+    }),
 }));
 
-// Mock child components
-vi.mock('../../Medications/CareRecipientList/CareRecipientList', () => ({
-  default: ({ recipients, onSelect }) => (
-    <div>
-      <h2>My Care Recipients</h2>
-      {recipients.map(r => (
-        <button key={r.id} onClick={() => onSelect(r.id)}>{r.name}</button>
-      ))}
-    </div>
-  ),
-}));
-vi.mock('../../Medications/MedicationLogging/MedicationLogging', () => ({
-  default: ({ onAddNew }) => (
-    <div>
-      <h3>Medication Logging</h3>
-      <button onClick={() => onAddNew()}>Add more medication</button>
-    </div>
-  ),
-}));
-vi.mock('../../Medications/MedicationDetails/MedicationDetails', () => ({
-  default: ({ medication }) => <div>{medication ? `Details for ${medication.name}` : 'No medication selected'}</div>,
-}));
-vi.mock('../../Medications/MedicationForm/MedicationForm', () => ({
-  default: () => <div>Medication Form</div>,
-}));
-vi.mock('../../TopHeader/Header/Header', () => ({
-  default: () => <header>Mock Header</header>,
+// Mock framer-motion
+vi.mock('framer-motion', () => ({
+    motion: {
+        div: ({ children, ...props }) => <div {...props}>{children}</div>,
+    },
+    AnimatePresence: ({ children }) => <div>{children}</div>,
 }));
 
-// Test Data 
-const mockApiRecipients = [
-    { _id: '1', name: 'James Tan' },
-    { _id: '2', name: 'Mary Zhang' },
-];
-const mockApiMedications = [
-    { _id: 'med1', name: 'Metformin XR 500mg', dosages: [] }
-];
+// Mock the translation service
+vi.mock('../../Medications/services/medicationTranslationService', () => ({
+    default: {
+        translateMedication: vi.fn((medication) => Promise.resolve(medication)),
+    },
+}));
 
+// Test Data
+const mockMedication = {
+    id: 'med1',
+    name: 'Metformin XR 500mg',
+    dosages: [
+        { time: '10:00', taken: true, period: 'Morning' },
+        { time: '18:00', taken: false, period: 'Evening' }
+    ],
+    dosage: '500mg twice daily',
+    usedTo: 'Type 2 diabetes management',
+    sideEffects: 'Nausea, stomach upset',
+    warnings: 'Take with food',
+    image: 'http://example.com/medication.jpg'
+};
 
-describe('MedicationsPage Component (Backend Connected)', () => {
+const defaultProps = {
+    medication: mockMedication,
+    onEdit: vi.fn(),
+};
 
-    // Reset mocks before each test to ensure they are clean
-    beforeEach(() => {
-        vi.resetAllMocks();
+describe('MedicationDetails Component (Updated Version)', () => {
+    beforeEach(async () => {
+        vi.clearAllMocks();
+        // Reset the mock to return the input medication by default
+        const mockTranslationService = (await import('../../Medications/services/medicationTranslationService')).default;
+        mockTranslationService.translateMedication.mockImplementation((med) => Promise.resolve(med));
     });
 
-    // Test Case 1: Loading and Success State
-    it('should show a loading state and then display fetched care recipients', async () => {
-        // Setup the mock to simulate a successful API call
-        const medicationScannerService = (await import('../../Medications/services/medicationScannerService')).default;
-        medicationScannerService.getCareRecipients.mockResolvedValue(mockApiRecipients);
-        medicationScannerService.getMedications.mockResolvedValue(mockApiMedications);
-
-        render(<MemoryRouter><MedicationsPage /></MemoryRouter>);
-
-        // Use 'waitFor' to wait for the asynchronous fetch to complete
-        await waitFor(() => {
-            expect(screen.getByText('James Tan')).toBeInTheDocument();
-            expect(screen.getByText('Mary Zhang')).toBeInTheDocument();
-        });
+    it('should render placeholder when no medication is provided', () => {
+        render(<MedicationDetails medication={null} onEdit={vi.fn()} />);
+        expect(screen.getByText('Select a medication to see its details.')).toBeInTheDocument();
     });
 
-    // Test Case 2: Error State
-    it('should display an error message if fetching recipients fails', async () => {
-        const medicationScannerService = (await import('../../Medications/services/medicationScannerService')).default;
-        // Simulate a failed API call
-        medicationScannerService.getCareRecipients.mockRejectedValue(new Error('Network Error'));
+    it('should show loading state while translating', async () => {
+        const medicationTranslationService = await import('../../Medications/services/medicationTranslationService');
+        medicationTranslationService.default.translateMedication.mockImplementation(
+            () => new Promise(resolve => setTimeout(() => resolve(mockMedication), 100))
+        );
 
-        render(<MemoryRouter><MedicationsPage /></MemoryRouter>);
-
-        // Wait for the error message to appear
-        await waitFor(() => {
-            // Check that no user names were rendered.
-            expect(screen.queryByText('James Tan')).not.toBeInTheDocument();
-            expect(screen.queryByText('Mary Zhang')).not.toBeInTheDocument();
-        });
-    });
-
-    // Test Case 3: Switching to "Create" Mode
-    it('should switch to the medication form when "Add more medication" is clicked', async () => {
-        const medicationScannerService = (await import('../../Medications/services/medicationScannerService')).default;
-        medicationScannerService.getCareRecipients.mockResolvedValue(mockApiRecipients);
-        medicationScannerService.getMedications.mockResolvedValue([]);
-
-        render(<MemoryRouter><MedicationsPage /></MemoryRouter>);
+        render(<MedicationDetails {...defaultProps} />);
         
-        // Wait for initial data to load
+        expect(screen.getByText('Loading... 🌐')).toBeInTheDocument();
+        
         await waitFor(() => {
-            expect(screen.getByText('James Tan')).toBeInTheDocument();
+            expect(screen.getByText('Metformin XR 500mg')).toBeInTheDocument();
+        });
+    });
+
+    it('should render medication details after translation', async () => {
+        render(<MedicationDetails {...defaultProps} />);
+        
+        await waitFor(() => {
+            expect(screen.getByText('Metformin XR 500mg')).toBeInTheDocument();
         });
 
-        // The form should not be visible initially
-        expect(screen.queryByText('Medication Form')).not.toBeInTheDocument();
+        expect(screen.getByText('Schedule')).toBeInTheDocument();
+        expect(screen.getByText('Dosage')).toBeInTheDocument();
+        expect(screen.getByText('Used For')).toBeInTheDocument();
+        expect(screen.getByText('Side Effects')).toBeInTheDocument();
+        expect(screen.getByText('Warnings')).toBeInTheDocument();
+        expect(screen.getByText('Image')).toBeInTheDocument();
+    });
 
-        // Click the add button
-        fireEvent.click(screen.getByRole('button', { name: 'Add more medication' }));
+    it('should display medication information correctly', async () => {
+        render(<MedicationDetails {...defaultProps} />);
+        
+        await waitFor(() => {
+            expect(screen.getByText('500mg twice daily')).toBeInTheDocument();
+            expect(screen.getByText('Type 2 diabetes management')).toBeInTheDocument();
+            expect(screen.getByText('Nausea, stomach upset')).toBeInTheDocument();
+            expect(screen.getByText('Take with food')).toBeInTheDocument();
+        });
+    });
 
-        // The form should now be visible
-        expect(screen.getByText('Medication Form')).toBeInTheDocument();
+    it('should show schedule icons when no text schedule is provided', async () => {
+        const medicationWithoutSchedule = {
+            ...mockMedication,
+            schedule: undefined
+        };
+
+        render(<MedicationDetails medication={medicationWithoutSchedule} onEdit={vi.fn()} />);
+        
+        await waitFor(() => {
+            expect(screen.getByText('Morning')).toBeInTheDocument();
+            expect(screen.getByText('Afternoon')).toBeInTheDocument();
+            expect(screen.getByText('Evening')).toBeInTheDocument();
+            expect(screen.getByText('Night')).toBeInTheDocument();
+        });
+    });
+
+    it('should display medication image when available', async () => {
+        render(<MedicationDetails {...defaultProps} />);
+        
+        await waitFor(() => {
+            const image = screen.getByRole('img', { name: 'Metformin XR 500mg' });
+            expect(image).toBeInTheDocument();
+            expect(image).toHaveAttribute('src', 'http://example.com/medication.jpg');
+        });
+    });
+
+    it('should show placeholder when no image is available', async () => {
+        const medicationWithoutImage = {
+            ...mockMedication,
+            image: null
+        };
+
+        // Ensure the mock returns the medication without image
+        const mockTranslationService = (await import('../../Medications/services/medicationTranslationService')).default;
+        mockTranslationService.translateMedication.mockResolvedValue(medicationWithoutImage);
+
+        render(<MedicationDetails medication={medicationWithoutImage} onEdit={vi.fn()} />);
+        
+        await waitFor(() => {
+            expect(screen.getByText('Metformin XR 500mg')).toBeInTheDocument();
+        });
+        
+        // Check for no image placeholder
+        expect(screen.getByText('No image available')).toBeInTheDocument();
+        expect(screen.getByText('Upload an image when editing this medication')).toBeInTheDocument();
+    });
+
+    it('should call onEdit when edit button is clicked', async () => {
+        const handleEdit = vi.fn();
+        render(<MedicationDetails {...defaultProps} onEdit={handleEdit} />);
+        
+        await waitFor(() => {
+            expect(screen.getByText('Edit medicine')).toBeInTheDocument();
+        });
+
+        fireEvent.click(screen.getByText('Edit medicine'));
+        expect(handleEdit).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle optional fields gracefully', async () => {
+        const minimalMedication = {
+            id: 'med2',
+            name: 'Simple Med',
+            usedTo: 'Pain relief',
+            sideEffects: 'Drowsiness'
+            // Note: no dosage, warnings, or image fields
+        };
+
+        // Ensure the mock returns the minimal medication
+        const mockTranslationService = (await import('../../Medications/services/medicationTranslationService')).default;
+        mockTranslationService.translateMedication.mockResolvedValue(minimalMedication);
+
+        render(<MedicationDetails medication={minimalMedication} onEdit={vi.fn()} />);
+        
+        await waitFor(() => {
+            expect(screen.getByText('Simple Med')).toBeInTheDocument();
+        });
+        
+        expect(screen.getByText('Pain relief')).toBeInTheDocument();
+        expect(screen.getByText('Drowsiness')).toBeInTheDocument();
+
+        // Check that warnings section is not rendered when warnings field is missing
+        expect(screen.queryByText('Warnings')).not.toBeInTheDocument();
+    });
+
+    it('should call translation service when component mounts', async () => {
+        const medicationTranslationService = await import('../../Medications/services/medicationTranslationService');
+        const translateSpy = vi.spyOn(medicationTranslationService.default, 'translateMedication');
+        
+        render(<MedicationDetails {...defaultProps} />);
+        
+        await waitFor(() => {
+            expect(translateSpy).toHaveBeenCalledTimes(1);
+            expect(translateSpy).toHaveBeenCalledWith(mockMedication);
+        });
     });
 });
