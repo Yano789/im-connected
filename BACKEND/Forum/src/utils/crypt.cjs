@@ -1,7 +1,9 @@
 const crypto = require('crypto');
 
 const algorithm = 'aes-256-gcm';
-const key = crypto.scryptSync(process.env.ENCRYPTION_SECRET, 'salt', 32); // 32 bytes key
+// Use a default encryption secret if not provided in environment
+const encryptionSecret = process.env.ENCRYPTION_SECRET || 'default-encryption-secret-change-in-production';
+const key = crypto.scryptSync(encryptionSecret, 'salt', 32); // 32 bytes key
 const ivLength = 12; // For GCM, 12 bytes is recommended
 
 function encrypt(buffer) {

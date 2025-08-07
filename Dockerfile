@@ -29,8 +29,11 @@ WORKDIR /app
 # Copy backend files
 COPY BACKEND/Forum/ ./
 
+# Copy environment file (for development/testing)
+COPY .env .env
+
 # Install backend dependencies
-RUN npm install --only=production
+RUN npm ci --only=production
 
 # Copy built frontend to serve as static files
 COPY --from=frontend-build /app/dist ./public
