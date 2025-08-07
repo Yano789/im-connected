@@ -6,7 +6,8 @@
   "installCommand": "npm ci",
   "functions": {
     "api/forum.js": {
-      "runtime": "nodejs20.x"
+      "runtime": "nodejs20.x",
+      "maxDuration": 10
     }
   },
   "rewrites": [
@@ -18,5 +19,8 @@
       "source": "/((?!api).*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }
