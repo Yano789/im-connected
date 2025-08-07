@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import HeartLogo from "../assets/HeartLogo.png";
 import SplashChars from "../assets/SplashscreenCharacters.png";
@@ -87,13 +87,6 @@ export default function SplashScreen() {
               <button className="top-button signin-btn">{t("Log In")}</button>
             </Link>
           </div>
-
-          {/* characters illustration */}
-          <img
-            src={SplashChars}
-            alt="Caregiver characters"
-            className="header-chars"
-          />
         </div>
       </header>
 

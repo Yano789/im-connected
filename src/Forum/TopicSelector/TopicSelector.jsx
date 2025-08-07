@@ -38,31 +38,31 @@ function TopicSelector({ onTagFilterChange }) {
     {
       id: 5,
       name: "Pediatric Care",
-      localName: t("Tag4"),
+      localName: t("Tag5"),
       image: ChildrenIcon,
     },
     {
       id: 6,
       name: "End of Life Care",
-      localName: t("Tag5"),
+      localName: t("Tag6"),
       image: ElderlyIcon,
     },
     {
       id: 7,
       name: "Financial & Legal Help",
-      localName: t("Tag6"),
+      localName: t("Tag7"),
       image: MoneyIcon,
     },
     {
       id: 8,
       name: "Mental Disability",
-      localName: t("Tag7"),
+      localName: t("Tag8"),
       image: DepressionIcon,
     },
     {
       id: 9,
       name: "Hospitals and Clinics",
-      localName: t("Tag8"),
+      localName: t("Tag9"),
       image: HospitalIcon,
     },
   ];

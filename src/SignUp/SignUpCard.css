@@ -79,7 +79,8 @@
   border-radius: 6px;
   height: 38px;
   border: 1px solid rgba(102, 102, 102, 0.35);
-  font-size: 14px;
+  font-size: 14px !important;
+  color: var(--text-colour);
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -88,6 +89,12 @@
   outline: none;
   border-color: var(--accent-colour-1);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input::placeholder {
+  color: var(--placeholder-colour);
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
 }
 
 .phone-input-container {
@@ -204,7 +211,8 @@
 }
 
 .phone-input::placeholder {
-  color: var(--placeholder-colour)
+  color: var(--placeholder-colour);
+  font-size: 14px;
 }
 
 .password-label {
@@ -236,7 +244,8 @@
 .password-row input {
   flex: 1;
   min-width: 0;
-  
+  font-size: 14px !important;
+  color: var(--text-colour);
 }
 
 .password-group {
@@ -405,6 +414,8 @@
   
   .password-row input {
     width: calc(50% - 5px);
+    font-size: 14px !important;
+    color: var(--text-colour);
   }
 }
 
@@ -415,6 +426,8 @@
   
   .password-row input {
     width: calc(50% - 4px);
+    font-size: 14px !important;
+    color: var(--text-colour);
   }
 }
 
@@ -430,5 +443,7 @@
   
   .password-row input {
     width: 100%;
+    font-size: 14px !important;
+    color: var(--text-colour);
   }
 }

@@ -48,7 +48,7 @@
   padding: 0.625rem;
   border-radius: 0.375rem; 
   border: 1px solid var(--border-2);
-  background-color: var(--button-colour-2);
+  background-color: var(--button-colour-1);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
   cursor: pointer;
   user-select: none;
@@ -64,7 +64,7 @@
 .topicMainDefault:hover {
   transform: scale(1.02);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-  background-color: var(--button-colour-2-onhover);
+  background-color: var(--button-colour-1-onhover);
 }
 
 .topicMainDefault:active {
@@ -81,7 +81,7 @@
   padding: 0.625rem;
   border-radius: 0.375rem;
   border: 1px solid var(--border-2);
-  background-color: var(--button-colour-2-onselect);
+  background-color: var(--button-colour-1-onselect);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
   cursor: pointer;
   user-select: none;
@@ -97,7 +97,7 @@
 .topicMainClicked:hover {
   transform: scale(1.02);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-  background-color: var(--button-colour-2-onselect);
+  background-color: var(--button-colour-1-onselect);
 }
 
 .topicMainClicked:active {
