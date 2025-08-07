@@ -1,8 +1,7 @@
-/* Medication Form Styles */
 .form-card {
     padding: 2rem;
     border-radius: 16px;
-    background-color: white;
+    background-color: var(--border-1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     max-width: 100%;
     overflow-y: auto;
@@ -15,19 +14,19 @@
     align-items: center;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #f1f3f5;
+    border-bottom: 2px solid var(--shadow-2);
 }
 
 .medication-title {
     font-size: 1.8rem;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--border-2);
     margin: 0;
 }
 
 .delete-button-top-right {
-    background-color: #e74c3c;
-    color: white;
+    background-color: var(--error-text);
+    color: border(--border-1)
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 8px;
@@ -37,7 +36,7 @@
 }
 
 .delete-button-top-right:hover {
-    background-color: #c0392b;
+    background-color: var(---med-accent);
     transform: translateY(-1px);
 }
 
@@ -49,19 +48,19 @@
     display: block;
     margin-bottom: 0.5rem;
     font-weight: 500;
-    color: #2c3e50;
+    color: var(--med-accent);
     font-size: 0.95rem;
 }
 
 .form-group input, .form-group textarea {
     width: 100%;
     padding: 0.75rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--shadow-2);
     border-radius: 8px;
     font-size: 1rem;
     font-family: inherit;
     resize: vertical;
-    box-sizing: border-box; /* Important for sizing */
+    box-sizing: border-box; 
 }
 
 .form-group textarea {
@@ -81,14 +80,14 @@
 
 .dosage-input-row select, .dosage-input-row input {
     padding: 0.75rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--shadow-2);
     border-radius: 8px;
     font-size: 1rem;
 }
 
 .remove-dosage-button {
-    background-color: #e74c3c;
-    color: white;
+    background-color: var(--error-text);
+    color: var(--border-1);
     border: none;
     padding: 0.5rem 1rem;
     border-radius: 6px;
@@ -98,12 +97,12 @@
 }
 
 .remove-dosage-button:hover {
-    background-color: #c0392b;
+    background-color: var(--med-accent);
 }
 
 .add-dosage-button {
-    background-color: #3498db;
-    color: white;
+    background-color: var(--success-text);
+    color: var(--border-1);
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
@@ -115,7 +114,7 @@
 }
 
 .add-dosage-button:hover {
-    background-color: #2980b9;
+    background-color: var(--profile-accent);
     transform: translateY(-1px);
 }
 
@@ -124,7 +123,7 @@
     gap: 1rem;
     margin-top: 2rem;
     padding-top: 1rem;
-    border-top: 1px solid #e1e8ed;
+    border-top: 1px solid var(--shadow-1);
 }
 
 .save-button, .cancel-button {
@@ -139,30 +138,30 @@
 }
 
 .save-button {
-    background-color: #52c41a;
-    color: white;
+    background-color: var(--success-text);
+    color: var(--border-1);
+    border: 1px solid var(--border-2);
 }
 
 .cancel-button {
-    background-color: #f1f3f5;
-    color: #333;
-    border: 1px solid #ddd;
+    background-color: var(--error-text);
+    color: var(--border-2);
+    border: 1px solid var(--border-2);
 }
 
 .save-button:hover:not(:disabled) {
-    background-color: #40916c;
+    background-color:var(--success-text);
 }
 
 .cancel-button:hover {
-    background-color: #ddd;
+    background-color: var(--shadow-2);
 }
 
 .save-button:disabled {
-    background-color: #95a5a6;
+    background-color: var(--shadow-3);
     cursor: not-allowed;
 }
 
-/* Image Upload Styles */
 .image-preview-container {
     width: 100%;
     margin-bottom: 1rem;
@@ -172,14 +171,14 @@
     max-width: 250px;
     width: 100%;
     border-radius: 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--shadow-2);
 }
 
 .upload-image-button {
     display: inline-block;
     padding: 0.6rem 1.2rem;
-    background-color: #e9ecef;
-    color: #333;
+    background-color: var(--button-colour-2);
+    color: var(--border-2);
     border-radius: 8px;
     cursor: pointer;
     font-weight: 500;
@@ -187,13 +186,12 @@
 }
 
 .upload-image-button:hover {
-    background-color: #dee2e6;
+    background-color: var(--button-colour-2-onhover);
 }
 
-/* Scanner-specific styles */
 .scanner-section {
-    background-color: #f8f9fa;
-    border: 2px dashed #dee2e6;
+    background-color: var(--border-1);
+    border: 2px dashed var(--border-2);
     border-radius: 12px;
     padding: 1.5rem;
     margin-bottom: 2rem;
@@ -216,9 +214,9 @@
 .file-input {
     margin-bottom: 1rem;
     padding: 0.5rem;
-    border: 1px solid #ced4da;
+    border: 1px solid var(--shadow-2);
     border-radius: 6px;
-    background-color: white;
+    background-color: var(--border-1);
 }
 
 .file-preview {
@@ -233,13 +231,13 @@
     max-width: 200px;
     max-height: 200px;
     border-radius: 8px;
-    border: 2px solid #dee2e6;
+    border: 2px solid var(--shadow-2);
     object-fit: cover;
 }
 
 .clear-file-btn {
-    background-color: #dc3545;
-    color: white;
+    background-color: var(--error-text);
+    color: var(--border-1);
     border: none;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
@@ -248,7 +246,7 @@
 }
 
 .clear-file-btn:hover {
-    background-color: #c82333;
+    background-color: var(--med-accent);
 }
 
 .scanner-actions {
@@ -258,8 +256,8 @@
 }
 
 .scan-button {
-    background-color: #007bff;
-    color: white;
+    background-color: var(--forum-accent);
+    color:  var(--border-1);
     border: none;
     padding: 0.75rem 1.5rem;
     border-radius: 8px;
@@ -280,21 +278,21 @@
 }
 
 .scan-error {
-    background-color: #f8d7da;
+    background-color: var(--error-text);
     color: #721c24;
     padding: 0.75rem;
     border-radius: 6px;
     margin-top: 0.5rem;
-    border: 1px solid #f5c6cb;
+    border: 1px solid var(--border-2);
 }
 
 .scan-success {
-    background-color: #d4edda;
+    background-color: var(--success-text);
     color: #155724;
     padding: 0.75rem;
     border-radius: 6px;
     margin-top: 0.5rem;
-    border: 1px solid #c3e6cb;
+    border: 1px solid var(--border-2);
 }
 
 .scan-progress {

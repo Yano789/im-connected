@@ -7,20 +7,20 @@
 .dropArea {
   border-width: 2px;
   border-style: dashed;
-  border-color: #D1D5DB; 
+  border-color: var(--shadow-1);
   border-radius: 1rem;    
   padding: 1.5rem;        
   text-align: center;
   font-size: 0.875rem;    
-  color: #6B7280;         
+  color: var(--shadow-3);         
   font-weight: 500;       
   cursor: pointer;
   transition: border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .dropArea:hover {
-  border-color: #3B82F6;  
-  background-color: #DBEAFE; 
+  border-color: var(--forum-accent);  
+  background-color: var(--shadow-1); 
 }
 
 .existingMediaContainer {
@@ -68,8 +68,8 @@
   position: absolute;
   top: 0.25rem; 
   right: 0.25rem; 
-  background-color: #DC2626; 
-  color: white;
+  background-color: var(--error-text);
+  color: var(--border-1);
   width: 1.5rem;  
   height: 1.5rem; 
   border-radius: 9999px; 
@@ -84,5 +84,5 @@
 }
 
 .removeMediaBtn:hover {
-  background-color: #B91C1C; 
+  background-color:var(--med-accent);
 }

@@ -47,8 +47,8 @@
   gap: 0.625rem; 
   padding: 0.625rem;
   border-radius: 0.375rem; 
-  border: 1px solid #2d2d2d;
-  background-color: #FFF2F0;
+  border: 1px solid var(--border-2);
+  background-color: var(--button-colour-2);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
   cursor: pointer;
   user-select: none;
@@ -64,7 +64,7 @@
 .topicMainDefault:hover {
   transform: scale(1.02);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-  background-color: #ffe2de;
+  background-color: var(--button-colour-2-onhover);
 }
 
 .topicMainDefault:active {
@@ -80,8 +80,8 @@
   gap: 0.625rem;
   padding: 0.625rem;
   border-radius: 0.375rem;
-  border: 1px solid #2d2d2d;
-  background-color: #FF7E7E;
+  border: 1px solid var(--border-2);
+  background-color: var(--button-colour-2-onselect);
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out;
   cursor: pointer;
   user-select: none;
@@ -97,7 +97,7 @@
 .topicMainClicked:hover {
   transform: scale(1.02);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
-  background-color: #ff6e6e;
+  background-color: var(--button-colour-2-onselect);
 }
 
 .topicMainClicked:active {
@@ -109,6 +109,6 @@
   max-width: 100%;
   flex-shrink: 1;
   text-align: left;
-  color: #2d2d2d;
+  color: var(--border-2);
   cursor: pointer;
 }

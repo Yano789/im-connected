@@ -1,16 +1,20 @@
-require("dotenv").config();
+require("../setUpMongo.cjs"); // Mongo Memory Server setup
 const request = require("supertest");
-const app = require("../../app.cjs"); //express app
-const User = require("../../domains/user/model.cjs");
-const Comment = require("../../domains/comment/model.cjs")
-const { Post } = require("../../domains/post/model.cjs")
+const app = require("../../../app.cjs"); //express app
+const User = require("../../../domains/user/model.cjs");
+const Comment = require("../../../domains/comment/model.cjs")
+const { Post } = require("../../../domains/post/model.cjs")
 const jwt = require("jsonwebtoken");
-require("./setUpMongo.cjs"); // Mongo Memory Server setup
 
 describe("Create a comment to a post", () => {
     let token
     let user
     let post
+    beforeAll(async()=>{
+        await User.deleteMany()
+        await Post.deleteMany()
+        await Comment.deleteMany()
+    })
     beforeEach(async () => {
         //create the mock data user and post , to make comments to
         user = await User.create({
@@ -47,13 +51,12 @@ describe("Create a comment to a post", () => {
             process.env.TOKEN_KEY,
             { expiresIn: process.env.TOKEN_EXPIRY }
         );
-    })
 
-    afterEach(async()=>{
-        await User.deleteMany()
+                await User.deleteMany()
         await Post.deleteMany()
         await Comment.deleteMany()
     })
+
 
     test("should create a new comment",async()=>{
         const res = await request(app)

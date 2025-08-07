@@ -1,31 +1,54 @@
-const { hashData, verifyHashedData } = require("./../utils/hashData.cjs")
+jest.mock('bcryptjs', () => ({
+  hash: jest.fn(),
+  compare: jest.fn(),
+}));
+
+const bcrypt = require('bcryptjs');
+const { hashData, verifyHashedData } = require('./../utils/hashData.cjs');
 
 describe("utils.hashData tests", () => {
+  const input = 'password123';
 
-    test("testing hashData()", async () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-        const input = 'mySecretPassword';
-        const hashed = await hashData(input);
+  test("hashData() should return hashed string", async () => {
+    bcrypt.hash.mockResolvedValue('mockedHashedValue');
 
-        expect(typeof hashed).toBe('string');
-        expect(hashed).not.toBe(input);
-        expect(hashed.length).toBeGreaterThan(0);
-    })
+    const hashed = await hashData(input);
 
-    test("testing verifyHashedData() for correct password", async () => {
-        const input = 'password123';
-        const hashed = await hashData(input);
-        const isMatch = await verifyHashedData(input, hashed);
+    expect(bcrypt.hash).toHaveBeenCalledWith(input, 10); // default saltRounds
+    expect(hashed).toBe('mockedHashedValue');
+  });
 
-        expect(isMatch).toBe(true);
-    })
+  test("verifyHashedData() should return true for matching input", async () => {
+    bcrypt.compare.mockResolvedValue(true);
 
-    test("testing verifyHashedData() for correct password", async () => {
-        const input = 'password123';
-        const wrongInput = 'wrongPassword';
-        const hashed = await hashData(input);
-        const isMatch = await verifyHashedData(wrongInput, hashed);
+    const result = await verifyHashedData(input, 'mockedHashedValue');
 
-        expect(isMatch).toBe(false);
-    });
-})
+    expect(bcrypt.compare).toHaveBeenCalledWith(input, 'mockedHashedValue');
+    expect(result).toBe(true);
+  });
+
+  test("verifyHashedData() should return false for non-matching input", async () => {
+    bcrypt.compare.mockResolvedValue(false);
+
+    const result = await verifyHashedData('wrongPassword', 'mockedHashedValue');
+
+    expect(bcrypt.compare).toHaveBeenCalledWith('wrongPassword', 'mockedHashedValue');
+    expect(result).toBe(false);
+  });
+
+  test("hashData() should throw if bcrypt.hash throws", async () => {
+    bcrypt.hash.mockRejectedValue(new Error("Hash error"));
+
+    await expect(hashData(input)).rejects.toThrow("Hash error");
+  });
+
+  test("verifyHashedData() should throw if bcrypt.compare throws", async () => {
+    bcrypt.compare.mockRejectedValue(new Error("Compare error"));
+
+    await expect(verifyHashedData(input, 'mockedHashedValue')).rejects.toThrow("Compare error");
+  });
+});

@@ -3,10 +3,40 @@
 
 :root {
   --user-font-size: 14px;
+  --background-colour: #ffffff;
+  --text-colour: #2d2d2d; /* black */
+  --button-colour-1: #c8b8db; /* lighter purple */
+  --button-colour-1-onhover: #ab97c3; /* dark purple */
+  --button-colour-1-onselect: #956bff;
+  --button-colour-2: #f1c5c0; /* pink */
+  --button-colour-2-onhover: #FFADAD; /* random pink */
+  --button-colour-2-onselect: #FF7E7E; /* neon pink */
+  --header-colour: #ab97c3; /* purple */
+  --accent-colour-1: #c8b8db; /* search bar light purple */
+  --accent-colour-2: #956bff; /* dark purple */
+  --shadow-1: #e5e7eb; /* blueish grey used for login */
+  --shadow-2: #f9fafb; /* light grey */
+  --shadow-3: #6b7280; /* dark grey */
+  --border-1: #FFFDF9;  /* white */
+  --border-2: #2d2d2d;  /* black */
+  --placeholder-colour: #9ca3af; /* grey */
+  --success-text: #10b981;  /* green */
+  --error-text: #BA1111; /* red */
+  --med-accent: #F87575; /* salmon pink */
+  --chatbot-accent: #F19C67; /* orange */
+  --forum-accent: #94C2BF; /* blue */
+  --profile-accent: #ABD9A9; /* green */
+  --password-toggle: #555;  /* dark grey */
+  --area-code: #6b7280;  /* lightish grey */
+  --phone-input: #1f2937;  /* phone input colour */
+  
+
 }
 
 html {
-  font-size: var(--user-font-size); 
+  font-size: var(--user-font-size);
+  font-family: 'Poppins', sans-serif;
+
 }
 
 
@@ -14,12 +44,7 @@ body {
   font-family: 'Poppins', sans-serif;
 }
 
-@theme {
-  --color-custom-pink: oklch(0.8604 0.0509 25.75);
-  --color-custom-purple: oklch(0.8071 0.0515 305.92);
-  --color-custom-purple-header: oklch(0.7091 0.0667 305.42);
-  --color-custom-white: oklch(0.9945 0.0057 84.57);
-}
+
 
 p, div, span, h1, h2, h3, h4, h5, h6 {
   overflow-wrap: break-word;

@@ -1,8 +1,7 @@
 const validateBody = (schema) => (req, res, next) => {
-  const { error, value } = schema.validate(req.body, { abortEarly: false });
+  const { error, value } = schema.validate(req.body);
   if (error) {
-    const errors = error.details.map(d => d.message);
-    return res.status(400).json({ errors });  // <-- always send 'errors' key
+    return res.status(400).json({ error: error.details[0].message });
   }
   req.body = value;
   next();

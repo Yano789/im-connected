@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 import "./userPreferences.css";
@@ -12,8 +12,10 @@ import Money from "../assets/Money.png";
 import Wheelchair from "../assets/Wheelchair.png";
 import i18next from "i18next";
 import { useTranslation } from "react-i18next";
+import { applyTextSize } from "../Profile/TextSize";
 
 const UserPreferences = () => {
+  const { t } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [selectedTextSize, setSelectedTextSize] = useState("Medium");
   const [selectedContentMode, setSelectedContentMode] = useState("Easy Read");
@@ -23,6 +25,19 @@ const UserPreferences = () => {
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
+
+  //to set default options - replacing the localstorage since it kept track of pref last time
+  useEffect(() => {
+    setSelectedLanguage("en");
+    i18next.changeLanguage("en");
+
+    setSelectedTextSize("Medium");
+    applyTextSize("Medium");
+
+    setSelectedContentMode("Easy Read");
+
+    setSelectedTopics([]);
+  }, []);
 
   const languages = [
     { id: "en", label: "English" },
@@ -42,7 +57,7 @@ const UserPreferences = () => {
     { id: "Default", label: t("Default Mode") },
   ];
 
-  const careRecipientTopics = [
+  const getCareRecipientTopics = () => [
     {
       id: "physical-disability",
       label: t("Physical Disability & Chronic Illness"),
@@ -65,7 +80,7 @@ const UserPreferences = () => {
     },
   ];
 
-  const caregiverTopics = [
+  const getCaregiverTopics = () => [
     {
       id: "personal-mental-health",
       label: t("Personal Mental Health"),
@@ -88,18 +103,67 @@ const UserPreferences = () => {
     },
   ];
 
-  const handleTopicToggle = (topicLabel) => {
+  const handleTopicToggle = (topicId) => {
+    //find topic by id for eng label
+    const allTopics = [...getCareRecipientTopics(), ...getCaregiverTopics()];
+    const topic = allTopics.find(t => t.id === topicId);
+
+    if (!topic) return;
+
     setSelectedTopics((prev) => {
-      if (prev.includes(topicLabel)) {
+      if (prev.includes(topic.englishLabel)) {
         //if already selected, remove it
-        return prev.filter((label) => label !== topicLabel);
+        return prev.filter((label) => label !== topic.englishLabel);
       } else if (prev.length < 2) {
         //if less than 2 selected, add it
-        return [...prev, topicLabel];
+        return [...prev, topic.englishLabel];
       }
       //if 2 are already selected and this isn't one of them, do nothing
       return prev;
     });
+  };
+
+  const handlePreferenceChange = async (category, value) => {
+    console.log("handlePreferenceChange called:", category, value);
+
+    if (category === "language") {
+      setSelectedLanguage(value);
+      i18next.changeLanguage(value);
+      console.log("Language changed to:", value);
+    } else if (category === "textSize") {
+      setSelectedTextSize(value);
+      applyTextSize(value);
+      console.log("Text size changed to:", value);
+    } else if (category === "contentMode") {
+      setSelectedContentMode(value);
+      console.log("Content mode changed to:", value);
+    }
+
+    const preferences = {
+      language: category === "language" ? value : selectedLanguage,
+      textSize: category === "textSize" ? value : selectedTextSize,
+      contentMode: category === "contentMode" ? value : selectedContentMode,
+      topics: selectedTopics,
+    };
+
+    try {
+      const res = await fetch("http://localhost:5001/api/v1/user/preferences", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ username, ...preferences }),
+      });
+
+      if (res.ok) {
+        console.log("Preference updated:", category, value);
+      } else {
+        console.error("Failed to update preference:", category, value);
+      }
+    } catch (err) {
+      console.error("Error updating preference:", err);
+    }
   };
 
   const handleContinue = async (e) => {
@@ -155,10 +219,12 @@ const UserPreferences = () => {
   };
 
   return (
-    <div className="preferences-container">
+    <div className="preferences-container" key={selectedLanguage}>
       <div className="signup-preferences-card">
         <div className="preferences-content">
           <div className="header-section">
+            <h1 className="greeting">{t("Hi")} {username}!</h1>
+            <p className="subtitle">{t("We want to get to know you better")}</p>
             <h1 className="greeting">{t("Hi")} {username}!</h1>
             <p className="subtitle">{t("We want to get to know you better")}</p>
           </div>
@@ -168,19 +234,15 @@ const UserPreferences = () => {
               <div className="signup-preference-group">
                 <label className="signup-preference-label">
                   {t("Preferred Language")}
+                  {t("Preferred Language")}
                 </label>
                 <div className="language-options">
                   {languages.map((lang) => (
                     <button
                       key={lang.id}
-                      className={`language-btn ${
-                        selectedLanguage === lang.id ? "selected" : ""
-                      }`}
-                      onClick={() => {
-                        setSelectedLanguage(lang.id);
-                        i18next.changeLanguage(lang.id);
-                      }}
-                    >
+                      className={`language-btn ${selectedLanguage === lang.id ? "selected" : ""
+                        }`}
+                      onClick={() => handlePreferenceChange("language", lang.id)}>
                       {lang.label}
                     </button>
                   ))}
@@ -193,12 +255,10 @@ const UserPreferences = () => {
                   {textSizes.map((size) => (
                     <button
                       key={size.id}
-                      className={`text-size-btn ${
-                        selectedTextSize === size.id ? "selected" : ""
-                      }`}
-                      onClick={() => setSelectedTextSize(size.id)}
-                      style={{ fontSize: size.fontSize }}
-                    >
+                      className={`text-size-btn ${selectedTextSize === size.id ? "selected" : ""
+                        }`}
+                      onClick={() => handlePreferenceChange("textSize", size.id)}
+                      style={{ fontSize: size.fontSize }}>
                       {size.label}
                     </button>
                   ))}
@@ -208,14 +268,12 @@ const UserPreferences = () => {
               <div className="signup-preference-group">
                 <label className="signup-preference-label">{t("Content Mode")}</label>
                 <div className="content-mode-options">
-                  {contentModes.map((mode) => (
+                  {getContentModes().map((mode) => (
                     <div
                       key={mode.id}
-                      className={`content-mode-card ${
-                        selectedContentMode === mode.id ? "selected" : ""
-                      }`}
-                      onClick={() => setSelectedContentMode(mode.id)}
-                    >
+                      className={`content-mode-card ${selectedContentMode === mode.id ? "selected" : ""
+                        }`}
+                      onClick={() => handlePreferenceChange("contentMode", mode.id)}>
                       <div className="mode-preview">
                         <div className="preview-image"></div>
                         {mode.id === "Easy Read" && (
@@ -241,26 +299,28 @@ const UserPreferences = () => {
               <div className="signup-preference-group">
                 <label className="signup-preference-label">
                   {t("Topics Interested In")}
+                  {t("Topics Interested In")}
                 </label>
 
                 <div className="topics-header">
+                  <span>{t("For Care Recipient")}</span>
+                  <span>{t("For Caregiver")}</span>
                   <span>{t("For Care Recipient")}</span>
                   <span>{t("For Caregiver")}</span>
                 </div>
 
                 <div className="topics-grid">
                   <div className="topics-column">
-                    {careRecipientTopics.map((topic) => {
-                      const isSelected = selectedTopics.includes(topic.label);
+                    {getCareRecipientTopics().map((topic) => {
+                      const isSelected = selectedTopics.includes(topic.englishLabel);
                       const isDisabled =
                         !isSelected && selectedTopics.length >= 2;
                       return (
                         <button
                           key={topic.id}
-                          className={`topic-btn ${
-                            isSelected ? "selected" : ""
-                          } ${isDisabled ? "disabled" : ""}`}
-                          onClick={() => handleTopicToggle(topic.label)}
+                          className={`topic-btn ${isSelected ? "selected" : ""
+                            } ${isDisabled ? "disabled" : ""}`}
+                          onClick={() => handleTopicToggle(topic.id)}
                         >
                           <span className="topic-icon">{topic.icon}</span>
                           <span className="topic-text">{topic.label}</span>
@@ -270,20 +330,16 @@ const UserPreferences = () => {
                   </div>
 
                   <div className="topics-column">
-                    {caregiverTopics.map((topic) => {
-                      const isSelected = selectedTopics.includes(topic.label);
-                      const isDisabled =
-                        !isSelected && selectedTopics.length >= 2;
-
+                    {getCaregiverTopics().map((topic) => {
+                      const isSelected = selectedTopics.includes(topic.englishLabel);
+                      const isDisabled = !isSelected && selectedTopics.length >= 2;
                       return (
                         <button
                           key={topic.id}
-                          className={`topic-btn ${
-                            isSelected ? "selected" : ""
-                          } ${isDisabled ? "disabled" : ""}`}
-                          onClick={() => handleTopicToggle(topic.label)}
-                          disabled={isDisabled}
-                        >
+                          className={`topic-btn ${isSelected ? "selected" : ""
+                            } ${isDisabled ? "disabled" : ""}`}
+                          onClick={() => handleTopicToggle(topic.id)}
+                          disabled={isDisabled}>
                           <span className="topic-icon">{topic.icon}</span>
                           <span className="topic-text">{topic.label}</span>
                         </button>

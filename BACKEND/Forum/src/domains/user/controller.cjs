@@ -92,50 +92,53 @@ const updateUserPreferences = async ({ username, preferences }) => {
 };
 
 
-const updateUserDetails = async(data)=>{
-    try {
-        const {name,username,newUsername,number,email} = data
-        const callingUser = await User.find({username})
-        let errorMessage=[];
-        console.log(callingUser)
-        
-        if(username !== newUsername){
-            const preexistingUsername = await User.findOne({username:newUsername})
-            if(preexistingUsername){
-                errorMessage.push("Username is used. Please use another username.\n")
-                //throw Error("Username is used. Please use another username.")
-            }
-        }
-        console.log(callingUser[0].email)
-        if(callingUser[0].email!== email){
-        const preexistingEmail = await User.findOne({email})
-        if(preexistingEmail){
-            errorMessage.push("Email is used! Please choose another email\n")
-            //throw new Error("Email is used! Please choose another email")
-        }
-        }
-
-        if(callingUser[0].number!==number){
-        const preexistingNumber = await User.findOne({number})
-        if(preexistingNumber){
-            errorMessage.push("Number is used! Please choose another mobile number\n")
-            //throw new Error("Number is used! Please choose another mobile number")
-        }
-        }
-        console.log(errorMessage)
-        if(errorMessage.length > 0){
-            throw new Error(errorMessage)
-        }
-
-        
-        const newUser = await User.findOneAndUpdate({username:username},{name:name,username:newUsername,email:email,number:number},{new:true});
-        const tokenData = { userId: newUser._id, email: newUser.email, username: newUser.username };
-        const token = await createToken(tokenData);
-        return {token,newUser}
-    } catch (error) {
-        throw error
+const updateUserDetails = async(data) => {
+  try {
+    const { name, username, newUsername, number, email } = data;
+    const callingUser = await User.findOne({ username });
+    if (!callingUser) {
+      throw new Error("User not found");
     }
-}
+    let errorMessage = [];
+
+    if (username !== newUsername) {
+      const preexistingUsername = await User.findOne({ username: newUsername });
+      if (preexistingUsername) {
+        errorMessage.push("Username is used. Please use another username.\n");
+      }
+    }
+
+    if (callingUser.email !== email) {
+      const preexistingEmail = await User.findOne({ email });
+      if (preexistingEmail) {
+        errorMessage.push("Email is used! Please choose another email\n");
+      }
+    }
+
+    if (callingUser.number !== number) {
+      const preexistingNumber = await User.findOne({ number });
+      if (preexistingNumber) {
+        errorMessage.push("Number is used! Please choose another mobile number\n");
+      }
+    }
+
+    if (errorMessage.length > 0) {
+      throw new Error(errorMessage.join(''));
+    }
+
+    const newUser = await User.findOneAndUpdate(
+      { username: username },
+      { name: name, username: newUsername, email: email, number: number },
+      { new: true }
+    );
+    const tokenData = { userId: newUser._id, email: newUser.email, username: newUser.username };
+    const token = await createToken(tokenData);
+    return { token, newUser };
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 const getUser = async (username)=>{
     try {

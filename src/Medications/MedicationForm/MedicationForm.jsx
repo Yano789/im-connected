@@ -317,17 +317,17 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                             disabled={!selectedFile || isScanning}
                             className="scan-button"
                         >
-                            {isScanning ? t('🔄 Scanning...') : 
-                             selectedRecipient ? t('🔍 Scan & Save to Database') : t('🔍 Scan Medication (Preview)')}
+                            {isScanning ? t('Scanning...') : 
+                             selectedRecipient ? t(' Scan & Save to Database') : t(' Scan Medication (Preview)')}
                         </button>
                     </div>
                 </div>
                 
                 {/* Scanner feedback */}
-                {scanError && <div className="scan-error">⚠️ {scanError}</div>}
-                {scanSuccess && <div className="scan-success">✅ {scanSuccess}</div>}
-                {uploadError && <div className="scan-error">⚠️ {t("Upload Error")}: {uploadError}</div>}
-                {uploadSuccess && <div className="scan-success">✅ {uploadSuccess}</div>}
+                {scanError && <div className="scan-error"> {scanError}</div>}
+                {scanSuccess && <div className="scan-success"> {scanSuccess}</div>}
+                {uploadError && <div className="scan-error"> {t("Upload Error")}: {uploadError}</div>}
+                {uploadSuccess && <div className="scan-success"> {uploadSuccess}</div>}
                 {isScanning && <div className="scan-progress">{t("Processing image and extracting medication information...")}</div>}
                 
                 <div className="scanner-divider">
@@ -337,7 +337,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
 
             {/* Manual Entry Section */}
             <div className="manual-entry-section">
-                <h3>✏️ {t("Manual Entry")}</h3>
+                <h3> {t("Manual Entry")}</h3>
                 
                 <div className="form-group">
                     <label htmlFor="name">{t("Medication Name")} *</label>

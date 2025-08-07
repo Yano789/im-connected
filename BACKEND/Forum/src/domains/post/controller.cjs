@@ -6,13 +6,7 @@ const createNestedComment = require("../../utils/buildNestedComments.cjs")
 const translate = require("./../../domains/translation/controller.cjs")
 const { v2: cloudinary } = require("cloudinary");
 const savedPost = require("../savedPosts/model.cjs")
-
-const addCacheBuster = (url) => {
-    if (!url) return url;
-    const cb = Date.now();
-    return url.includes('?') ? `${url}&cb=${cb}` : `${url}?cb=${cb}`;
-};
-
+const addCacheBuster = require("./../../utils/cacheBuster.cjs")
 
 
 

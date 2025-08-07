@@ -11,6 +11,7 @@ const { getPostByTitle } = require("../../domains/post/controller.cjs");
 describe("getPostByTitle", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    translate.mockImplementation(async (text, lang) => `${text} [${lang}]`);
   });
 
   test("should return a post matching the title", async () => {
@@ -22,7 +23,7 @@ describe("getPostByTitle", () => {
     };
 
     User.findOne.mockReturnValue({
-      lean: jest.fn().mockResolvedValue({ preferences: { preferredLanguage: null } }),
+      lean: jest.fn().mockResolvedValue({ preferences: { preferredLanguage: "es" } }),
     });
 
     Post.findOne.mockReturnValue({
@@ -32,7 +33,8 @@ describe("getPostByTitle", () => {
     const result = await getPostByTitle({ title: "Test Post", username: "user1" });
 
     expect(Post.findOne).toHaveBeenCalledWith({ title: "Test Post", draft: false });
-    expect(result).toEqual(mockPost);
+    expect(result.title).toBe("Test Post [es]");
+    expect(result.content).toBe("This is a test. [es]");
   });
 
   test("should return null if post not found", async () => {

@@ -10,30 +10,28 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
   const [content, setContent] = useState("");
   const [draftPostId, setDraftPostId] = useState(null);
 
-  // Existing media objects from backend: {url, type, public_id}
   const [existingMedia, setExistingMedia] = useState([]);
 
-  // Keep track of which existing media user removed (array of public_id)
   const [mediaToRemove, setMediaToRemove] = useState([]);
 
   // New files user uploads (File objects)
   const [mediaFiles, setMediaFiles] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const tags = [
     {
       key: "Physical Disability & Chronic Illness",
       label: t("Tag1"),
     },
-    { key: "Personal Mental Health", label: t("Tag2"), },
-    { key: "End of Life Care", label: t("Tag3"), },
-    { key: "Financial & Legal Help", llabel: t("Tag4"), },
-    { key: "Mental Disability", label: t("Tag5"), },
-    { key: "Hospitals and Clinics", label: t("Tag6"),},
-    { key: "Pediatric Care", label: t("Tag7"), },
-    { key: "Subsidies and Govt Support", label: t("Tag8"), },
+    { key: "Personal Mental Health", label: t("Tag2") },
+    { key: "End of Life Care", label: t("Tag3") },
+    { key: "Financial & Legal Help", label: t("Tag4") },
+    { key: "Mental Disability", label: t("Tag5") },
+    { key: "Hospitals and Clinics", label: t("Tag6") },
+    { key: "Pediatric Care", label: t("Tag7") },
+    { key: "Subsidies and Govt Support", label: t("Tag8") },
   ];
 
   const resetForm = () => {
@@ -181,14 +179,14 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
         }}
       >
         <div className="createPostDiv">
-          <div className="createPost">{("Create Post")}</div>
+          <div className="createPost">{"Create Post"}</div>
           <div className="x" onClick={() => navigate("/forum")}>
             X
           </div>
         </div>
 
         <div className="postTitleDiv">
-          <div className="postTitle">{("Title")}</div>
+          <div className="postTitle">{"Title"}</div>
           <textarea
             className="createPostWrapper"
             value={title}
@@ -198,23 +196,21 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
         </div>
 
         <div className="postData">
-          <div className="selectTagsAssociated">
-            {t("Select Tags")}
-          </div>
+          <div className="selectTagsAssociated">{t("Select Tags")}</div>
           <div className="tags">
             {tags.map((tag) => (
               <div
-                key={tag}
+                key={tag.key}
                 className={`newPostTag ${
-                  selectedTags.includes(tag) ? "newPostTagSelected" : ""
+                  selectedTags.includes(tag.key) ? "newPostTagSelected" : ""
                 }`}
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  toggleTag(tag);
+                  toggleTag(tag.key);
                 }}
               >
-                <div className="tagText">{tag}</div>
+                <div className="tagText">{tag.label}</div>
               </div>
             ))}
           </div>

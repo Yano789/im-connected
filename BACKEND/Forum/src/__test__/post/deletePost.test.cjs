@@ -1,78 +1,114 @@
-jest.mock("./../../domains/post/model.cjs")
-jest.mock("./../../domains/comment/model.cjs")
-jest.mock("./../../domains/savedPosts/model.cjs")
+jest.mock("./../../domains/post/model.cjs");
+jest.mock("./../../domains/comment/model.cjs");
+jest.mock("./../../domains/savedPosts/model.cjs");
 
+// Step 1: Mock cloudinary uploader.destroy before importing controller
+const mockDestroy = jest.fn().mockResolvedValue({ result: "ok" });
 
+jest.mock("cloudinary", () => ({
+  v2: {
+    uploader: {
+      destroy: mockDestroy
+    }
+  }
+}));
 
+const { Post } = require("../../domains/post/model.cjs");
+const Comment = require("../../domains/comment/model.cjs");
+const savedPost = require("../../domains/savedPosts/model.cjs");
 
-
-
-const { Post} = require("../../domains/post/model.cjs")
-
-
-const Comment = require("../../domains/comment/model.cjs")
-
-const savedPost = require("../../domains/savedPosts/model.cjs")
-
-const {deletePost} = require("../../domains/post/controller.cjs")
-
-
+const { deletePost } = require("../../domains/post/controller.cjs");
 
 describe("deleting post", () => {
-    const mockData = {
-        postId: "123",
-        username: "username"
-    }
-    const fixedTime = 1752934590239;
-    beforeEach(() => {
-        jest.clearAllMocks()
-    })
-    test("successfully delete post", async () => {
+  const mockData = {
+    postId: "123",
+    username: "username"
+  };
+  const fixedTime = 1752934590239;
 
-        const mockPost = {
-            postId: "123",
-            title: "title",
-            content: "content",
-            tags: ["Mental Disability"],
-            username: "username",
-            createdAt: fixedTime,
-            edited: false,
-            draft: false,
-            comments: 0,
-            likes: 0
-        }
-        Post.findOne.mockResolvedValueOnce(mockPost)
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-        Post.deleteOne.mockResolvedValueOnce({ deletedCount: 1 })
-        Comment.deleteMany.mockResolvedValueOnce({ deletedCount: 2 })
-        savedPost.deleteMany.mockResolvedValueOnce({ deletedCount: 2 })
+  test("successfully delete post without media", async () => {
+    const mockPost = {
+      postId: "123",
+      title: "title",
+      content: "content",
+      tags: ["Mental Disability"],
+      username: "username",
+      createdAt: fixedTime,
+      edited: false,
+      draft: false,
+      comments: 0,
+      likes: 0,
+      media: []
+    };
 
-        const result = await deletePost(mockData)
+    Post.findOne.mockResolvedValueOnce(mockPost);
+    Post.deleteOne.mockResolvedValueOnce({ deletedCount: 1 });
+    Comment.deleteMany.mockResolvedValueOnce({ deletedCount: 2 });
+    savedPost.deleteMany.mockResolvedValueOnce({ deletedCount: 2 });
 
-        expect(Post.findOne).toHaveBeenCalledWith({ postId: "123" })
-        expect(Post.deleteOne).toHaveBeenCalledWith({ postId: "123", draft: false })
-        expect(Comment.deleteMany).toHaveBeenCalledWith({ postId: "123" });
-        expect(savedPost.deleteMany).toHaveBeenCalledWith({ savedPostId: "123" });
+    const result = await deletePost(mockData);
 
-        expect(result).toEqual(mockPost)
-    })
+    expect(Post.findOne).toHaveBeenCalledWith({ postId: "123" });
+    expect(Post.deleteOne).toHaveBeenCalledWith({ postId: "123", draft: false });
+    expect(Comment.deleteMany).toHaveBeenCalledWith({ postId: "123" });
+    expect(savedPost.deleteMany).toHaveBeenCalledWith({ savedPostId: "123" });
 
-    test("throws error if post not found", async () => {
+    expect(mockDestroy).not.toHaveBeenCalled(); // no media, so no destroy calls
 
-        Post.findOne.mockResolvedValueOnce(null)
+    expect(result).toEqual(mockPost);
+  });
 
-        await expect(deletePost(mockData)).rejects.toThrow("Post does not exist");
-    })
+  test("successfully delete post with media and calls cloudinary destroy", async () => {
+    const mockPostWithMedia = {
+      postId: "123",
+      username: "username",
+      draft: false,
+      media: [
+        { public_id: "media1", type: "image" },
+        { public_id: "media2", type: "video" }
+      ]
+    };
 
-    test("throws error if user is unauthorized", async () => {
-        const mockPost = {
-            postId: "post123",
-            username: "otherUser",
-            draft: false
-        }
+    Post.findOne.mockResolvedValueOnce(mockPostWithMedia);
+    Post.deleteOne.mockResolvedValueOnce({ deletedCount: 1 });
+    Comment.deleteMany.mockResolvedValueOnce({ deletedCount: 2 });
+    savedPost.deleteMany.mockResolvedValueOnce({ deletedCount: 2 });
 
-        Post.findOne.mockResolvedValueOnce(mockPost);
+    const result = await deletePost(mockData);
 
-        await expect(deletePost(mockData)).rejects.toThrow("Unauthorized");
-    })
-})
+    expect(Post.findOne).toHaveBeenCalledWith({ postId: "123" });
+    expect(mockDestroy).toHaveBeenCalledTimes(2);
+    expect(mockDestroy).toHaveBeenCalledWith("media1", { resource_type: "image" });
+    expect(mockDestroy).toHaveBeenCalledWith("media2", { resource_type: "video" });
+
+    expect(Post.deleteOne).toHaveBeenCalledWith({ postId: "123", draft: false });
+    expect(Comment.deleteMany).toHaveBeenCalledWith({ postId: "123" });
+    expect(savedPost.deleteMany).toHaveBeenCalledWith({ savedPostId: "123" });
+
+    expect(result).toEqual(mockPostWithMedia);
+  });
+
+  test("throws error if post not found", async () => {
+    Post.findOne.mockResolvedValueOnce(null);
+
+    await expect(deletePost(mockData)).rejects.toThrow("Post does not exist");
+
+    expect(Post.findOne).toHaveBeenCalledWith({ postId: "123" });
+  });
+
+  test("throws error if user is unauthorized", async () => {
+    const mockPost = {
+      postId: "post123",
+      username: "otherUser",
+      draft: false
+    };
+
+    Post.findOne.mockResolvedValueOnce(mockPost);
+
+    await expect(deletePost(mockData)).rejects.toThrow("Unauthorized");
+  });
+});

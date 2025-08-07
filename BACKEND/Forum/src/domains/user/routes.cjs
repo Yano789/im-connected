@@ -101,26 +101,40 @@ router.get('/threadId', auth, async (req, res) => {
   try {
     // re‑fetch user record so we include the latest threadId
     const username = req.currentUser.username;
+    console.log(`This is the current user ${username}`);
     const user = await getUser(username);
     let threadId = user.threadId;
+    console.log(`This is the retrieved current user's threadId ${threadId}`);
     if (!threadId) {
       //Create a new thread via the Quick‑start POST /api/assistants/threads
-      const createRes = await fetch(
+
+      const AI_BASE = process.env.AI_CHATBOT_URL || 'http://ai-chatbot:3000';
+      console.log('[threadId] no threadId in user, calling Quick-start API…');
+      /*const createRes = await fetch(
         "http://localhost:3000/api/assistants/threads",
         { method: "POST" }
+      );*/
+      const createRes = await fetch(
+        `${AI_BASE}/api/assistants/threads`,
+        { method: "POST" }
       );
+
+      console.log('[threadId] Quick-start status:', createRes.status, createRes.statusText);
+
       if (!createRes.ok) {
         throw new Error(`Quickstart failed: ${createRes.status} ${createRes.statusText}`);
       }
       const { threadId: newId } = await createRes.json();
+      console.log('[threadId] got new threadId:', newId);
 
       threadId = newId;
       user.threadId = threadId;
+      console.log('[threadId] saving user…');
       await user.save();
     }
     return res.status(200).json({ threadId });
   } catch (err) {
-    console.error('[threadId] could not read or create thread:', err);
+    console.error('[threadId] could not read or create thread:', err.stack || err);
     return res.status(500).send('Could not read/create threadId');
   }
 });

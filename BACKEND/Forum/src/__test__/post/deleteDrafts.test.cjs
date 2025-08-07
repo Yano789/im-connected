@@ -1,9 +1,18 @@
-jest.mock("./../../domains/post/model.cjs")
+jest.mock("./../../domains/post/model.cjs");
 
-const { Post} = require("../../domains/post/model.cjs")
 
-const {deleteDrafts } = require("../../domains/post/controller.cjs")
+const mockDestroy = jest.fn().mockResolvedValue({ result: "ok" });
 
+jest.mock("cloudinary", () => ({
+  v2: {
+    uploader: {
+      destroy: mockDestroy
+    }
+  }
+}));
+
+const { Post } = require("../../domains/post/model.cjs");
+const { deleteDrafts } = require("../../domains/post/controller.cjs");
 
 describe("deleteDrafts", () => {
   afterEach(() => {
@@ -11,11 +20,17 @@ describe("deleteDrafts", () => {
   });
 
   test("should delete and return the draft for given username and postId", async () => {
-    const mockDraft = { postId: "draft1", username: "user1", draft: true, media: [] };
+    const mockDraft = {
+      postId: "draft1",
+      username: "user1",
+      draft: true,
+      media: [
+        { public_id: "media1", type: "image" },
+        { public_id: "media2", type: "video" }
+      ]
+    };
 
-    // Mock findOne to return the draft
     Post.findOne.mockResolvedValue(mockDraft);
-    // Mock deleteOne to simulate deletion
     Post.deleteOne.mockResolvedValue({ deletedCount: 1 });
 
     const result = await deleteDrafts({ username: "user1", postId: "draft1" });
@@ -23,13 +38,17 @@ describe("deleteDrafts", () => {
     expect(Post.findOne).toHaveBeenCalledWith({
       username: "user1",
       postId: "draft1",
-      draft: true,
+      draft: true
     });
+
+    expect(mockDestroy).toHaveBeenCalledTimes(2);
+    expect(mockDestroy).toHaveBeenCalledWith("media1", { resource_type: "image" });
+    expect(mockDestroy).toHaveBeenCalledWith("media2", { resource_type: "video" });
 
     expect(Post.deleteOne).toHaveBeenCalledWith({
       username: "user1",
       postId: "draft1",
-      draft: true,
+      draft: true
     });
 
     expect(result).toEqual(mockDraft);
@@ -45,7 +64,7 @@ describe("deleteDrafts", () => {
     expect(Post.findOne).toHaveBeenCalledWith({
       username: "user1",
       postId: "draft1",
-      draft: true,
+      draft: true
     });
   });
 });
