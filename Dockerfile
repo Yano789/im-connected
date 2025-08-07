@@ -1,5 +1,5 @@
 # Frontend Dockerfile
-FROM node:18-alpine as frontend-build
+FROM node:20-alpine as frontend-build
 
 WORKDIR /app
 
@@ -24,6 +24,10 @@ COPY --from=frontend-build /app/dist /usr/share/nginx/html
 # Copy nginx config
 COPY nginx.conf /etc/nginx/nginx.conf
 
+# Copy startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["/start.sh"]

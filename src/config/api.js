@@ -1,9 +1,9 @@
 // API configuration
-// For Vercel deployment, use relative paths since frontend and backend are on the same domain
-// For local development, use the full localhost URL
+// For Railway deployment, you'll need to set the VITE_API_URL environment variable
+// to point to your deployed backend service
 const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
   ? (__API_URL__ || 'http://localhost:5001')
-  : ''; // Empty string for relative paths in production
+  : (__API_URL__ || 'http://localhost:5001'); // Will be replaced with your Railway backend URL
 
 // API endpoints
 export const API_ENDPOINTS = {
