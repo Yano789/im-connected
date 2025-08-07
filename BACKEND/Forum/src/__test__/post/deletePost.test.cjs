@@ -67,7 +67,7 @@ describe("deleting post", () => {
     expect(result).toEqual(mockPost);
   });
 
-  test("successfully delete post with media and calls cloudinary destroy", async () => {
+  test("successfully delete post with media and calls Google Cloud Storage destroy", async () => {
     const mockPostWithMedia = {
       postId: "123",
       username: "username",

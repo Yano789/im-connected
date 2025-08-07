@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const upload = require('../../config/storage.cjs');
-const { v2: cloudinary } = require("cloudinary");
+const upload = require('../../config/googleStorage.cjs');
+const { gcsClient } = require("../../config/gcsStorage.cjs");
 const auth = require("../../middleware/auth.cjs");
 const {
     createCareRecipient,
@@ -170,7 +170,7 @@ router.get('/user-data', auth, async (req, res) => {
 
 // ==================== IMAGE UPLOAD ====================
 
-// Upload medication image to Cloudinary
+// Upload medication image to Google Cloud Storage
 router.post('/upload-image', auth, upload.single('medicationImage'), async (req, res) => {
     try {
         if (!req.file) {
@@ -180,18 +180,17 @@ router.post('/upload-image', auth, upload.single('medicationImage'), async (req,
             });
         }
 
-        // The file is already uploaded to Cloudinary by multer-storage-cloudinary
+        // The file is already uploaded to Google Cloud Storage by the custom storage engine
         const uploadResult = {
-            url: req.file.path,
-            public_id: req.file.filename,
+            url: req.file.secure_url || req.file.url,
+            public_id: req.file.public_id || req.file.filename,
             type: 'image',
-            width: req.file.width,
-            height: req.file.height,
             format: req.file.format,
-            bytes: req.file.bytes
+            bytes: req.file.bytes || req.file.size,
+            resource_type: req.file.resource_type || 'image'
         };
 
-        console.log('Medication image uploaded to Cloudinary:', uploadResult);
+        console.log('Medication image uploaded to Google Cloud Storage:', uploadResult);
 
         res.status(200).json({
             success: true,
@@ -203,9 +202,9 @@ router.post('/upload-image', auth, upload.single('medicationImage'), async (req,
         console.error('Error uploading medication image:', error);
         
         // Clean up uploaded file if there was an error
-        if (req.file && req.file.filename) {
+        if (req.file && req.file.public_id) {
             try {
-                await cloudinary.uploader.destroy(req.file.filename, { resource_type: "image" });
+                await gcsClient.destroy(req.file.public_id);
             } catch (cleanupError) {
                 console.error('Error cleaning up uploaded file:', cleanupError);
             }
@@ -216,26 +215,23 @@ router.post('/upload-image', auth, upload.single('medicationImage'), async (req,
             message: 'Failed to upload medication image'
         });
     }
-});
-
-// Delete medication image from Cloudinary
+});// Delete medication image from Google Cloud Storage
 router.delete('/delete-image', auth, async (req, res) => {
     try {
-        const { public_id } = req.body;
+        const { public_id, publicId } = req.body;
+        const imageId = public_id || publicId;
 
-        if (!public_id) {
+        if (!imageId) {
             return res.status(400).json({
-                error: 'Missing public_id',
+                error: 'Missing public_id or publicId',
                 message: 'Please provide the public_id of the image to delete'
             });
         }
 
-        // Delete from Cloudinary
-        const deleteResult = await cloudinary.uploader.destroy(public_id, { 
-            resource_type: "image" 
-        });
+        // Delete from Google Cloud Storage
+        const deleteResult = await gcsClient.destroy(imageId);
 
-        console.log('Medication image deleted from Cloudinary:', deleteResult);
+        console.log('Medication image deleted from Google Cloud Storage:', deleteResult);
 
         if (deleteResult.result === 'ok') {
             res.status(200).json({
@@ -351,16 +347,17 @@ router.post('/scan-medication', upload.single('image'), async (req, res) => {
         const userId = req.user?.id || 'default_user_id';
         const { careRecipientId } = req.body;
 
-        // Upload image to Cloudinary first
-        const result = await cloudinary.uploader.upload(req.file.path, {
-            folder: 'scanned_medications',
-            resource_type: 'image'
-        });
+        // Upload image to Google Cloud Storage first
+        const result = await gcsClient.uploadBuffer(
+            req.file.buffer, 
+            `scanned_medications/${Date.now()}-${req.file.originalname}`,
+            req.file.mimetype
+        );
 
         // TODO: Integrate with Scanner service for OCR processing
         // For now, return the uploaded image data
         const scanData = {
-            imageUrl: result.secure_url,
+            imageUrl: result.url,
             publicId: result.public_id,
             scanResults: {
                 text: "OCR processing not yet implemented",
