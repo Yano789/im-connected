@@ -29,9 +29,6 @@ RUN npm ci --only=production
 # Copy built frontend to serve as static files
 COPY --from=frontend-build /app/dist ./public
 
-# Copy environment variables
-COPY .env .env
-
 # Expose the port
 EXPOSE 5001
 
