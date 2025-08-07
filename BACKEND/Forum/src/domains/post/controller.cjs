@@ -27,38 +27,87 @@ const createPost = async (data) => {
 
     const processedMedia = await Promise.all(
       media.map(async (file) => {
-        const encryptedBuffer = encrypt(file.buffer);
-        const folder = "forum_uploads";
-        const ext = path.extname(file.originalname).slice(1);
-        const base = path.basename(file.originalname, `.${ext}`);
-        const randomSuffix = crypto.randomBytes(6).toString("hex");
-        const publicId = `${folder}/${Date.now()}-${base}-${randomSuffix}.${ext}`;
-        const fileRef = gcsClient.bucket.file(publicId);
+        // Check if GCS is available, otherwise use Cloudinary
+        if (gcsClient) {
+          // Use Google Cloud Storage
+          const encryptedBuffer = encrypt(file.buffer);
+          const folder = "forum_uploads";
+          const ext = path.extname(file.originalname).slice(1);
+          const base = path.basename(file.originalname, `.${ext}`);
+          const randomSuffix = crypto.randomBytes(6).toString("hex");
+          const publicId = `${folder}/${Date.now()}-${base}-${randomSuffix}.${ext}`;
+          const fileRef = gcsClient.bucket.file(publicId);
 
-        await fileRef.save(encryptedBuffer, {
-          metadata: {
-            contentType: file.mimetype,
+          await fileRef.save(encryptedBuffer, {
             metadata: {
-              originalName: file.originalname,
-              encrypted: "true",
-              uploadedBy: username,
-              uploadTime: new Date().toISOString(),
+              contentType: file.mimetype,
+              metadata: {
+                originalName: file.originalname,
+                encrypted: "true",
+                uploadedBy: username,
+                uploadTime: new Date().toISOString(),
+              },
             },
-          },
-          resumable: false,
-          validation: "crc32c",
-        });
+            resumable: false,
+            validation: "crc32c",
+          });
 
-        uploadedFiles.push(publicId); // Track uploaded GCS file
+          uploadedFiles.push({ type: 'gcs', id: publicId }); // Track uploaded GCS file
 
-        return {
-          public_id: publicId,
-          resource_type: file.mimetype.startsWith("video") ? "video" : "image",
-          original_filename: file.originalname,
-          mimetype: file.mimetype,
-          format: ext,
-          url: addCacheBuster(`/media/${publicId}`),
-        };
+          return {
+            public_id: publicId,
+            resource_type: file.mimetype.startsWith("video") ? "video" : "image",
+            original_filename: file.originalname,
+            mimetype: file.mimetype,
+            format: ext,
+            url: addCacheBuster(`/media/${publicId}`),
+          };
+        } else {
+          // Fallback to Cloudinary
+          console.log('Using Cloudinary fallback for file upload');
+          const uploadResult = await cloudinary.uploader.upload_stream(
+            {
+              resource_type: file.mimetype.startsWith("video") ? "video" : "image",
+              folder: "forum_uploads",
+            },
+            (error, result) => {
+              if (error) throw error;
+              return result;
+            }
+          );
+
+          // Convert buffer to stream for Cloudinary upload
+          const streamUpload = (buffer) => {
+            return new Promise((resolve, reject) => {
+              const stream = cloudinary.uploader.upload_stream(
+                {
+                  resource_type: file.mimetype.startsWith("video") ? "video" : "image",
+                  folder: "forum_uploads",
+                },
+                (error, result) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    resolve(result);
+                  }
+                }
+              );
+              stream.end(file.buffer);
+            });
+          };
+
+          const result = await streamUpload(file.buffer);
+          uploadedFiles.push({ type: 'cloudinary', id: result.public_id }); // Track uploaded Cloudinary file
+
+          return {
+            public_id: result.public_id,
+            resource_type: file.mimetype.startsWith("video") ? "video" : "image",
+            original_filename: file.originalname,
+            mimetype: file.mimetype,
+            format: result.format,
+            url: result.secure_url,
+          };
+        }
       })
     );
 
@@ -75,14 +124,18 @@ const createPost = async (data) => {
 
     return await newPost.save();
   } catch (error) {
-    // Clean up uploaded files from GCS on error
+    // Clean up uploaded files on error
     if (uploadedFiles.length > 0) {
       await Promise.all(
-        uploadedFiles.map(async (publicId) => {
+        uploadedFiles.map(async (upload) => {
           try {
-            await gcsClient.bucket.file(publicId).delete();
+            if (upload.type === 'gcs' && gcsClient) {
+              await gcsClient.bucket.file(upload.id).delete();
+            } else if (upload.type === 'cloudinary') {
+              await cloudinary.uploader.destroy(upload.id);
+            }
           } catch (err) {
-            console.warn(`Failed to delete ${publicId}:`, err.message);
+            console.warn(`Failed to delete ${upload.id}:`, err.message);
           }
         })
       );
