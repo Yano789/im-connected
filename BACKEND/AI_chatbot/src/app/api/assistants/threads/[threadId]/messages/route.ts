@@ -82,14 +82,30 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:8080",
   "https://im-connected-production.up.railway.app",
   "https://scanner-service.up.railway.app",
+  "https://ai-chatbot-production-c94d.up.railway.app",
 ]);
 
 function cors(origin: string | null) {
-  const o = origin && ALLOWED_ORIGINS.has(origin) ? origin : "null";
+  // In production environment, be more permissive for Railway deployments
+  if (process.env.NODE_ENV === 'production') {
+    // Allow Railway domains and cross-service communication
+    if (!origin || origin.includes('railway.app') || origin.includes('localhost')) {
+      return {
+        "Access-Control-Allow-Origin": origin || "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+        "Access-Control-Allow-Credentials": "true",
+      };
+    }
+  }
+  
+  // Development environment with strict origin checking
+  const o = origin && ALLOWED_ORIGINS.has(origin) ? origin : "*";
   return {
     "Access-Control-Allow-Origin": o,
     "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+    "Access-Control-Allow-Credentials": "true",
   };
 }
 
@@ -98,15 +114,39 @@ export async function OPTIONS(request: Request) {
 }
 
 export async function POST(request: Request, { params }: { params: { threadId: string } }) {
-  const threadId = params.threadId;
-  const { content } = await request.json();
+  const origin = request.headers.get("origin");
+  const corsHeaders = cors(origin);
+  
+  try {
+    if (!openai) {
+      return new Response(JSON.stringify({ error: "OpenAI API key not configured" }), {
+        status: 500,
+        headers: {
+          ...corsHeaders,
+          "Content-Type": "application/json",
+        },
+      });
+    }
 
-  await openai.beta.threads.messages.create(threadId, { role: "user", content });
+    const threadId = params.threadId;
+    const { content } = await request.json();
 
-  const stream = openai.beta.threads.runs.stream(threadId, { assistant_id: assistantId });
+    await openai.beta.threads.messages.create(threadId, { role: "user", content });
 
-  return new Response(stream.toReadableStream(), {
-    headers: cors(request.headers.get("origin")),
-  });
+    const stream = openai.beta.threads.runs.stream(threadId, { assistant_id: assistantId });
+
+    return new Response(stream.toReadableStream(), {
+      headers: corsHeaders,
+    });
+  } catch (error) {
+    console.error("AI Chatbot API Error:", error);
+    return new Response(JSON.stringify({ error: "Internal server error" }), {
+      status: 500,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/json",
+      },
+    });
+  }
 }
 
