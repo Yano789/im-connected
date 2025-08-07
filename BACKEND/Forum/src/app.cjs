@@ -31,7 +31,7 @@ app.use(bodyParser());
 
 // Serve static files from the public directory (built frontend)
 if (process.env.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../../public")));
+  app.use(express.static(path.join(__dirname, "../public")));
 }
 
 app.use("/api/v1",routes);
@@ -39,7 +39,7 @@ app.use("/api/v1",routes);
 // Serve frontend for all non-API routes in production
 if (process.env.NODE_ENV === "production") {
   app.get("*", (req, res) => {
-    res.sendFile(path.join(__dirname, "../../public/index.html"));
+    res.sendFile(path.join(__dirname, "../public/index.html"));
   });
 }
 

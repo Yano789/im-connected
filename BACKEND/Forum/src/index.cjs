@@ -1,4 +1,10 @@
 require('dotenv').config({ path: __dirname + '/../.env' });
+
+// Set NODE_ENV to production if not already set
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'production';
+}
+
 const app = require("./app.cjs");
 
 const {PORT}  = process.env;

@@ -2,14 +2,18 @@ const crypto = require('crypto');
 
 const algorithm = 'aes-256-gcm';
 // Use a default encryption secret if not provided in environment
-const encryptionSecret = process.env.ENCRYPTION_SECRET || 'default-encryption-secret-for-railway-deployment-change-in-production';
+const encryptionSecret = process.env.ENCRYPTION_SECRET || 'default-encryption-secret-for-railway-deployment-change-in-production-123456789';
 
 // Validate that we have a proper encryption secret
 if (!encryptionSecret || encryptionSecret.length < 16) {
+  console.error('ENCRYPTION_SECRET environment variable must be set and at least 16 characters long');
+  console.error('Current value:', encryptionSecret);
   throw new Error('ENCRYPTION_SECRET environment variable must be set and at least 16 characters long');
 }
 
-const key = crypto.scryptSync(encryptionSecret, 'salt', 32); // 32 bytes key
+// Ensure the secret is a string before passing to scryptSync
+const secretString = String(encryptionSecret);
+const key = crypto.scryptSync(secretString, 'salt', 32); // 32 bytes key
 const ivLength = 12; // For GCM, 12 bytes is recommended
 
 function encrypt(buffer) {
