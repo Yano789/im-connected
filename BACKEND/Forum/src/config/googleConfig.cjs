@@ -1,18 +1,9 @@
 const { Storage } = require('@google-cloud/storage');
 
-// Check if Google Cloud Storage is configured
-const isGCSConfigured = process.env.GCS_BUCKET_NAME && 
-                       process.env.GOOGLE_CLOUD_PROJECT_ID;
-
-let storage = null;
-let gcsClient = null;
-
-if (isGCSConfigured) {
-  try {
-    storage = new Storage({
-      projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-      keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE,
-    });
+const storage = new Storage({
+  projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+  keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE,
+});
 
 const gcsClient = {
   bucket: storage.bucket(process.env.GCS_BUCKET_NAME),
