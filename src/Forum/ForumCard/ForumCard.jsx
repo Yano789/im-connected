@@ -5,6 +5,7 @@ import UnlikesIcon from "../../assets/Unlikes.png";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function ForumCard(props) {
   const {
@@ -35,9 +36,7 @@ function ForumCard(props) {
     e.stopPropagation();
 
     try {
-      const url = `http://localhost:5001/api/v1/like/${encodedPostId}/${
-        liked ? "unlike" : "like"
-      }`;
+      const url = API_ENDPOINTS.LIKE_ACTION(postId, liked ? "unlike" : "like");
       const method = liked ? "DELETE" : "POST";
 
       const res = await fetch(url, {

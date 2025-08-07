@@ -1,11 +1,12 @@
 // Medication Database Service - Frontend service for medication management
 // This service interfaces with the Forum backend medication API
 
-const API_BASE_URL = 'http://localhost:5001/api';
+import { API_ENDPOINTS } from '../../config/api.js';
 
 class MedicationDatabaseService {
     constructor() {
-        this.baseURL = `${API_BASE_URL}/medication`;
+        // Use the centralized API configuration
+        this.baseURL = API_ENDPOINTS.MEDICATION_BASE.replace('/medications', '') + '/medication';
     }
 
     // =============================================================================

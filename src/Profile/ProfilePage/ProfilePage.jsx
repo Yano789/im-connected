@@ -6,6 +6,7 @@ import PreferencesCard from "../PreferencesCard/PreferencesCard";
 import i18next from "i18next";
 import { applyTextSize } from "../TextSize";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function ProfilePage() {
 	const {t} = useTranslation();
@@ -20,7 +21,7 @@ function ProfilePage() {
     const fetchUser = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5001/api/v1/user/getUser",
+          API_ENDPOINTS.USER_GET,
           {
             credentials: "include",
           }
@@ -72,7 +73,7 @@ function ProfilePage() {
 
     try {
       const response = await fetch(
-        "http://localhost:5001/api/v1/user/userDetails",
+        API_ENDPOINTS.USER_DETAILS,
         {
           method: "POST",
           headers: {
@@ -125,7 +126,7 @@ function ProfilePage() {
 
     try {
       const response = await fetch(
-        "http://localhost:5001/api/v1/user/preferences",
+        API_ENDPOINTS.USER_PREFERENCES,
         {
           method: "POST",
           headers: {

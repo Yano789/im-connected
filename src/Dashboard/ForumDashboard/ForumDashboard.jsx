@@ -2,6 +2,7 @@ import AIDashboardEntry from "../AIDashboardEntry/AIDashboardEntry";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function ForumDashboard() {
   const [topPosts, setTopPosts] = useState({
@@ -24,7 +25,7 @@ function ForumDashboard() {
     });
 
     try {
-      const res = await fetch(`http://localhost:5001/api/v1/post/?${params}`, {
+      const res = await fetch(`${API_ENDPOINTS.POST_BASE}/?${params}`, {
         method: "GET",
         credentials: "include",
         headers: {

@@ -3,8 +3,10 @@
  * Handles medication scanning via Scanner API and data management via Forum API
  */
 
+import { API_BASE_URL } from '../../config/api.js';
+
 const SCANNER_API_BASE_URL = 'http://localhost:3001';
-const FORUM_API_BASE_URL = 'http://localhost:5001/api/v1';
+const FORUM_API_BASE_URL = API_BASE_URL;
 
 class MedicationService {
   // ==================== SCANNING OPERATIONS ====================

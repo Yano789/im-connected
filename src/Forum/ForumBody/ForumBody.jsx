@@ -80,7 +80,7 @@ function ForumBody() {
         const savedData = await savedRes.json();
         setSavedPostIds(new Set(savedData.map((p) => p.postId)));
 
-        const likedRes = await fetch("http://localhost:5001/api/v1/like", {
+        const likedRes = await fetch(API_ENDPOINTS.LIKE_BASE, {
           method: "GET",
           credentials: "include",
         });

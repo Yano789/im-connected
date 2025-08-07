@@ -35,7 +35,7 @@ function SavedPostBody() {
 
     const fetchLikedPosts = async () => {
       try {
-        const likedRes = await fetch("http://localhost:5001/api/v1/like", {
+        const likedRes = await fetch(API_ENDPOINTS.LIKE_BASE, {
           method: "GET",
           credentials: "include",
         });

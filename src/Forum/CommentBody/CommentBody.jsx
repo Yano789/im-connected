@@ -3,6 +3,7 @@ import "./CommentBody.css";
 import CommentEntry from "../CommentEntry/CommentEntry";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function CommentBody({ comments = [], postId, refreshComments }) {
   const {t} = useTranslation();
@@ -13,7 +14,7 @@ function CommentBody({ comments = [], postId, refreshComments }) {
 
     try {
       const res = await fetch(
-        `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/create`,
+        API_ENDPOINTS.COMMENT_CREATE(postId),
         {
           method: "POST",
           credentials: "include",
@@ -38,7 +39,7 @@ function CommentBody({ comments = [], postId, refreshComments }) {
   const handleDeleteComment = async (commentIdToDelete) => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/${encodeURIComponent(commentIdToDelete)}/delete`,
+        API_ENDPOINTS.COMMENT_DELETE(postId, commentIdToDelete),
         {
           method: "DELETE",
           credentials: "include",

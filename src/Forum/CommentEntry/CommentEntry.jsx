@@ -2,6 +2,7 @@
 import { useState } from "react";
 import "./CommentEntry.css";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function CommentEntry({ comment, postId, refreshComments, onDelete }) {
   const { commentId, username, createdAt, content, children = [] } = comment;
@@ -16,7 +17,7 @@ function CommentEntry({ comment, postId, refreshComments, onDelete }) {
   const handleEdit = async () => {
     try {
       const res = await fetch(
-        `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/${encodeURIComponent(commentId)}/edit`,
+        API_ENDPOINTS.COMMENT_EDIT(postId, commentId),
         {
           method: "PUT",
           credentials: "include",
@@ -39,7 +40,7 @@ function CommentEntry({ comment, postId, refreshComments, onDelete }) {
 
     try {
       const res = await fetch(
-        `http://localhost:5001/api/v1/${encodeURIComponent(postId)}/comment/create`,
+        API_ENDPOINTS.COMMENT_CREATE(postId),
         {
           method: "POST",
           credentials: "include",

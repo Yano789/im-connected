@@ -5,6 +5,7 @@ import ChatBotIcon from "../../assets/ChatbotIcon.png";
 import "./chatWindow.css";
 import { AssistantStream } from "openai/lib/AssistantStream.mjs";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 
 const UserMessage = ({ text }) => {
@@ -89,7 +90,7 @@ const ChatWindow = ({
         /*ask the user route for current threadId */
         //console.log('before fetching');
         const res = await fetch(
-          "http://localhost:5001/api/v1/user/threadId",
+          API_ENDPOINTS.USER_THREAD_ID,
           { method: "GET", credentials: "include" }
         );
         //console.log('after fetching', res.status);
@@ -108,7 +109,7 @@ const ChatWindow = ({
       }
       /*try {
         const langRes = await fetch(
-          "http://localhost:5001/api/v1/user/language",
+          API_ENDPOINTS.USER_LANGUAGE,
           { method: "GET", credentials: "include" }
         );
         if (!langRes.ok) {

@@ -30,6 +30,44 @@ export const API_ENDPOINTS = {
   // Saved posts endpoints
   SAVED_POSTS: `${API_BASE_URL}/api/v1/saved`,
   SAVED_POST_ACTION: (postId, action) => `${API_BASE_URL}/api/v1/saved/${encodeURIComponent(postId)}/${action}`,
+  
+  // Like endpoints
+  LIKE_BASE: `${API_BASE_URL}/api/v1/like`,
+  LIKE_ACTION: (postId, action) => `${API_BASE_URL}/api/v1/like/${encodeURIComponent(postId)}/${action}`,
+  
+  // Thread endpoints
+  USER_THREAD_ID: `${API_BASE_URL}/api/v1/user/threadId`,
+  
+  // Post endpoints (additional)
+  POST_BY_ID: (postId) => `${API_BASE_URL}/api/v1/post/getPost/${encodeURIComponent(postId)}`,
+  POST_BY_TITLE: (title) => `${API_BASE_URL}/api/v1/post/getPost/title/${encodeURIComponent(title)}`,
+  POST_DELETE: (postId) => `${API_BASE_URL}/api/v1/post/${encodeURIComponent(postId)}/delete`,
+  POST_MY_DRAFTS: `${API_BASE_URL}/api/v1/post/myDrafts`,
+  POST_EDIT_DRAFT: (postId) => `${API_BASE_URL}/api/v1/post/myDrafts/${encodeURIComponent(postId)}/edit`,
+  
+  // Password reset endpoints
+  FORGOT_PASSWORD: `${API_BASE_URL}/api/v1/forgot_password/`,
+  FORGOT_PASSWORD_RESET: `${API_BASE_URL}/api/v1/forgot_password/reset`,
+  
+  // Medication endpoints
+  MEDICATION_CARE_RECIPIENTS: `${API_BASE_URL}/api/v1/medication/care-recipients`,
+  MEDICATION_CARE_RECIPIENT_BY_ID: (id) => `${API_BASE_URL}/api/v1/medication/care-recipients/${encodeURIComponent(id)}`,
+  MEDICATION_BASE: `${API_BASE_URL}/api/v1/medication/medications`,
+  
+  // Language endpoint
+  USER_LANGUAGE: `${API_BASE_URL}/api/v1/user/language`,
+  
+  // Comment endpoints (additional)
+  COMMENT_DELETE: (postId, commentId) => `${API_BASE_URL}/api/v1/${encodeURIComponent(postId)}/comment/${encodeURIComponent(commentId)}/delete`,
+  COMMENT_BY_POST: (postId) => `${API_BASE_URL}/api/v1/${encodeURIComponent(postId)}/comment/`,
+  
+  // Post creation
+  POST_CREATE: `${API_BASE_URL}/api/v1/post/create`,
+  POST_DRAFT_DELETE: (draftId) => `${API_BASE_URL}/api/v1/post/myDrafts/${encodeURIComponent(draftId)}/delete`,
+  POST_DRAFT_BY_ID: (draftId) => `${API_BASE_URL}/api/v1/post/myDrafts/${encodeURIComponent(draftId)}`,
+  
+  // Translation endpoint
+  TRANSLATE: `${API_BASE_URL}/api/v1/lang`,
 };
 
 export { API_BASE_URL };
