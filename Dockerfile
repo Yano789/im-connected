@@ -1,33 +1,39 @@
-# Frontend Dockerfile
+# Multi-stage build for Railway deployment
 FROM node:20-alpine as frontend-build
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files for frontend
 COPY package.json package-lock.json* ./
 
-# Install dependencies
+# Install frontend dependencies
 RUN npm ci
 
-# Copy source code
+# Copy frontend source code
 COPY . .
 
 # Build the frontend
 RUN npm run build
 
 # Production stage
-FROM nginx:alpine
+FROM node:20-alpine
 
-# Copy built frontend
-COPY --from=frontend-build /app/dist /usr/share/nginx/html
+WORKDIR /app
 
-# Copy nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy backend files
+COPY BACKEND/Forum/ ./
 
-# Copy startup script
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+# Install backend dependencies
+RUN npm ci --only=production
 
-EXPOSE 80
+# Copy built frontend to serve as static files
+COPY --from=frontend-build /app/dist ./public
 
-CMD ["/start.sh"]
+# Copy environment variables
+COPY .env .env
+
+# Expose the port
+EXPOSE 5001
+
+# Start the backend server (which will also serve the frontend)
+CMD ["npm", "start"]
