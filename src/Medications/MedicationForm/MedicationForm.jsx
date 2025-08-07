@@ -162,7 +162,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                 setFormData(prevData => ({
                     ...prevData,
                     name: medicationData.name || prevData.name,
-                    usedTo: medicationData.usedFor || prevData.usedTo,
+                    usedTo: medicationData.usedTo || prevData.usedTo, // Fixed: use usedTo instead of usedFor
                     sideEffects: medicationData.sideEffects || prevData.sideEffects,
                     dosage: medicationData.dosage || prevData.dosage,
                     schedule: medicationData.schedule || prevData.schedule,

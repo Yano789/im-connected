@@ -18,9 +18,6 @@ export function applyTextSize(size) {
   document.documentElement.style.setProperty('--text-small', `${baseSize - 2}px`);
   document.documentElement.style.setProperty('--text-medium', `${baseSize}px`);
   document.documentElement.style.setProperty('--text-large', `${baseSize + 2}px`);
-  document.documentElement.style.setProperty('--text-xl', `${baseSize + 4}px`);
-  document.documentElement.style.setProperty('--text-2xl', `${baseSize + 8}px`);
-  document.documentElement.style.setProperty('--text-3xl', `${baseSize + 12}px`);
   
   // Force a re-render by triggering a resize event
   window.dispatchEvent(new Event('resize'));
