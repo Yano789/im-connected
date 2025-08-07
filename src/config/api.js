@@ -4,6 +4,12 @@ const API_BASE_URL = typeof window !== 'undefined' &&
   ? (__API_URL__ || 'http://localhost:5001')
   : ''; // Empty string for relative paths in production (same domain)
 
+// Scanner API configuration - for OCR scanning functionality
+const SCANNER_API_BASE_URL = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:3001'
+  : `${API_BASE_URL}/scanner`; // In production, scanner is integrated into main API
+
 // API endpoints
 export const API_ENDPOINTS = {
   // User endpoints
@@ -57,10 +63,11 @@ export const API_ENDPOINTS = {
   MEDICATION_USER_DATA: `${API_BASE_URL}/api/v1/medication/user-data`,
   MEDICATION_UPLOAD_IMAGE: `${API_BASE_URL}/api/v1/medication/upload-image`,
   MEDICATION_DELETE_IMAGE: `${API_BASE_URL}/api/v1/medication/delete-image`,
-  MEDICATION_BY_ID: (id) => `${API_BASE_URL}/api/v1/medication/medications/${encodeURIComponent(id)}`,
-  MEDICATION_UPLOAD_IMAGE: `${API_BASE_URL}/api/v1/medication/upload-image`,
-  MEDICATION_DELETE_IMAGE: `${API_BASE_URL}/api/v1/medication/delete-image`,
   MEDICATION_HEALTH: `${API_BASE_URL}/api/v1/medication/health`,
+  
+  // Scanner API endpoints (OCR functionality)
+  SCANNER_HEALTH: `${SCANNER_API_BASE_URL}/health`,
+  SCANNER_SCAN_MEDICATION: `${SCANNER_API_BASE_URL}/scan-medication`,
   
   // Language endpoint
   USER_LANGUAGE: `${API_BASE_URL}/api/v1/user/language`,
@@ -78,4 +85,4 @@ export const API_ENDPOINTS = {
   TRANSLATE: `${API_BASE_URL}/api/v1/lang`,
 };
 
-export { API_BASE_URL };
+export { API_BASE_URL, SCANNER_API_BASE_URL };

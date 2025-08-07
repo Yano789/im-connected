@@ -3,9 +3,8 @@
  * Handles medication scanning via Scanner API and data management via Forum API
  */
 
-import { API_BASE_URL, API_ENDPOINTS } from '../../config/api.js';
+import { API_BASE_URL, API_ENDPOINTS, SCANNER_API_BASE_URL } from '../../config/api.js';
 
-const SCANNER_API_BASE_URL = 'http://localhost:3001';
 const FORUM_API_BASE_URL = API_BASE_URL; // Add this to fix the undefined variable
 
 class MedicationService {
@@ -17,13 +16,13 @@ class MedicationService {
    */
   async checkApiHealth() {
     try {
-      console.log('Checking Scanner API health at:', `${SCANNER_API_BASE_URL}/health`);
+      console.log('Checking Scanner API health at:', API_ENDPOINTS.SCANNER_HEALTH);
       
       // Create AbortController for timeout handling
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
       
-      const response = await fetch(`${SCANNER_API_BASE_URL}/health`, {
+      const response = await fetch(API_ENDPOINTS.SCANNER_HEALTH, {
         method: 'GET',
         signal: controller.signal,
       });
@@ -80,9 +79,9 @@ class MedicationService {
         }
       }
 
-      console.log('Scanner Service: Sending request to:', `${SCANNER_API_BASE_URL}/scan-medication`);
+      console.log('Scanner Service: Sending request to:', API_ENDPOINTS.SCANNER_SCAN_MEDICATION);
 
-      const response = await fetch(`${SCANNER_API_BASE_URL}/scan-medication`, {
+      const response = await fetch(API_ENDPOINTS.SCANNER_SCAN_MEDICATION, {
         method: 'POST',
         body: formData,
       });
