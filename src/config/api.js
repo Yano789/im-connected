@@ -12,11 +12,11 @@ const SCANNER_API_BASE_URL = typeof window !== 'undefined' &&
   : 'https://scanner-service.up.railway.app';
 
 // AI Chatbot API configuration - for OpenAI assistant functionality
-// In production, use the Railway AI chatbot service URL
+// Temporarily disabled until OpenAI deployment issues are resolved
 const AI_CHATBOT_API_BASE_URL = typeof window !== 'undefined' && 
   (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:3000'
-  : 'https://ai-chatbot-production-c94d.up.railway.app';
+  : null; // Temporarily disabled in production
 
 // API endpoints
 export const API_ENDPOINTS = {

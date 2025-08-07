@@ -4,6 +4,10 @@ export const runtime = "nodejs";
 
 // Create a new assistant
 export async function POST() {
+  if (!openai) {
+    return Response.json({ error: "OpenAI API key not configured" }, { status: 500 });
+  }
+
   const assistant = await openai.beta.assistants.create({
     instructions: "You are a helpful assistant.",
     name: "Quickstart Assistant",

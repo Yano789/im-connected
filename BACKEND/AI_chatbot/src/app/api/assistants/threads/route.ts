@@ -41,6 +41,18 @@ export async function OPTIONS(request: Request) {
 
 export async function POST(request: Request) {
   const origin = request.headers.get("origin");
+  
+  if (!openai) {
+    const errorBody = JSON.stringify({ error: "OpenAI API key not configured" });
+    return new Response(errorBody, {
+      status: 500,
+      headers: {
+        ...makeCorsHeaders(origin),
+        "Content-Type": "application/json",
+      },
+    });
+  }
+
   const thread = await openai.beta.threads.create();
   const body = JSON.stringify({ threadId: thread.id });
 
