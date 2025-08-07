@@ -20,7 +20,9 @@ app.use(cors({
     "http://localhost:80",   // Docker frontend
     "http://localhost",      // Docker frontend (without port)
     "http://localhost:3000", // Alternative dev port
-    "http://localhost:8080"  // Nginx proxy
+    "http://localhost:8080", // Nginx proxy
+    /^https:\/\/.*\.vercel\.app$/, // Vercel deployments
+    /^https:\/\/im-connected.*\.vercel\.app$/, // Your specific Vercel app
   ],
   credentials: true                // This is REQUIRED for cookies to work
 }));

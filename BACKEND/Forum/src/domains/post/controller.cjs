@@ -202,7 +202,7 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
         let posts = await Post.find({ ...filter, draft: false }).sort(sortOptions).limit(num);
         console.log(posts)
         if (posts.length === 0 && source === "default") {
-            posts = await Post.find({ draft: false }).sort(sortOptions).limit(num);
+            posts = []
         }
 
 
@@ -296,6 +296,7 @@ const getPostWithComment = async (data) => {
             commentArray: nestedComments,
             commentCount: comments.length
         }
+        console.log(response)
         return response
     } catch (error) {
         throw error

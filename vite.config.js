@@ -5,8 +5,12 @@ import react from '@vitejs/plugin-react'
 
 
 export default defineConfig({
+  base: '/',
   server: {
     host: '0.0.0.0'   // listen on all IPv4 addresses (and often IPv6 too)
+  },
+  define: {
+    __API_URL__: JSON.stringify(process.env.VITE_API_URL || 'http://localhost:5001')
   },
   plugins: [
     // other Vite plugins

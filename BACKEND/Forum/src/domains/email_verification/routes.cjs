@@ -24,7 +24,7 @@ router.post("/verify",validateBody(emailVerifySchema),async(req,res)=>{
         const cookieOptions = {
             httpOnly: true,
             secure: isProduction,
-            sameSite: "Strict",
+            sameSite: isProduction ? "None" : "Strict", // Use "None" in production for cross-origin
             maxAge: 24 * 60 * 60 * 1000 // 24 hours
         };
         
