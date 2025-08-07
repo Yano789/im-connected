@@ -6,8 +6,8 @@ const storage = new Storage({
 });
 
 const gcsClient = {
-  bucket: storage.bucket(process.env.GCS_BUCKET_NAME),
-  bucketName: process.env.GCS_BUCKET_NAME,
+  bucket: storage.bucket(process.env.GCS_BUCKET_NAME || 'default-bucket'),
+  bucketName: process.env.GCS_BUCKET_NAME || 'default-bucket',
 
   // Upload file to Google Cloud Storage
   uploadBuffer: async (buffer, fileName, mimeType) => {

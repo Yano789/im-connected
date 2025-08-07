@@ -1,6 +1,6 @@
 const multer = require('multer');
-const { gcsClient } = require('./googleConfig.cjs');
-const crypto = require("crypto")
+const { gcsClient } = require('./gcsStorage.cjs');
+const crypto = require("crypto");
 
 class GCSStorage {
   constructor(options) {

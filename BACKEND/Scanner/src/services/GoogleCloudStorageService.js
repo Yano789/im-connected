@@ -10,6 +10,17 @@ class GoogleCloudStorageService {
   constructor() {
     this.forumBackendUrl = process.env.FORUM_BACKEND_URL || 'http://localhost:5001';
     
+    // Check for required environment variables
+    if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
+      console.error('❌ GOOGLE_CLOUD_PROJECT_ID environment variable is required');
+      throw new Error('GOOGLE_CLOUD_PROJECT_ID environment variable is required');
+    }
+
+    if (!process.env.GCS_BUCKET_NAME) {
+      console.error('❌ GCS_BUCKET_NAME environment variable is required');
+      throw new Error('GCS_BUCKET_NAME environment variable is required');
+    }
+    
     // Initialize Google Cloud Storage client
     this.storage = new Storage({
       projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
