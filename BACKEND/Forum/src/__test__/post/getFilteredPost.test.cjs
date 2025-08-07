@@ -1,12 +1,16 @@
 jest.mock("../../domains/post/model.cjs");
 jest.mock("../../domains/user/model.cjs");
 jest.mock("../../domains/translation/controller.cjs");
-jest.mock("../../utils/cacheBuster.cjs");
+jest.mock("../../config/googleConfig.cjs", () => ({
+  gcsClient: {
+    url: jest.fn(async (publicId) => `http://example.com/${publicId}.jpg`),
+  },
+}));
 
 const { Post } = require("../../domains/post/model.cjs");
 const User = require("../../domains/user/model.cjs");
 const translate = require("../../domains/translation/controller.cjs");
-const addCacheBuster  = require("../../utils/cacheBuster.cjs");
+const { gcsClient } = require("../../config/googleConfig.cjs");
 
 const { getFilteredPosts } = require("../../domains/post/controller.cjs");
 
@@ -26,18 +30,18 @@ describe("getFilteredPosts", () => {
       createdAt: new Date(),
       likes: 10,
       comments: 2,
-      media: [{ url: "https://example.com/image1.jpg" }],
+      media: [{ public_id: "media1" }],
     },
   ];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    addCacheBuster.mockImplementation(url => `${url}?cb=1234567890`);  // <-- mock here
   });
 
-  it("returns filtered and translated posts based on user preferences", async () => {
+  test("returns filtered and translated posts based on user preferences and default source", async () => {
     User.findOne.mockResolvedValue(mockUser);
 
+    // Setup chained mocks for Post.find().sort().limit()
     const mockLimit = jest.fn().mockResolvedValue(mockPosts);
     const mockSort = jest.fn().mockReturnValue({ limit: mockLimit });
     Post.find.mockReturnValue({ sort: mockSort });
@@ -52,80 +56,109 @@ describe("getFilteredPosts", () => {
     });
 
     expect(User.findOne).toHaveBeenCalledWith({ username: "user1" });
+
+    // Because preferredTags length > 1, tags filter uses $in
     expect(Post.find).toHaveBeenCalledWith(
       expect.objectContaining({
         tags: { $in: ["tag1", "tag2"] },
         draft: false,
       })
     );
+
     expect(mockSort).toHaveBeenCalledWith({ createdAt: -1 });
     expect(mockLimit).toHaveBeenCalledWith(10);
+
+    // gcsClient.url should be called for each media public_id
+    expect(gcsClient.url).toHaveBeenCalledWith("media1");
+
     expect(posts[0].title).toBe("Original Title [es]");
     expect(posts[0].content).toBe("Original Content [es]");
-    expect(posts[0].media[0].url).toBe("https://example.com/image1.jpg?cb=1234567890");
+    expect(posts[0].media[0].url).toBe("http://example.com/media1.jpg");
+    expect(posts[0].media[0].secure_url).toBe("http://example.com/media1.jpg");
   });
 
- it("uses fallback query if no posts found with preferences", async () => {
+  test("returns empty posts if none found and source is 'default'", async () => {
+    User.findOne.mockResolvedValue(mockUser);
 
-    const mockPosts1 = [
-    {
-      title: "Original Title",
-      content: "Original Content",
-      createdAt: new Date(),
-      likes: 10,
-      comments: 2,
-      media: [{ url: "https://example.com/image1.jpg" }],
-    },
-  ];
-  User.findOne.mockResolvedValue(mockUser);
+    // First find returns empty, so posts should be []
+    const primaryLimit = jest.fn().mockResolvedValue([]);
+    const primarySort = jest.fn().mockReturnValue({ limit: primaryLimit });
+    Post.find.mockReturnValue({ sort: primarySort });
 
-  const primaryLimit = jest.fn().mockReturnValue(Promise.resolve([]));
-  const primarySort = jest.fn().mockReturnValue({ limit: primaryLimit });
+    const posts = await getFilteredPosts({
+      tags: [],
+      sort: "latest",
+      source: "default",
+      username: "user1",
+    });
 
-  const fallbackLimit = jest.fn().mockReturnValue(Promise.resolve(mockPosts1));
-  const fallbackSort = jest.fn().mockReturnValue({ limit: fallbackLimit });
-
-  Post.find
-    .mockReturnValueOnce({ sort: primarySort })   // First attempt
-    .mockReturnValueOnce({ sort: fallbackSort }); // Fallback attempt
-
-  translate.mockImplementation(async (text, lang) => `${text} [${lang}]`);
-
-  const posts = await getFilteredPosts({
-    tags: [],
-    sort: "latest",
-    source: "default",
-    username: "user1",
+    expect(posts).toEqual([]);
   });
 
-  expect(Post.find).toHaveBeenCalledTimes(2);
-  expect(posts.length).toBe(1);
-  expect(posts[0].title).toBe("Original Title [es]");
-});
-
-  it("filters only by username when source is not 'default'", async () => {
+  test("filters only by username when source is 'personalized'", async () => {
     User.findOne.mockResolvedValue(mockUser);
 
     const mockLimit = jest.fn().mockResolvedValue(mockPosts);
     const mockSort = jest.fn().mockReturnValue({ limit: mockLimit });
-
     Post.find.mockReturnValue({ sort: mockSort });
 
     await getFilteredPosts({
       tags: [],
       sort: "most likes",
-      source: "profile",
+      source: "personalized",
       username: "user1",
     });
 
+    // The filter should include username, and also tags from preferences
     expect(Post.find).toHaveBeenCalledWith(
-      expect.objectContaining({"draft": false, "tags": {"$in": ["tag1", "tag2"]}})
+      expect.objectContaining({
+        username: "user1",
+        tags: { $in: ["tag1", "tag2"] },
+        draft: false,
+      })
     );
     expect(mockSort).toHaveBeenCalledWith({ likes: -1 });
     expect(mockLimit).toHaveBeenCalledWith(10);
   });
 
-  it("throws an error if user fetch fails", async () => {
+  test("returns all posts if source is 'all'", async () => {
+    User.findOne.mockResolvedValue(mockUser);
+
+    const mockLimit = jest.fn().mockResolvedValue(mockPosts);
+    const mockSort = jest.fn().mockReturnValue({ limit: mockLimit });
+    Post.find.mockReturnValue({ sort: mockSort });
+
+    await getFilteredPosts({
+      tags: ["someTag"], // ignored for source=all
+      sort: "earliest",
+      source: "all",
+      username: "user1",
+    });
+
+    expect(Post.find).toHaveBeenCalledWith(expect.objectContaining({}));
+    expect(mockSort).toHaveBeenCalledWith({ createdAt: 1 });
+    expect(mockLimit).toHaveBeenCalledWith(10);
+  });
+
+  test("uses 'mode' to limit number of posts", async () => {
+    User.findOne.mockResolvedValue(mockUser);
+
+    const mockLimit = jest.fn().mockResolvedValue(mockPosts);
+    const mockSort = jest.fn().mockReturnValue({ limit: mockLimit });
+    Post.find.mockReturnValue({ sort: mockSort });
+
+    await getFilteredPosts({
+      tags: [],
+      sort: "latest",
+      source: "default",
+      username: "user1",
+      mode: "compact",
+    });
+
+    expect(mockLimit).toHaveBeenCalledWith(5); // mode != default triggers limit=5
+  });
+
+  test("throws error if user fetch fails", async () => {
     User.findOne.mockRejectedValue(new Error("DB error"));
 
     await expect(

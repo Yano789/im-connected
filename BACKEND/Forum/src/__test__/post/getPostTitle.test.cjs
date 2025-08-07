@@ -1,6 +1,11 @@
 jest.mock("../../domains/post/model.cjs");
 jest.mock("../../domains/user/model.cjs");
 jest.mock("../../domains/translation/controller.cjs");
+jest.mock("../../config/googleConfig.cjs", () => ({
+  gcsClient: {
+    url: jest.fn(async (publicId) => `http://example.com/${publicId}.jpg`),
+  },
+}));
 
 const { Post } = require("../../domains/post/model.cjs");
 const User = require("../../domains/user/model.cjs");

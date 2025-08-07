@@ -129,9 +129,6 @@ describe("Create Post", () => {
     expect(response.body.media.length).toBe(1);
     expect(response.body.tags).toEqual(["Mental Disability", "Pediatric Care"]);
 
-    response.body.media.forEach(file => {
-      expect(file.url).toMatch(/\?cb=\d+$/);
-    });
   });
 
   test("should create post with tags as array (JSON) - normalizeTags test replaced", async () => {

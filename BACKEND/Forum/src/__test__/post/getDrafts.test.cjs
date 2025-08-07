@@ -2,7 +2,15 @@
 jest.mock("../../domains/post/model.cjs");
 jest.mock("../../domains/user/model.cjs");
 jest.mock("../../domains/translation/controller.cjs");
-
+jest.mock("../../config/googleConfig.cjs", () => ({
+  bucket: {
+    file: jest.fn().mockReturnThis(),
+    getSignedUrl: jest.fn().mockResolvedValue(["http://example.com/signed.jpg"]),
+  },
+  url: jest.fn().mockImplementation(async (publicId) => {
+    return `http://example.com/${publicId}.jpg`;
+  }),
+}));
 
 const { Post } = require("../../domains/post/model.cjs");
 const User = require("../../domains/user/model.cjs");
@@ -15,7 +23,7 @@ describe("getAllMyDrafts", () => {
     jest.clearAllMocks();
   });
 
-  it("returns drafts for a given username and translates them", async () => {
+  test("returns drafts for a given username and translates them", async () => {
     const mockDrafts = [
       {
         postId: "d1",
@@ -59,13 +67,12 @@ describe("getAllMyDrafts", () => {
     expect(translate).toHaveBeenCalledWith("Title1", "es");
     expect(translate).toHaveBeenCalledWith("Content1", "es");
 
-    // This tests that our mocked addCacheBuster is used (with fixed '?cb=123')
-    expect(drafts[0].media[0].url).toMatch(/\?cb=\d+$/);
+
     expect(drafts[0].title).toBe("[es] Title1");
     expect(drafts[1].title).toBe("[es] Title2");
   });
 
-  it("throws if Post.find throws", async () => {
+  test("throws if Post.find throws", async () => {
     User.findOne.mockReturnValue({
       lean: jest.fn().mockResolvedValue({ preferences: { preferredLanguage: "en" } }),
     });
@@ -83,7 +90,7 @@ describe("getMyDraft", () => {
     jest.clearAllMocks();
   });
 
-  it("returns a single draft and translates it", async () => {
+  test("returns a single draft and translates test", async () => {
     const mockDraft = {
       postId: "d1",
       username: "user1",
@@ -118,10 +125,9 @@ describe("getMyDraft", () => {
 
     expect(draft.title).toBe("[fr] Original Title");
     expect(draft.content).toBe("[fr] Original Content");
-    expect(draft.media[0].url).toMatch(/\?cb=\d+$/);
   });
 
-  it("throws if Post.findOne throws", async () => {
+  test("throws if Post.findOne throws", async () => {
     User.findOne.mockReturnValue({
       lean: jest.fn().mockResolvedValue({ preferences: { preferredLanguage: "en" } }),
     });

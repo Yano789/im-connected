@@ -1,14 +1,19 @@
 jest.mock("./../../domains/post/model.cjs");
 
 
-const mockDestroy = jest.fn().mockResolvedValue({ result: "ok" });
+const mockDelete = jest.fn().mockResolvedValue();
 
-jest.mock("cloudinary", () => ({
-  v2: {
-    uploader: {
-      destroy: mockDestroy
-    }
-  }
+jest.mock("../../config/googleConfig.cjs", () => ({
+  gcsClient: {
+    bucket: {
+      file: jest.fn(() => ({
+        delete: mockDelete,
+      })),
+    },
+  },
+  url: jest.fn().mockImplementation(async (publicId) => {
+    return `http://example.com/${publicId}.jpg`;
+  }),
 }));
 
 const { Post } = require("../../domains/post/model.cjs");
@@ -41,9 +46,10 @@ describe("deleteDrafts", () => {
       draft: true
     });
 
-    expect(mockDestroy).toHaveBeenCalledTimes(2);
-    expect(mockDestroy).toHaveBeenCalledWith("media1", { resource_type: "image" });
-    expect(mockDestroy).toHaveBeenCalledWith("media2", { resource_type: "video" });
+ expect(mockDelete).toHaveBeenCalledTimes(2);
+const { gcsClient } = require("../../config/googleConfig.cjs");
+expect(gcsClient.bucket.file).toHaveBeenCalledWith("media1");
+expect(gcsClient.bucket.file).toHaveBeenCalledWith("media2");
 
     expect(Post.deleteOne).toHaveBeenCalledWith({
       username: "user1",

@@ -1,11 +1,7 @@
-
-// gcs-storage.js (replaces your multer-cloudinary setup)
 const multer = require('multer');
 const { gcsClient } = require('./googleConfig.cjs');
-const crypto = require('crypto');
-const path = require('path');
+const crypto = require("crypto")
 
-// Custom storage engine that mimics CloudinaryStorage
 class GCSStorage {
   constructor(options) {
     this.options = options;
@@ -14,7 +10,6 @@ class GCSStorage {
   }
 
   _handleFile(req, file, cb) {
-    // Get params from options (same interface as CloudinaryStorage)
     const getParams = async () => {
       if (typeof this.options.params === 'function') {
         return await this.options.params(req, file);
@@ -22,92 +17,72 @@ class GCSStorage {
       return this.options.params || {};
     };
 
-    const uploadFile = async () => {
+    (async () => {
       try {
         const params = await getParams();
-        
-        // Generate filename similar to Cloudinary's public_id
+
         const folder = params.folder || 'uploads';
         const resource_type = params.resource_type || 'auto';
-        const format = params.format || file.originalname.split('.').pop();
-        const public_id = params.public_id || `${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
-        
-        // Create full path
-        const fileName = `${folder}/${public_id}.${format}`;
-        
+        const format = file.originalname.split('.').pop();
+        const uniqueId = `${Date.now()}-${crypto.randomBytes(8).toString('hex')}`;
+        const fileName = `${folder}/${uniqueId}.${format}`;  // Full path with extension
+
         const fileUpload = this.bucket.file(fileName);
-        
-        // Create upload stream
+
         const stream = fileUpload.createWriteStream({
           metadata: {
             contentType: file.mimetype,
             metadata: {
               originalName: file.originalname,
-              folder: folder,
-              resource_type: resource_type,
-              public_id: public_id,
-              uploadTime: new Date().toISOString()
+              folder,
+              resource_type,
+              public_id: fileName, // store full path as public_id
+              uploadTime: new Date().toISOString(),
             }
           },
           resumable: true,
-          validation: 'crc32c'
+          validation: 'crc32c',
         });
 
-        // Handle stream events
         stream.on('error', (error) => {
           cb(error);
         });
 
         stream.on('finish', async () => {
-          try {
-            // Generate signed URL
-            const [signedUrl] = await fileUpload.getSignedUrl({
-              version: 'v4',
-              action: 'read',
-              expires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
-            });
+          // Pass expires as a Date object here
+          const [signedUrl] = await fileUpload.getSignedUrl({
+            version: 'v4',
+            action: 'read',
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+          });
+          console.log(signedUrl)
 
-            // Return file info in Cloudinary-like format
-            cb(null, {
-              // Cloudinary-compatible properties
-              public_id: `${folder}/${public_id}`,
-              secure_url: signedUrl,
-              url: signedUrl,
-              resource_type: resource_type,
-              format: format,
-              bytes: file.size || 0,
-              folder: folder,
-              original_filename: file.originalname,
-              
-              // Additional GCS properties
-              filename: fileName,
-              bucket: this.bucketName,
-              fieldname: file.fieldname,
-              originalname: file.originalname,
-              mimetype: file.mimetype,
-              size: file.size || 0
-            });
-          } catch (error) {
-            cb(error);
-          }
+          cb(null, {
+            public_id: fileName,  // full path with extension
+            secure_url: signedUrl,
+            url: signedUrl,
+            resource_type,
+            format,
+            bytes: file.size || 0,
+            folder,
+            original_filename: file.originalname,
+            filename: fileName,
+            bucket: this.bucketName,
+            fieldname: file.fieldname,
+            originalname: file.originalname,
+            mimetype: file.mimetype,
+            size: file.size || 0,
+          });
         });
 
-        // Pipe file buffer to stream
-        const { encrypt } = require('./utils/crypto');
-        const encryptedBuffer = encrypt(file.buffer);
-        stream.end(encryptedBuffer);
-
-        
+        file.stream.pipe(stream);
       } catch (error) {
         cb(error);
       }
-    };
-
-    uploadFile();
+    })();
   }
 
   _removeFile(req, file, cb) {
-    // Handle file removal if needed
     if (file.filename) {
       this.bucket.file(file.filename).delete()
         .then(() => cb(null))
@@ -118,35 +93,35 @@ class GCSStorage {
   }
 }
 
-// Create storage instance (same interface as CloudinaryStorage)
 const storage = new GCSStorage({
   gcsClient,
   params: async (req, file) => {
-    let folder = 'forum_uploads';
-    let resource_type = file.mimetype.startsWith('video') ? 'video' : 'image';
+    const folder = 'forum_uploads';
+    const resource_type = file.mimetype.startsWith('video') ? 'video' : 'image';
     return {
       folder,
       resource_type,
-      format: file.originalname.split('.').pop(), // use original extension
-      public_id: `${Date.now()}-${file.originalname.split('.')[0]}`, // custom name
+      format: file.originalname.split('.').pop(),
+      // Do not include public_id here because upload generates uniqueId with extension
     };
   }
 });
 
-// File filter (exactly the same as your Cloudinary version)
 const fileFilter = (req, file, cb) => {
-  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp','video/mp4', 'video/webm'];
+  const allowedMimeTypes = [
+    'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+    'video/mp4', 'video/webm'
+  ];
   if (!allowedMimeTypes.includes(file.mimetype)) {
-    return cb(new Error('Only JPG, PNG, and MP4 files are allowed'), false);
+    return cb(new Error('Only JPG, PNG, GIF, WEBP, MP4, and WEBM files are allowed'), false);
   }
   cb(null, true);
 };
 
-// Multer configuration (exactly the same interface as your current setup)
 const upload = multer({
   storage,
   fileFilter,
-  limits: { fileSize: 20 * 1024 * 1024 } // 20MB
+  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB
 });
 
 module.exports = upload;

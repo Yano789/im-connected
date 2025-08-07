@@ -2,15 +2,20 @@ jest.mock("./../../domains/post/model.cjs");
 jest.mock("./../../domains/comment/model.cjs");
 jest.mock("./../../domains/savedPosts/model.cjs");
 
-// Step 1: Mock cloudinary uploader.destroy before importing controller
-const mockDestroy = jest.fn().mockResolvedValue({ result: "ok" });
 
-jest.mock("cloudinary", () => ({
-  v2: {
-    uploader: {
-      destroy: mockDestroy
-    }
-  }
+const mockDelete = jest.fn().mockResolvedValue();
+
+jest.mock("../../config/googleConfig.cjs", () => ({
+  gcsClient: {
+    bucket: {
+      file: jest.fn(() => ({
+        delete: mockDelete,
+      })),
+    },
+  },
+  url: jest.fn().mockImplementation(async (publicId) => {
+    return `http://example.com/${publicId}.jpg`;
+  }),
 }));
 
 const { Post } = require("../../domains/post/model.cjs");
@@ -57,7 +62,7 @@ describe("deleting post", () => {
     expect(Comment.deleteMany).toHaveBeenCalledWith({ postId: "123" });
     expect(savedPost.deleteMany).toHaveBeenCalledWith({ savedPostId: "123" });
 
-    expect(mockDestroy).not.toHaveBeenCalled(); // no media, so no destroy calls
+    expect(mockDelete).not.toHaveBeenCalled(); // no media, so no destroy calls
 
     expect(result).toEqual(mockPost);
   });
@@ -81,9 +86,10 @@ describe("deleting post", () => {
     const result = await deletePost(mockData);
 
     expect(Post.findOne).toHaveBeenCalledWith({ postId: "123" });
-    expect(mockDestroy).toHaveBeenCalledTimes(2);
-    expect(mockDestroy).toHaveBeenCalledWith("media1", { resource_type: "image" });
-    expect(mockDestroy).toHaveBeenCalledWith("media2", { resource_type: "video" });
+    expect(mockDelete).toHaveBeenCalledTimes(2);
+    const { gcsClient } = require("../../config/googleConfig.cjs");
+    expect(gcsClient.bucket.file).toHaveBeenCalledWith("media1");
+    expect(gcsClient.bucket.file).toHaveBeenCalledWith("media2");
 
     expect(Post.deleteOne).toHaveBeenCalledWith({ postId: "123", draft: false });
     expect(Comment.deleteMany).toHaveBeenCalledWith({ postId: "123" });

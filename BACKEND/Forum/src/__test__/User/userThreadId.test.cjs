@@ -13,6 +13,11 @@ jest.mock('../../middleware/auth.cjs', () => {
     next();
   };
 });
+jest.mock("../../config/googleConfig.cjs", () => ({
+  gcsClient: {
+    url: jest.fn(async (publicId) => `http://example.com/${publicId}.jpg`),
+  },
+}));
 
 /* Mock User model BEFORE app import*/
 jest.mock('../../domains/user/model.cjs', () => ({

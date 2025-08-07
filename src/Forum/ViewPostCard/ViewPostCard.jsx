@@ -118,6 +118,7 @@ function ViewPostCard() {
   if (!postData) return <p>{t("Loading post...")}</p>;
 
   const { title, content, username, createdAt, tags = [], media } = postData;
+  console.log(media)
 
   return (
     <div className="viewPostDiv">
