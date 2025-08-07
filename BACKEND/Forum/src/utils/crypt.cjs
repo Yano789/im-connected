@@ -2,7 +2,7 @@ const crypto = require('crypto');
 
 const algorithm = 'aes-256-gcm';
 // Use a default encryption secret if not provided in environment
-const encryptionSecret = process.env.ENCRYPTION_SECRET || 'default-encryption-secret-change-in-production';
+const encryptionSecret = process.env.ENCRYPTION_SECRET || 'default-encryption-secret-for-railway-deployment-change-in-production';
 
 // Validate that we have a proper encryption secret
 if (!encryptionSecret || encryptionSecret.length < 16) {

@@ -30,7 +30,7 @@ WORKDIR /app
 COPY BACKEND/Forum/ ./
 
 # Install backend dependencies
-RUN npm install --only=production
+RUN npm install
 
 # Copy built frontend to serve as static files
 COPY --from=frontend-build /app/dist ./public
