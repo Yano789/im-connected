@@ -115,7 +115,12 @@ export async function POST(
     );
 
     return new Response(stream.toReadableStream(), {
-      headers: corsHeaders,
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "text/plain; charset=utf-8",
+        "Cache-Control": "no-cache",
+        "Connection": "keep-alive",
+      },
     });
   } catch (error) {
     console.error("AI Chatbot Actions Error:", error);
