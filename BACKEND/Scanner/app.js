@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url';
 import fetch from 'node-fetch';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import OpenAI from 'openai';
 
 // Database connection
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/im-connected';
@@ -21,6 +22,11 @@ if (process.env.NODE_ENV !== 'test') {
   .then(() => console.log('🔗 Connected to MongoDB (Forum Database)'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 }
+
+// Initialize OpenAI client (same as AI_chatbot backend)
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 // Import medication models from forum backend
 const careRecipientSchema = new mongoose.Schema({
@@ -263,7 +269,7 @@ class MedicationInfoService {
       ]);
 
       // Combine results from multiple authoritative sources
-      const medicationInfo = this.combineSourceResults(sources, correctedName, medicationName);
+      const medicationInfo = await this.combineSourceResults(sources, correctedName, medicationName);
       
       // Enhanced with context from extracted text
       if (extractedText) {
@@ -511,13 +517,24 @@ class MedicationInfoService {
     }
   }
 
-  combineSourceResults(sources, correctedName, originalName) {
+  async combineSourceResults(sources, correctedName, originalName) {
     const results = sources
       .filter(result => result.status === 'fulfilled' && result.value)
       .map(result => result.value);
 
     if (results.length === 0) {
-      console.log(`No online sources returned data for ${originalName} - using default information`);
+      console.log(`❌ No FDA/medical database results found for ${originalName}`);
+      console.log(`🤖 Attempting AI chatbot fallback for medication information`);
+      
+      // Try AI chatbot as a fallback before using default information
+      const aiResult = await this.getAIChatbotMedicationInfo(originalName);
+      if (aiResult && aiResult.confidence > 0.3) {
+        console.log(`✅ AI chatbot provided fallback information with confidence: ${aiResult.confidence}`);
+        console.log(`📋 AI generated "used to treat": ${aiResult.usedFor?.substring(0, 100)}${aiResult.usedFor?.length > 100 ? '...' : ''}`);
+        return aiResult;
+      }
+      
+      console.log(`⚠️ AI chatbot confidence too low (${aiResult?.confidence || 'N/A'}) - using default information`);
       return this.getDefaultMedicationInfo(originalName);
     }
 
@@ -591,7 +608,7 @@ class MedicationInfoService {
   }
 
   parseFDAResult(fdaResult, medicationName) {
-    return {
+    const result = {
       source: 'FDA',
       name: medicationName,
       genericName: fdaResult.openfda?.generic_name?.[0] || 'Not available',
@@ -604,6 +621,14 @@ class MedicationInfoService {
       route: fdaResult.openfda?.route?.[0] || 'Not available',
       confidence: 0.85
     };
+
+    // Also try to extract more comprehensive usage information
+    const comprehensiveUsage = this.extractComprehensiveUsage(fdaResult);
+    if (comprehensiveUsage && comprehensiveUsage.length > result.usedFor.length) {
+      result.usedFor = comprehensiveUsage;
+    }
+
+    return result;
   }
 
   parseOpenFDAResult(result, medicationName) {
@@ -617,15 +642,25 @@ class MedicationInfoService {
   }
 
   extractIndications(drug) {
-    const fields = ['indications_and_usage', 'clinical_pharmacology', 'description'];
-    for (const field of fields) {
+    // Prioritize indications_and_usage field for better "used to treat" information
+    const prioritizedFields = ['indications_and_usage', 'description', 'clinical_pharmacology'];
+    
+    for (const field of prioritizedFields) {
       if (drug[field] && drug[field].length > 0) {
         let text = drug[field][0].replace(/\s+/g, ' ').trim();
-        text = this.formatMedicationText(text);
-        return text.length > 500 ? text.substring(0, 500) + '...' : text;
+        
+        // Enhanced extraction specifically for usage/treatment information
+        const usageInfo = this.extractSpecificUsageInfo(text);
+        if (usageInfo && usageInfo.length > 50) {
+          return this.formatFDAMedicationText(usageInfo, 'indications');
+        }
+        
+        // Fallback to formatted full text if no specific usage found
+        text = this.formatFDAMedicationText(text, 'indications');
+        return text.length > 800 ? text.substring(0, 800) + '...' : text;
       }
     }
-    return 'Consult healthcare provider for indications.';
+    return 'Please consult your healthcare provider for specific indications and proper usage information.';
   }
 
   extractSideEffects(drug) {
@@ -633,11 +668,11 @@ class MedicationInfoService {
     for (const field of fields) {
       if (drug[field] && drug[field].length > 0) {
         let text = drug[field][0].replace(/\s+/g, ' ').trim();
-        text = this.formatMedicationText(text);
-        return text.length > 500 ? text.substring(0, 500) + '...' : text;
+        text = this.formatFDAMedicationText(text, 'adverse_reactions');
+        return text.length > 800 ? text.substring(0, 800) + '...' : text;
       }
     }
-    return 'Consult healthcare provider for side effects.';
+    return 'Consult healthcare provider for potential side effects and report any unusual symptoms immediately.';
   }
 
   extractWarnings(drug) {
@@ -645,11 +680,11 @@ class MedicationInfoService {
     for (const field of fields) {
       if (drug[field] && drug[field].length > 0) {
         let text = drug[field][0].replace(/\s+/g, ' ').trim();
-        text = this.formatMedicationText(text);
-        return text.length > 500 ? text.substring(0, 500) + '...' : text;
+        text = this.formatFDAMedicationText(text, 'warnings');
+        return text.length > 800 ? text.substring(0, 800) + '...' : text;
       }
     }
-    return 'Follow healthcare provider instructions.';
+    return 'Follow healthcare provider instructions exactly. Take only as prescribed.';
   }
 
   // New method to format medication text for better readability
@@ -703,6 +738,263 @@ class MedicationInfoService {
       .trim();
 
     return formatted;
+  }
+
+  // Enhanced method specifically for formatting FDA API text with better structure
+  formatFDAMedicationText(text, type = 'general') {
+    if (!text) return text;
+    
+    // Remove common FDA formatting artifacts
+    let formatted = text
+      .replace(/\s+/g, ' ') // Replace multiple spaces with single space
+      .replace(/\(\s*\d+(?:\.\d+)?\s*\)/g, '') // Remove reference numbers like (6.1)
+      .replace(/\[\s*see[^[\]]*\]/gi, '') // Remove "see" references
+      .replace(/\s*\.\s*\(\s*\d+(?:\.\d+)?\s*\)/g, '.') // Clean up period + reference
+      .trim();
+
+    // Type-specific formatting
+    switch (type) {
+      case 'indications':
+        formatted = this.formatIndicationsText(formatted);
+        break;
+      case 'adverse_reactions':
+        formatted = this.formatAdverseReactionsText(formatted);
+        break;
+      case 'warnings':
+        formatted = this.formatWarningsText(formatted);
+        break;
+    }
+
+    // General cleanup for all types
+    formatted = formatted
+      // Fix section headers
+      .replace(/^(\d+)\s+([A-Z\s]+)/g, '\n$2:\n') // Convert "6 ADVERSE REACTIONS" to "ADVERSE REACTIONS:"
+      .replace(/^(\d+\.\d+)\s+([A-Z][^.]*)/g, '\n$2:\n') // Convert "6.1 Clinical" to "Clinical:"
+      // Clean up spacing
+      .replace(/\s*:\s*/g, ':\n') // Add newline after colons
+      .replace(/\s*,\s*/g, ', ') // Clean up commas
+      .replace(/\s*\.\s*/g, '. ') // Clean up periods
+      // Handle contact information properly
+      .replace(/contact\s+([^,]+)\s+at\s+([0-9-]+)/gi, 'Contact $1 at $2')
+      .replace(/or\s+FDA\s+at\s+([0-9-]+)/gi, 'or FDA at $1')
+      .replace(/or\s+(www\.[^\s]+)/gi, 'or visit $1');
+
+    // Split into lines and clean each line
+    const lines = formatted.split('\n');
+    const cleanedLines = lines.map(line => {
+      line = line.trim();
+      
+      // Skip empty lines
+      if (!line) return '';
+      
+      // Capitalize section headers
+      if (line.endsWith(':') && line.length < 50) {
+        line = line.charAt(0).toUpperCase() + line.slice(1).toLowerCase();
+        line = line.replace(/\b\w/g, l => l.toUpperCase()); // Title case
+      } else if (line.length > 0) {
+        // Capitalize first letter of regular lines
+        line = line.charAt(0).toUpperCase() + line.slice(1);
+      }
+      
+      return line;
+    });
+
+    // Rejoin and final cleanup
+    formatted = cleanedLines
+      .filter(line => line.length > 0) // Remove empty lines
+      .join('\n')
+      .replace(/\n{3,}/g, '\n\n') // Replace multiple newlines with double newlines
+      .trim();
+
+    return formatted;
+  }
+
+  // Format indications/usage text specifically
+  formatIndicationsText(text) {
+    // Look for common indication patterns
+    text = text
+      .replace(/is indicated for/gi, 'is indicated for:')
+      .replace(/used to treat/gi, 'used to treat:')
+      .replace(/treatment of/gi, 'treatment of:')
+      .replace(/indicated in/gi, 'indicated for:');
+
+    // Extract key usage information
+    const usagePatterns = [
+      /(?:indicated for|used to treat|treatment of):?\s*([^.]+)/gi,
+      /is a[^.]*indicated for\s+([^.]+)/gi,
+      /used in the treatment of\s+([^.]+)/gi
+    ];
+
+    let mainUsage = '';
+    for (const pattern of usagePatterns) {
+      const match = text.match(pattern);
+      if (match && match[0].length > mainUsage.length) {
+        mainUsage = match[0];
+        break;
+      }
+    }
+
+    if (mainUsage) {
+      text = `INDICATED FOR:\n${mainUsage.replace(/^[^:]*:?\s*/i, '').trim()}\n\n${text}`;
+    }
+
+    return text;
+  }
+
+  // Format adverse reactions text specifically
+  formatAdverseReactionsText(text) {
+    // Handle the specific format like your example
+    text = text
+      // Clean up the common reactions part
+      .replace(/Most common adverse reactions reported at an incidence ≥(\d+)% are\s*/gi, 'Most Common Side Effects (≥$1% incidence):\n• ')
+      .replace(/,\s*and\s+/gi, '\n• ')
+      .replace(/,\s+/g, '\n• ')
+      // Format contact information better
+      .replace(/To report SUSPECTED ADVERSE REACTIONS,?\s*/gi, '\n\nTo Report Side Effects:\n')
+      .replace(/contact\s+([^,]+)\s+at\s+([0-9-]+)/gi, '• Contact $1: $2')
+      .replace(/or\s+FDA\s+at\s+([0-9-]+)/gi, '\n• FDA: $1')
+      .replace(/or\s+(www\.[^\s]+)/gi, '\n• Online: $1');
+
+    // Clean up clinical trials section
+    text = text
+      .replace(/Clinical Trials Experience\s*/gi, '\n\nClinical Trials Experience:\n')
+      .replace(/Because clinical trials are conducted under widely varying conditions,?\s*/gi, 'Note: Clinical trial results may vary due to different study conditions. ');
+
+    return text;
+  }
+
+  // Format warnings text specifically
+  formatWarningsText(text) {
+    // Handle contraindications
+    text = text
+      .replace(/CONTRAINDICATIONS\s*/gi, 'CONTRAINDICATIONS:\n')
+      .replace(/is contraindicated in/gi, 'This medication should not be used in:')
+      .replace(/may cause fetal harm/gi, 'may cause harm to unborn babies')
+      // Format pregnancy warnings
+      .replace(/contraindicated in pregnancy/gi, 'not safe during pregnancy')
+      .replace(/If this drug is used during pregnancy,?\s*/gi, '\n\nImportant: If used during pregnancy, ')
+      .replace(/treatment should be discontinued/gi, 'stop treatment immediately')
+      .replace(/patient apprised of the potential haza/gi, 'inform patient of potential hazards');
+
+    return text;
+  }
+
+  // New method to extract specific usage information from FDA text
+  extractSpecificUsageInfo(text) {
+    // Enhanced patterns to find specific usage/treatment information
+    const usagePatterns = [
+      // Direct indication statements
+      /(?:is indicated for|indicated for the treatment of)\s*([^.]+)/gi,
+      // Used to treat patterns
+      /(?:used to treat|treatment of|therapy for)\s*([^.]+)/gi,
+      // Management patterns
+      /(?:management of|prescribed for)\s*([^.]+)/gi,
+      // Relief patterns
+      /(?:relief of|relieves)\s*([^.]+)/gi,
+      // Prevention patterns
+      /(?:prevention of|prevents)\s*([^.]+)/gi
+    ];
+
+    let bestUsage = '';
+    let highestScore = 0;
+
+    for (const pattern of usagePatterns) {
+      const matches = [...text.matchAll(pattern)];
+      
+      for (const match of matches) {
+        if (match[1]) {
+          let usage = match[1].trim();
+          
+          // Score based on content quality
+          let score = 1;
+          
+          // Prefer shorter, more focused descriptions
+          if (usage.length < 200) score += 2;
+          if (usage.length < 100) score += 1;
+          
+          // Bonus for medical terminology
+          const medicalTerms = /(?:pain|infection|inflammation|fever|hypertension|diabetes|depression|anxiety|cholesterol)/gi;
+          const medicalMatches = [...usage.matchAll(medicalTerms)];
+          score += medicalMatches.length;
+          
+          // Penalty for incomplete sentences
+          if (!usage.match(/[.!?]$/)) score -= 1;
+          
+          if (score > highestScore) {
+            highestScore = score;
+            bestUsage = usage;
+          }
+        }
+      }
+    }
+
+    // Clean up the best usage found
+    if (bestUsage) {
+      bestUsage = bestUsage
+        .replace(/\s+/g, ' ')
+        .replace(/[,;]\s*$/, '') // Remove trailing commas/semicolons
+        .trim();
+      
+      // Ensure it ends with proper punctuation
+      if (!bestUsage.match(/[.!?]$/)) {
+        bestUsage += '.';
+      }
+      
+      // Capitalize first letter
+      if (bestUsage.length > 0) {
+        bestUsage = bestUsage.charAt(0).toUpperCase() + bestUsage.slice(1);
+      }
+    }
+
+    return bestUsage;
+  }
+
+  // Extract comprehensive usage information from multiple FDA fields
+  extractComprehensiveUsage(drug) {
+    const usageFields = [
+      'indications_and_usage',
+      'clinical_pharmacology', 
+      'description',
+      'mechanism_of_action',
+      'pharmacodynamics'
+    ];
+
+    let bestUsage = '';
+    let usageScore = 0;
+
+    for (const field of usageFields) {
+      if (drug[field] && drug[field].length > 0) {
+        const text = drug[field][0];
+        
+        // Score based on presence of key usage indicators
+        let score = 0;
+        const usageIndicators = [
+          /indicated for/gi,
+          /used to treat/gi,
+          /treatment of/gi,
+          /therapy for/gi,
+          /management of/gi,
+          /prescribed for/gi
+        ];
+
+        usageIndicators.forEach(pattern => {
+          if (pattern.test(text)) score += 1;
+        });
+
+        // Prefer shorter, more focused descriptions for usage
+        if (text.length < 1000) score += 1;
+        if (text.length < 500) score += 1;
+
+        if (score > usageScore) {
+          usageScore = score;
+          let processedText = text.replace(/\s+/g, ' ').trim();
+          processedText = this.formatFDAMedicationText(processedText, 'indications');
+          bestUsage = processedText.length > 800 ? processedText.substring(0, 800) + '...' : processedText;
+        }
+      }
+    }
+
+    return bestUsage || 'Consult healthcare provider for indications and proper usage.';
   }
 
   extractContextualInfo(text, medicationName) {
@@ -762,6 +1054,170 @@ class MedicationInfoService {
     }
     
     return null;
+  }
+
+  /**
+   * Use AI chatbot as a fallback to generate medication information
+   * when FDA and other medical databases don't have information
+   */
+  async getAIChatbotMedicationInfo(medicationName) {
+    try {
+      console.log(`Using AI chatbot fallback for medication: ${medicationName}`);
+      
+      // Enhanced prompt with specific focus on "used to treat" information
+      const prompt = `Please provide comprehensive medication information for "${medicationName}".
+
+IMPORTANT: Focus especially on what this medication is "used to treat" - provide clear, detailed therapeutic indications.
+
+I need accurate medical information including:
+
+1. Generic name and common brand names
+2. DETAILED therapeutic indications - what conditions/diseases this treats (be very specific)
+3. Common and serious side effects
+4. Important warnings, contraindications, and precautions
+5. Dosage forms available
+6. Your confidence level in this information
+
+Please format your response as a JSON object with these exact keys:
+- genericName: (string - chemical/generic name)
+- brandNames: (array of common brand names)
+- usedFor: (DETAILED description starting with "This medication is used to treat..." - be specific about conditions, symptoms, or diseases it treats)
+- sideEffects: (comprehensive list of side effects, both common and serious)
+- warnings: (important warnings, contraindications, drug interactions)
+- dosageForm: (tablets, capsules, injection, cream, etc.)
+- confidence: (number 0.1-1.0, use 0.8+ only for very well-known medications)
+
+CRITICAL: For "usedFor" field, be very specific about therapeutic indications. Examples:
+- "This medication is used to treat high blood pressure (hypertension) and heart failure..."
+- "This medication is used to treat bacterial infections such as pneumonia, urinary tract infections..."
+- "This medication is used to treat depression and anxiety disorders..."
+
+Only provide information for real medications. If uncertain or if this isn't a real medication, set confidence to 0.1.`;
+
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: "You are a medical information specialist. Your primary focus is providing clear therapeutic indications (what medications are used to treat). Be precise about medical conditions and include appropriate healthcare disclaimers."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        temperature: 0.2, // Lower temperature for more consistent medical information
+        max_tokens: 1200 // Increased for more detailed usage information
+      });
+
+      const responseText = completion.choices[0].message.content.trim();
+      
+      // Try to parse JSON response
+      let aiData;
+      try {
+        // Extract JSON from response if it's wrapped in text
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        const jsonText = jsonMatch ? jsonMatch[0] : responseText;
+        aiData = JSON.parse(jsonText);
+      } catch (parseError) {
+        console.error('Failed to parse AI response as JSON:', parseError);
+        return null;
+      }
+
+      // Validate and format the AI response
+      if (!aiData || typeof aiData !== 'object') {
+        console.error('AI response is not a valid object');
+        return null;
+      }
+
+      // Format the response to match our medication info structure
+      const formattedInfo = {
+        name: medicationName,
+        genericName: aiData.genericName || 'Information generated by AI assistant',
+        brandNames: Array.isArray(aiData.brandNames) ? aiData.brandNames : ['AI-generated information'],
+        strength: 'Consult prescription label or healthcare provider',
+        usedFor: this.formatAIUsedFor(aiData.usedFor) || 'Please consult your healthcare provider for medication indications and proper usage instructions.',
+        sideEffects: this.formatAISideEffects(aiData.sideEffects) || 'Please consult your healthcare provider for potential side effects.',
+        warnings: this.formatAIWarnings(aiData.warnings) || 'Follow your healthcare provider\'s instructions exactly. Take only as prescribed.',
+        dosageForm: aiData.dosageForm || 'Consult prescription label',
+        schedule: 'Follow prescription instructions exactly',
+        confidence: Math.min(Math.max(aiData.confidence || 0.5, 0.1), 0.8), // Cap AI confidence at 0.8
+        source: 'AI_Assistant',
+        dataSource: 'ai_fallback',
+        searchedAt: new Date().toISOString(),
+        note: 'Information generated by AI assistant. Please verify with healthcare provider or official medical sources.',
+        disclaimer: 'This information was generated by an AI assistant and should not replace professional medical advice. Always consult with a healthcare provider.'
+      };
+
+      console.log(`AI chatbot provided information for ${medicationName} with confidence ${formattedInfo.confidence}`);
+      return formattedInfo;
+
+    } catch (error) {
+      console.error('Error getting AI chatbot medication info:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Format AI-generated "used for" information with better structure
+   * Ensures clear "used to treat" information is displayed properly
+   */
+  formatAIUsedFor(text) {
+    if (!text) return null;
+    
+    let formatted = text.trim();
+    
+    // Ensure it starts with proper therapeutic indication language
+    if (!formatted.toLowerCase().startsWith('this medication is used to treat') && 
+        !formatted.toLowerCase().startsWith('used to treat') &&
+        !formatted.toLowerCase().startsWith('indicated for')) {
+      // If it doesn't start properly, add the prefix
+      formatted = `This medication is used to treat: ${formatted}`;
+    }
+    
+    // Clean up common AI response patterns
+    formatted = formatted
+      .replace(/^(This medication is )?used to treat:?\s*/i, 'This medication is used to treat: ')
+      .replace(/^(This (?:drug|medicine) is )?indicated for:?\s*/i, 'This medication is used to treat: ')
+      .replace(/\s+/g, ' ') // Clean up extra spaces
+      .trim();
+
+    // Ensure proper sentence structure
+    if (formatted && !formatted.endsWith('.') && !formatted.endsWith('!') && !formatted.endsWith('?')) {
+      formatted += '.';
+    }
+    
+    // Add medical disclaimer if not present
+    if (!formatted.toLowerCase().includes('consult') && !formatted.toLowerCase().includes('healthcare')) {
+      formatted += '\n\nImportant: Always consult with your healthcare provider for proper medication usage and dosing instructions.';
+    }
+    
+    return this.formatMedicationText(formatted);
+  }
+
+  /**
+   * Format AI-generated side effects information
+   */
+  formatAISideEffects(text) {
+    if (!text) return null;
+    
+    let formatted = text;
+    
+    // Add reporting disclaimer
+    if (!formatted.toLowerCase().includes('report') && !formatted.toLowerCase().includes('contact')) {
+      formatted += '\n\nImportant: Report any unusual or severe side effects to your healthcare provider immediately.';
+    }
+    
+    return this.formatAdverseReactionsText(formatted);
+  }
+
+  /**
+   * Format AI-generated warnings information
+   */
+  formatAIWarnings(text) {
+    if (!text) return null;
+    
+    return this.formatWarningsText(text);
   }
 
   getDefaultMedicationInfo(medicationName) {
@@ -1785,6 +2241,41 @@ app.use((error, req, res, next) => {
     error: 'Internal server error',
     details: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
   });
+});
+
+// Test endpoint for AI chatbot fallback
+app.post('/api/test-ai-fallback', async (req, res) => {
+  try {
+    const { medicationName } = req.body;
+    
+    if (!medicationName) {
+      return res.status(400).json({ error: 'Medication name is required' });
+    }
+
+    console.log(`Testing AI fallback for medication: ${medicationName}`);
+    
+    const medicationService = new MedicationInfoService();
+    const result = await medicationService.getAIChatbotMedicationInfo(medicationName);
+    
+    if (result) {
+      res.json({
+        success: true,
+        medication: result
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: 'AI could not generate information for this medication'
+      });
+    }
+  } catch (error) {
+    console.error('Error testing AI fallback:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error.message : 'Something went wrong'
+    });
+  }
 });
 
 // Start server
