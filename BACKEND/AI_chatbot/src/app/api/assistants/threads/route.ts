@@ -19,6 +19,8 @@ const ALLOWED_ORIGINS = new Set([
   "http://localhost:5001",
   "http://localhost:80",
   "http://localhost:8080",
+  "https://im-connected-production.up.railway.app",
+  "https://scanner-service.up.railway.app",
 ]);
 
 function makeCorsHeaders(origin: string | null) {

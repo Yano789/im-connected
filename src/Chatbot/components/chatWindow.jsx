@@ -125,8 +125,17 @@ const ChatWindow = ({
   }, []);
 
   const sendMessage = async (text) => {
+    // Check if AI chatbot service is available
+    if (!API_ENDPOINTS.AI_CHATBOT_THREADS(threadId)) {
+      console.error('AI Chatbot API is not available in this environment');
+      // Add a message to the chat indicating the service is unavailable
+      appendMessage("assistant", "I'm sorry, but the AI chatbot service is currently unavailable. Please try again later or contact support.");
+      setInputDisabled(false);
+      return;
+    }
+
     const response = await fetch(
-      `http://localhost:3000/api/assistants/threads/${threadId}/messages`,
+      API_ENDPOINTS.AI_CHATBOT_THREADS(threadId),
       {
         method: "POST",
         body: JSON.stringify({
@@ -139,8 +148,15 @@ const ChatWindow = ({
   };
 
   const submitActionResult = async (runId, toolCallOutputs) => {
+    // Check if AI chatbot service is available
+    if (!API_ENDPOINTS.AI_CHATBOT_ACTIONS(threadId)) {
+      console.error('AI Chatbot API is not available in this environment');
+      setInputDisabled(false);
+      return;
+    }
+
     const response = await fetch(
-      `http://localhost:3000/api/assistants/threads/${threadId}/actions`,
+      API_ENDPOINTS.AI_CHATBOT_ACTIONS(threadId),
       {
         method: "POST",
         headers: {

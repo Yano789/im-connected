@@ -11,6 +11,13 @@ const SCANNER_API_BASE_URL = typeof window !== 'undefined' &&
   ? 'http://localhost:3001'
   : 'https://scanner-service.up.railway.app';
 
+// AI Chatbot API configuration - for OpenAI assistant functionality
+// In production, use the Railway AI chatbot service URL
+const AI_CHATBOT_API_BASE_URL = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ? 'http://localhost:3000'
+  : 'https://ai-chatbot.up.railway.app';
+
 // API endpoints
 export const API_ENDPOINTS = {
   // User endpoints
@@ -70,6 +77,10 @@ export const API_ENDPOINTS = {
   SCANNER_HEALTH: SCANNER_API_BASE_URL ? `${SCANNER_API_BASE_URL}/health` : null,
   SCANNER_SCAN_MEDICATION: SCANNER_API_BASE_URL ? `${SCANNER_API_BASE_URL}/scan-medication` : null,
   
+  // AI Chatbot API endpoints (OpenAI assistant functionality)
+  AI_CHATBOT_THREADS: (threadId) => AI_CHATBOT_API_BASE_URL ? `${AI_CHATBOT_API_BASE_URL}/api/assistants/threads/${encodeURIComponent(threadId)}/messages` : null,
+  AI_CHATBOT_ACTIONS: (threadId) => AI_CHATBOT_API_BASE_URL ? `${AI_CHATBOT_API_BASE_URL}/api/assistants/threads/${encodeURIComponent(threadId)}/actions` : null,
+  
   // Language endpoint
   USER_LANGUAGE: `${API_BASE_URL}/api/v1/user/language`,
   
@@ -86,4 +97,4 @@ export const API_ENDPOINTS = {
   TRANSLATE: `${API_BASE_URL}/api/v1/lang`,
 };
 
-export { API_BASE_URL, SCANNER_API_BASE_URL };
+export { API_BASE_URL, SCANNER_API_BASE_URL, AI_CHATBOT_API_BASE_URL };
