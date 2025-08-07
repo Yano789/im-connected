@@ -31,3 +31,5 @@ node_modules
 .env.PREVIOUS
 /BACKEND/AI_chatbot/openai-assistants-quickstart/.env
 /BACKEND/AI_chatbot/src/.next/
+BACKEND/AI_chatbot/src/.next/
+BACKEND/Forum/src/__test__/.env.test

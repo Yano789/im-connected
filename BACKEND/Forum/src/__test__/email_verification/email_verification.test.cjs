@@ -5,7 +5,6 @@ jest.mock("./../../domains/otp/controller.cjs")
 const User = require("./../../domains/user/model.cjs");
 const {sendOTP,verifyOTP,deleteOTP} = require("./../../domains/otp/controller.cjs");
 const {sendVerificationOTPEmail,verifyUserEmail} = require("./../../domains/email_verification/controller.cjs");
-const { verify } = require("jsonwebtoken");
 
 
 describe("sendVerifiactionOTPEmail",()=>{

@@ -6,7 +6,7 @@ jest.mock("./../../utils/createToken.cjs")
 const User = require("./../../domains/user/model.cjs")
 const { hashData, verifyHashedData } = require("./../../utils/hashData.cjs")
 const createToken = require("./../../utils/createToken.cjs")
-const { createNewUser,authenticateUser, updateUserPreferences,getUser } = require("./../../domains/user/controller.cjs")
+const { createNewUser,authenticateUser, updateUserPreferences,getUser ,updateUserDetails} = require("./../../domains/user/controller.cjs")
 
 
 describe("createNewUser", () => {
@@ -40,6 +40,63 @@ describe("createNewUser", () => {
         expect(saveMock).toHaveBeenCalled();
         expect(user.password).toBe("hashedpassword");
     })
+
+    test("should throw error if email already exists", async () => {
+    User.findOne
+      .mockResolvedValueOnce({ email: "exists@example.com" }) // email exists
+      .mockResolvedValueOnce(null) // username check (won't reach)
+      .mockResolvedValueOnce(null);
+
+    const mockData = {
+      name: "John Doe",
+      username: "johndoe",
+      email: "exists@example.com",
+      password: "password123",
+      number: "1234567890",
+    };
+
+    await expect(createNewUser(mockData)).rejects.toThrow(
+      "User with provided email already exists"
+    );
+  });
+
+  test("should throw error if username already taken", async () => {
+    User.findOne
+      .mockResolvedValueOnce(null) // email not exists
+      .mockResolvedValueOnce({ username: "johndoe" }) // username exists
+      .mockResolvedValueOnce(null);
+
+    const mockData = {
+      name: "John Doe",
+      username: "johndoe",
+      email: "john@example.com",
+      password: "password123",
+      number: "1234567890",
+    };
+
+    await expect(createNewUser(mockData)).rejects.toThrow(
+      "Username has been taken"
+    );
+  });
+
+  test("should throw error if mobile number already taken", async () => {
+    User.findOne
+      .mockResolvedValueOnce(null) // email not exists
+      .mockResolvedValueOnce(null) // username not exists
+      .mockResolvedValueOnce({ number: "1234567890" }); // number exists
+
+    const mockData = {
+      name: "John Doe",
+      username: "johndoe",
+      email: "john@example.com",
+      password: "password123",
+      number: "1234567890",
+    };
+
+    await expect(createNewUser(mockData)).rejects.toThrow(
+      "Mobile number has been taken"
+    );
+  });
 })
 
 
@@ -185,4 +242,134 @@ describe("getUser", () => {
         User.findOne.mockResolvedValueOnce(null);
         await expect(getUser("nonexistentuser")).rejects.toThrow("User not found");
     });
+});
+
+
+describe("updateUserDetails", () => {
+  const mockUser = {
+    _id: "user123",
+    name: "John",
+    username: "johndoe",
+    number: "+6512341234",
+    email: "johndoe@example.com",
+    password: "hashedpassword",
+    verified: true,
+    threadId: null,
+    preferences: {
+      preferredLanguage: "en",
+      textSize: "Medium",
+      contentMode: "Default",
+      topics: ["Mental Disability"]
+    }
+  };
+
+  const updatedUser = {
+    _id: "user123",
+    name: "Jane",
+    username: "janedoe",
+    number: "+6512341235",
+    email: "janedoe@example.com",
+    password: "hashedpassword",
+    verified: true,
+    threadId: null,
+    preferences: {
+      preferredLanguage: "en",
+      textSize: "Medium",
+      contentMode: "Default",
+      topics: ["Mental Disability"]
+    }
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test("should update user details and return token", async () => {
+
+  User.findOne.mockResolvedValueOnce(mockUser);
+
+
+  User.findOne
+    .mockResolvedValueOnce(null)  // check newUsername
+    .mockResolvedValueOnce(null)  // check email
+    .mockResolvedValueOnce(null); // check number
+
+  User.findOneAndUpdate.mockResolvedValue(updatedUser);
+
+  createToken.mockResolvedValue("mock.jwt.token");
+
+  const data = {
+    name: "Jane",
+    username: "johndoe",
+    newUsername: "janedoe",
+    number: "+6512341235",
+    email: "janedoe@example.com"
+  };
+
+  const result = await updateUserDetails(data);
+
+
+
+  expect(User.findOne).toHaveBeenCalledTimes(4);
+
+  expect(User.findOne).toHaveBeenNthCalledWith(1, { username: "johndoe" });     // get current user
+  expect(User.findOne).toHaveBeenNthCalledWith(2, { username: "janedoe" });     // newUsername conflict check
+  expect(User.findOne).toHaveBeenNthCalledWith(3, { email: "janedoe@example.com" }); // email conflict check
+  expect(User.findOne).toHaveBeenNthCalledWith(4, { number: "+6512341235" });   // number conflict check
+
+  expect(User.findOneAndUpdate).toHaveBeenCalledWith(
+    { username: "johndoe" },
+    {
+      name: "Jane",
+      username: "janedoe",
+      email: "janedoe@example.com",
+      number: "+6512341235"
+    },
+    { new: true }
+  );
+
+  expect(createToken).toHaveBeenCalledWith({
+    userId: updatedUser._id,
+    email: updatedUser.email,
+    username: updatedUser.username
+  });
+
+  expect(result).toEqual({ token: "mock.jwt.token", newUser: updatedUser });
+});
+
+
+test("should throw error if current user not found",async()=>{
+    User.findOne.mockResolvedValue(null);
+
+    const data = {
+        name:"Jane",
+        username:"nil",
+        newUsername:"janedoe",
+        number:"+6512341235",
+        email:"janedoe@example.com"
+    }
+
+    await expect(updateUserDetails(data)).rejects.toThrow("User not found");
+})
+
+test("should throw error if newUsername, email or number already used", async () => {
+    User.findOne
+      .mockResolvedValueOnce(mockUser)      // current user found
+      .mockResolvedValueOnce({})             // newUsername conflict found (non-null)
+      .mockResolvedValueOnce({})             // email conflict found
+      .mockResolvedValueOnce({});            // number conflict found
+
+    const data = {
+      name: "Jane",
+      username: "johndoe",
+      newUsername: "takenUsername",
+      number: "+6512341235",
+      email: "takenemail@example.com"
+    };
+
+    await expect(updateUserDetails(data)).rejects.toThrow(
+      /Username is used|Email is used|Number is used/
+    );
+  });
+
 });

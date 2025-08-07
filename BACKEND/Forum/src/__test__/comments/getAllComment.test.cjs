@@ -1,5 +1,4 @@
 jest.mock("./../../domains/comment/model.cjs");
-jest.mock("./../../domains/post/model.cjs");
 jest.mock("./../../utils/buildNestedComments.cjs");
 jest.mock("./../../domains/user/model.cjs");
 jest.mock("./../../domains/translation/controller.cjs");
@@ -7,7 +6,6 @@ jest.mock("./../../domains/translation/controller.cjs");
 const { getAllComments } = require("./../../domains/comment/controller.cjs");
 
 const Comment = require("./../../domains/comment/model.cjs");
-const { Post } = require("./../../domains/post/model.cjs");
 const createNestedComment = require("./../../utils/buildNestedComments.cjs");
 const User = require("./../../domains/user/model.cjs");
 const translate = require("./../../domains/translation/controller.cjs");

@@ -1,11 +1,12 @@
+
 require("dotenv").config();
+require("../setUpMongo.cjs"); // Mongo Memory Server setup
 const request = require("supertest");
-const app = require("../../app.cjs"); //express app
-const User = require("../../domains/user/model.cjs");
-const Comment = require("../../domains/comment/model.cjs")
-const { Post } = require("../../domains/post/model.cjs")
+const app = require("../../../app.cjs"); //express app
+const User = require("../../../domains/user/model.cjs");
+const Comment = require("../../../domains/comment/model.cjs")
+const { Post } = require("../../../domains/post/model.cjs")
 const jwt = require("jsonwebtoken");
-require("./setUpMongo.cjs"); // Mongo Memory Server setup
 
 describe("Create a comment to a post", () => {
     let token

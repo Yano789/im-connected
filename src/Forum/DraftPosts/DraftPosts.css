@@ -10,7 +10,7 @@
   justify-content: flex-start;
   gap: 0.5rem;
   font-size: 1.25rem; 
-  color: #1e1e1e;
+  color: var(--border-2);
 }
 
 .draftsMain {
@@ -28,7 +28,7 @@
   min-height: 100vh;
   position: relative;
   box-shadow: 5px 5px 4px rgba(0, 0, 0, 0.25);
-  background-color: #fffdf9;
+  background-color: var(--border-1);
   border-width: 1px;
   box-sizing: border-box;
   display: flex;
@@ -37,9 +37,9 @@
   justify-content: flex-start;
   text-align: left;
   font-size: 1rem;
-  color: black;
+  color: var(--border-2);
   padding: 1.25rem 1.25rem;
   border-radius: 5px;
   border-style: solid;
-  border-color: black;
+  border-color: var(--border-2);
 }

@@ -9,7 +9,7 @@
   top: 50%;
   right: 15%;
   width: 500px;
-  background: #FFFDF9;
+  background: var(--border-1);
   box-shadow: 0px 5px 4px rgba(0, 0, 0, 0.25);
   border-radius: 20px;
   padding: 30px;
@@ -37,7 +37,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  color: #2d2d2d;
+  color: var(--text-colour);
   font-size: 32px;
   font-family: "Poppins", sans-serif;
   font-weight: 500;
@@ -53,7 +53,7 @@
 }
 
 .auth-subtitle {
-  color: #333333;
+  color: var(--text-colour);
   font-size: 16px;
   font-family: "Poppins", sans-serif;
   font-weight: 400;
@@ -63,7 +63,7 @@
 
 .auth-resend {
   font-size: 13px;
-  color: #333;
+  color: var(--text-colour);
 }
 
 .auth-resend-link {
@@ -96,13 +96,13 @@
 
 .auth-code-box:focus {
   outline: none;
-  border-color: #C8B8DB;
+  border-color: var(--button-colour-1);
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .auth-signup-button {
   padding: 20px 62px;
-  background: #c8b8db;
+  background: var(--button-colour-1);
   border-radius: 16px;
   display: flex;
   justify-content: center;
@@ -114,7 +114,7 @@
 }
 
 .auth-signup-button:hover {
-  background: #b39ccc;
+  background: var(--button-colour-1-onhover);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transform: translateY(-1px);
   transition: all 0.2s ease;
@@ -150,9 +150,9 @@
 }
 
 .status-message.success {
-  color: #10b981;
+  color: var(--success-text);
 }
 
 .status-message.error {
-  color: #ef4444;
+  color: var(--error-text);
 }
