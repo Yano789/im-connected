@@ -57,6 +57,7 @@ services:
       - NODE_ENV=${NODE_ENV:-production}
       - SCANNER_PORT=${SCANNER_PORT}
       - MONGODB_URI=${MONGODB_URI}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
     ports:
       - "3001:3001"
     depends_on:

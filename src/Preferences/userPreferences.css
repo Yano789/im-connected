@@ -126,7 +126,7 @@
 }
 
 .language-btn.selected {
-  background: var(--button-colour-1);
+  background: var(--button-colour-1-onselect);
   color: var(--border-2);
 }
 
@@ -134,10 +134,7 @@
   opacity: 0.8;
   background: var(--button-colour-1-onhover);
 }
-.language-btn:active {
-  opacity: 0.8;
-  background: var(--button-colour-1-onselect);
-}
+
 
 .text-size-options {
   display: flex;
@@ -323,8 +320,8 @@
 }
 
 .topic-btn.selected {
-  background: var(--accent-colour-1);
-}
+  background: var(--button-colour-1-onhover);
+} `
 
 .topic-btn:hover {
   opacity: 0.8;
