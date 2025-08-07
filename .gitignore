@@ -38,4 +38,4 @@ BACKEND/Forum/src/__test__/integration_test/.env.test
 BACKEND/Forum/src/__test__/integration_test/.env.test
 BACKEND/Forum/src/__test__/integration_test/.env.test
 *.env.test
-
+BACKEND/Forum/src/config/service-account-key.json

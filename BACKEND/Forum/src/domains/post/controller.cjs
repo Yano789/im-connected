@@ -7,45 +7,90 @@ const translate = require("./../../domains/translation/controller.cjs")
 const { v2: cloudinary } = require("cloudinary");
 const savedPost = require("../savedPosts/model.cjs")
 const addCacheBuster = require("./../../utils/cacheBuster.cjs")
+const path = require("path");
+const crypto = require("crypto");
+const { encrypt } = require("../../utils/crypt.cjs");
+const { gcsClient } = require("../../config/googleConfig.cjs");
 
 
 
 const createPost = async (data) => {
-    try {
-        const { title, content, tags, username, draft, media } = data;
-        const existingUsername = await User.findOne({ username });
+  const uploadedFiles = []; // Track successful uploads
+  try {
+    const { title, content, tags, username, draft, media = [] } = data;
 
-        if (!existingUsername) {
-            throw new Error("Username does not exist");
-        }
+    const user = await User.findOne({ username });
+    if (!user) throw new Error("Username does not exist");
 
-        const now = Date.now();
-        const createdPostId = await hashData(username + now);
+    const now = Date.now();
+    const postId = await hashData(username + now);
 
-        const newPost = new Post({
-            postId: createdPostId,
-            title,
-            content,
-            username,
-            tags,
-            createdAt: now,
-            draft: draft,
-            media: media
+    const processedMedia = await Promise.all(
+      media.map(async (file) => {
+        const encryptedBuffer = encrypt(file.buffer);
+        const folder = "forum_uploads";
+        const ext = path.extname(file.originalname).slice(1);
+        const base = path.basename(file.originalname, `.${ext}`);
+        const randomSuffix = crypto.randomBytes(6).toString("hex");
+        const publicId = `${folder}/${Date.now()}-${base}-${randomSuffix}.${ext}`;
+        const fileRef = gcsClient.bucket.file(publicId);
+
+        await fileRef.save(encryptedBuffer, {
+          metadata: {
+            contentType: file.mimetype,
+            metadata: {
+              originalName: file.originalname,
+              encrypted: "true",
+              uploadedBy: username,
+              uploadTime: new Date().toISOString(),
+            },
+          },
+          resumable: false,
+          validation: "crc32c",
         });
 
-        const createdPost = await newPost.save();
-        if (createdPost.media && createdPost.media.length > 0) {
-            createdPost.media = createdPost.media.map(file => ({
-                ...file,
-                url: addCacheBuster(file.url),
-            }));
-        }
-        return createdPost;
-    } catch (error) {
-        throw error;
-    }
-};
+        uploadedFiles.push(publicId); // Track uploaded GCS file
 
+        return {
+          public_id: publicId,
+          resource_type: file.mimetype.startsWith("video") ? "video" : "image",
+          original_filename: file.originalname,
+          mimetype: file.mimetype,
+          format: ext,
+          url: addCacheBuster(`/media/${publicId}`),
+        };
+      })
+    );
+
+    const newPost = new Post({
+      postId,
+      title,
+      content,
+      username,
+      tags,
+      createdAt: now,
+      draft,
+      media: processedMedia,
+    });
+
+    return await newPost.save();
+  } catch (error) {
+    // Clean up uploaded files from GCS on error
+    if (uploadedFiles.length > 0) {
+      await Promise.all(
+        uploadedFiles.map(async (publicId) => {
+          try {
+            await gcsClient.bucket.file(publicId).delete();
+          } catch (err) {
+            console.warn(`Failed to delete ${publicId}:`, err.message);
+          }
+        })
+      );
+    }
+
+    throw error;
+  }
+};
 const editDraft = async (data) => {
     try {
         const { postId, content, title, tags, username, draft, newMedia, mediaToRemove } = data;
