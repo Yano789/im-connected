@@ -25,10 +25,12 @@ dist-ssr
 
 # env
 **/openai-assistants-quickstart/.env
+BACKEND/Forum/src/test/integration_test/.env.test
 
 *.env
 node_modules
 .env.PREVIOUS
+.env.old
 /BACKEND/AI_chatbot/openai-assistants-quickstart/.env
 /BACKEND/AI_chatbot/src/.next/
 BACKEND/AI_chatbot/src/.next/

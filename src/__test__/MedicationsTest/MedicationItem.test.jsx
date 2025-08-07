@@ -1,77 +1,147 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import MedicationItem from '../../Medications/MedicationItem/MedicationItem';
 
+// Mock react-i18next
+vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+        t: (key) => key === 'No time set' ? 'No time set' : key,
+    }),
+}));
+
 // Test Data
-// Using the new data structure 
 const mockMedication = {
     id: 'med1',
     name: 'Metformin XR 500mg',
     dosages: [
-        { period: 'Morning', time: '10:00', taken: true },
-        { period: 'Evening', time: '18:00', taken: false }
+        { time: '10:00', taken: true },
+        { time: '18:00', taken: false },
+        { time: '', taken: false } // Test empty time
     ]
 };
 
-describe('MedicationItem Component (New Version)', () => {
+const defaultProps = {
+    medication: mockMedication,
+    onSelect: vi.fn(),
+    isSelected: false,
+    onToggleDose: vi.fn(),
+};
 
-    it('should render the medication name and formatted dosage times', () => {
-        render(
-            <MedicationItem 
-                medication={mockMedication} 
-                isSelected={false} 
-                onSelect={() => {}} 
-            />
-        );
+describe('MedicationItem Component (Updated Version)', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
 
+    it('should render the medication name', () => {
+        render(<MedicationItem {...defaultProps} />);
         expect(screen.getByText('Metformin XR 500mg')).toBeInTheDocument();
+    });
+
+    it('should format times to 12-hour AM/PM format', () => {
+        render(<MedicationItem {...defaultProps} />);
+        
         expect(screen.getByText('10:00 AM')).toBeInTheDocument();
         expect(screen.getByText('6:00 PM')).toBeInTheDocument();
     });
 
-    it('should correctly check the checkboxes based on the "taken" property', () => {
-        render(
-            <MedicationItem 
-                medication={mockMedication} 
-                isSelected={false} 
-                onSelect={() => {}} 
-            />
-        );
-        
-        const checkboxes = screen.getAllByRole('checkbox');
-        expect(checkboxes[0].checked).toBe(true);
-        expect(checkboxes[1].checked).toBe(false);
+    it('should display "No time set" for empty time values', () => {
+        render(<MedicationItem {...defaultProps} />);
+        expect(screen.getByText('No time set')).toBeInTheDocument();
     });
 
+    it('should render correct number of dosage rows', () => {
+        render(<MedicationItem {...defaultProps} />);
+        
+        const checkboxes = screen.getAllByRole('checkbox');
+        expect(checkboxes).toHaveLength(3); // Should match dosages array length
+    });
 
-    it('should call onSelect with the medication ID when the name container is clicked', () => {
-        const handleSelect = vi.fn(); // Create a spy function
+    it('should correctly set checkbox states based on taken property', () => {
+        render(<MedicationItem {...defaultProps} />);
+        
+        const checkboxes = screen.getAllByRole('checkbox');
+        expect(checkboxes[0]).toBeChecked(); // First dosage taken: true
+        expect(checkboxes[1]).not.toBeChecked(); // Second dosage taken: false
+        expect(checkboxes[2]).not.toBeChecked(); // Third dosage taken: false
+    });
 
+    it('should call onSelect with medication ID when name button is clicked', () => {
+        const handleSelect = vi.fn();
         render(
             <MedicationItem 
-                medication={mockMedication} 
-                isSelected={false} 
-                onSelect={handleSelect} 
+                {...defaultProps}
+                onSelect={handleSelect}
             />
         );
 
-        // In the new component, the whole name container is clickable
-        fireEvent.click(screen.getByText('Metformin XR 500mg').closest('.med-name-container'));
+        const nameButton = screen.getByText('Metformin XR 500mg');
+        fireEvent.click(nameButton);
 
         expect(handleSelect).toHaveBeenCalledTimes(1);
         expect(handleSelect).toHaveBeenCalledWith('med1');
     });
 
-    it('should have the "selected" class when isSelected is true', () => {
+    it('should call onToggleDose with correct parameters when checkbox is changed', () => {
+        const handleToggleDose = vi.fn();
+        render(
+            <MedicationItem 
+                {...defaultProps}
+                onToggleDose={handleToggleDose}
+            />
+        );
+
+        const checkboxes = screen.getAllByRole('checkbox');
+        
+        // Toggle first checkbox
+        fireEvent.click(checkboxes[0]);
+        expect(handleToggleDose).toHaveBeenCalledWith('med1', 0);
+        
+        // Toggle second checkbox
+        fireEvent.click(checkboxes[1]);
+        expect(handleToggleDose).toHaveBeenCalledWith('med1', 1);
+        
+        expect(handleToggleDose).toHaveBeenCalledTimes(2);
+    });
+
+    it('should apply selected class when isSelected is true', () => {
         const { container } = render(
             <MedicationItem 
-                medication={mockMedication} 
-                isSelected={true} 
-                onSelect={() => {}} 
+                {...defaultProps}
+                isSelected={true}
             />
         );
 
         const layoutDiv = container.querySelector('.med-item-layout');
-        expect(layoutDiv.classList.contains('selected')).toBe(true);
+        expect(layoutDiv).toHaveClass('selected');
+    });
+
+    it('should not apply selected class when isSelected is false', () => {
+        const { container } = render(
+            <MedicationItem 
+                {...defaultProps}
+                isSelected={false}
+            />
+        );
+
+        const layoutDiv = container.querySelector('.med-item-layout');
+        expect(layoutDiv).not.toHaveClass('selected');
+    });
+
+    it('should handle medication with no dosages', () => {
+        const medicationWithNoDosages = {
+            id: 'med2',
+            name: 'Test Medicine',
+            dosages: []
+        };
+
+        render(
+            <MedicationItem 
+                {...defaultProps}
+                medication={medicationWithNoDosages}
+            />
+        );
+
+        expect(screen.getByText('Test Medicine')).toBeInTheDocument();
+        expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
     });
 });
