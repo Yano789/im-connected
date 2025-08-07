@@ -5,6 +5,12 @@ const crypto = require("crypto");
 class GCSStorage {
   constructor(options) {
     this.options = options;
+    
+    // Validate that gcsClient and bucket are available
+    if (!options.gcsClient || !options.gcsClient.bucket) {
+      throw new Error('Google Cloud Storage client or bucket not properly initialized');
+    }
+    
     this.bucket = options.gcsClient.bucket;
     this.bucketName = options.gcsClient.bucketName;
   }

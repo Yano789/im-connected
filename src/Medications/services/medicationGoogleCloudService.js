@@ -7,7 +7,7 @@ import { API_BASE_URL } from '../../config/api';
 
 class MedicationGoogleCloudService {
     constructor() {
-        this.baseURL = `${API_BASE_URL}/api/medications`;
+        this.baseURL = `${API_BASE_URL}/api/v1/medication`;
     }
 
     /**

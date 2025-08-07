@@ -1,6 +1,6 @@
 const { Storage } = require('@google-cloud/storage');
 
-// Validate required environment variables with better error handling
+// Validate required environment variables
 if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
   console.error('❌ Missing GOOGLE_CLOUD_PROJECT_ID environment variable');
 }
@@ -66,12 +66,28 @@ const gcsClient = {
 
       return new Promise((resolve, reject) => {
         stream.on('error', reject);
-        stream.on('finish', () => {
-          resolve({
-            url: `gs://${gcsClient.bucketName}/${fileName}`,
-            public_id: fileName,
-            resource_type: mimeType.startsWith('video') ? 'video' : 'image',
-          });
+        stream.on('finish', async () => {
+          try {
+            // Generate signed URL for access
+            const [signedUrl] = await file.getSignedUrl({
+              version: 'v4',
+              action: 'read',
+              expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24 hours
+            });
+            
+            resolve({
+              url: signedUrl,
+              public_id: fileName,
+              resource_type: mimeType.startsWith('video') ? 'video' : 'image',
+            });
+          } catch (urlError) {
+            console.warn('Failed to generate signed URL, using gs:// URL:', urlError.message);
+            resolve({
+              url: `gs://${gcsClient.bucketName}/${fileName}`,
+              public_id: fileName,
+              resource_type: mimeType.startsWith('video') ? 'video' : 'image',
+            });
+          }
         });
         stream.end(buffer);
       });
@@ -105,6 +121,7 @@ const gcsClient = {
         return null;
       }
       
+      console.log("Generating signed URL for:", publicId);
       const file = gcsClient.bucket.file(publicId);
       const [signedUrl] = await file.getSignedUrl({
         version: 'v4',

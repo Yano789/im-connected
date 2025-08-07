@@ -10,7 +10,7 @@ class GoogleCloudStorageService {
   constructor() {
     this.forumBackendUrl = process.env.FORUM_BACKEND_URL || 'http://localhost:5001';
     
-    // Check for required environment variables with warnings instead of errors
+    // Check for required environment variables
     if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
       console.warn('⚠️ GOOGLE_CLOUD_PROJECT_ID environment variable is not set');
     }
@@ -22,20 +22,35 @@ class GoogleCloudStorageService {
     // Only initialize Google Cloud Storage client if we have the required variables
     if (process.env.GOOGLE_CLOUD_PROJECT_ID && process.env.GCS_BUCKET_NAME) {
       try {
-        this.storage = new Storage({
+        const storageConfig = {
           projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-          keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE,
-        });
+        };
+
+        // Support both key file and environment variable authentication
+        if (process.env.GOOGLE_CLOUD_KEY_JSON) {
+          // Use service account key from environment variable
+          console.log('🔑 Scanner: Using Google Cloud credentials from environment variable');
+          storageConfig.credentials = JSON.parse(process.env.GOOGLE_CLOUD_KEY_JSON);
+        } else if (process.env.GOOGLE_CLOUD_KEY_FILE) {
+          // Use service account key from file
+          console.log('🔑 Scanner: Using Google Cloud credentials from file:', process.env.GOOGLE_CLOUD_KEY_FILE);
+          storageConfig.keyFilename = process.env.GOOGLE_CLOUD_KEY_FILE;
+        } else {
+          // Try using default credentials
+          console.log('🔑 Scanner: Using default Google Cloud credentials');
+        }
+
+        this.storage = new Storage(storageConfig);
         
         this.bucket = this.storage.bucket(process.env.GCS_BUCKET_NAME);
-        console.log('✅ Google Cloud Storage client initialized successfully');
+        console.log(`✅ Scanner: Google Cloud Storage client initialized successfully with bucket: ${process.env.GCS_BUCKET_NAME}`);
       } catch (error) {
-        console.error('❌ Failed to initialize Google Cloud Storage client:', error.message);
+        console.error('❌ Scanner: Failed to initialize Google Cloud Storage client:', error.message);
         this.storage = null;
         this.bucket = null;
       }
     } else {
-      console.warn('⚠️ Google Cloud Storage client not initialized - missing environment variables');
+      console.warn('⚠️ Scanner: Google Cloud Storage client not initialized - missing environment variables');
       this.storage = null;
       this.bucket = null;
     }
@@ -46,6 +61,10 @@ class GoogleCloudStorageService {
    */
   async uploadImageDirect(imagePath) {
     try {
+      if (!this.bucket) {
+        throw new Error('Google Cloud Storage bucket not initialized. Check environment variables.');
+      }
+      
       console.log('Uploading image to Google Cloud Storage:', imagePath);
       
       const fileName = `scanner_uploads/${Date.now()}-${imagePath.split('/').pop().replace(/[^a-zA-Z0-9.-]/g, '_')}`;
@@ -93,7 +112,7 @@ class GoogleCloudStorageService {
       formData.append('medicationImage', imageStream);
       
       // Make request to Forum backend's upload endpoint
-      const response = await fetch(`${this.forumBackendUrl}/api/medications/upload-image`, {
+      const response = await fetch(`${this.forumBackendUrl}/api/v1/medication/upload-image`, {
         method: 'POST',
         body: formData,
         headers: {
@@ -138,6 +157,10 @@ class GoogleCloudStorageService {
    */
   async deleteImageDirect(publicId) {
     try {
+      if (!this.bucket) {
+        throw new Error('Google Cloud Storage bucket not initialized. Check environment variables.');
+      }
+      
       console.log('Deleting image from Google Cloud Storage:', publicId);
       
       const file = this.bucket.file(publicId);
@@ -161,7 +184,7 @@ class GoogleCloudStorageService {
     try {
       console.log('Deleting image from Google Cloud Storage via Forum backend:', publicId);
       
-      const response = await fetch(`${this.forumBackendUrl}/api/medications/delete-image`, {
+      const response = await fetch(`${this.forumBackendUrl}/api/v1/medication/delete-image`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
