@@ -1,7 +1,9 @@
 import React from 'react';
 import './UserInfoCard.css';
+import { useTranslation } from "react-i18next";
 
 function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, errors }) {
+      const {t} = useTranslation();
     
     // --- FOR EDIT MODE ---
     if (isEditing) {
@@ -9,17 +11,17 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, errors }
             <div className="user-card">
                 <div className="user-details">
                     <div className="detail-row edit-mode">
-                        <label htmlFor="name" className="detail-label">Name:</label>
+                        <label htmlFor="name" className="detail-label">{t("Name:")}</label>
                         <input type="text" id="name" name="name" value={user.name || ''} onChange={onChange} />
                         {errors.name && <p className="error-text">{errors.name}</p>}
                     </div>
                     <div className="detail-row edit-mode">
-                        <label htmlFor="username" className="detail-label">Username:</label>
+                        <label htmlFor="username" className="detail-label">{t("Username:")}</label>
                         <input type="text" id="username" name="username" value={user.username || ''} onChange={onChange} />
                         {errors.username && <p className="error-text">{errors.username}</p>}
                     </div>
                     <div className="detail-row edit-mode">
-                        <label htmlFor="email" className="detail-label">Email Address:</label>
+                        <label htmlFor="email" className="detail-label">{t("Email Address:")}</label>
                         <input 
                             type="email" 
                             id="email" 
@@ -31,7 +33,7 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, errors }
                         {errors.email && <p className="error-text">{errors.email}</p>}                    
                     </div>
                     <div className="detail-row edit-mode">
-                        <label htmlFor="number" className="detail-label">Phone Number:</label>
+                        <label htmlFor="number" className="detail-label">{t("Phone Number:")}</label>
                         <input 
                             type="tel" 
                             id="number" 
@@ -42,7 +44,7 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, errors }
                         {errors.number && <p className="error-text">{errors.number}</p>}
                     </div>
                 </div>
-                <button onClick={onSave} className="save-profile-button">Save Changes</button>
+                <button onClick={onSave} className="save-profile-button">{t("Save Changes")}</button>
             </div>
         );
     }
@@ -53,28 +55,28 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, errors }
             <div className="user-details">
                 <div className="detail-row">
                     <div>
-                        <span className="detail-label">Name:</span>
+                        <span className="detail-label">{t("Name:")}</span>
                         <span className="detail-value">{user.name}</span>
                     </div>
                     <button onClick={onEditClick} className="edit-icon-button">✏️</button>
                 </div>
                 <div className="detail-row">
                     <div>
-                        <span className="detail-label">Username:</span>
+                        <span className="detail-label">{t("Username:")}</span>
                         <span className="detail-value">{user.username}</span>
                     </div>
                      <button onClick={onEditClick} className="edit-icon-button">✏️</button>
                 </div>
                 <div className="detail-row">
                     <div>
-                        <span className="detail-label">Email Address:</span>
+                        <span className="detail-label">{t("Email Address:")}</span>
                         <span className="detail-value">{user.email}</span>
                     </div>
                      <button onClick={onEditClick} className="edit-icon-button">✏️</button>
                 </div>
                 <div className="detail-row">
                     <div>
-                        <span className="detail-label">Phone Number:</span>
+                        <span className="detail-label">{t("Phone Number:")}</span>
                         <span className="detail-value">{user.number}</span>
                     </div>
                      <button onClick={onEditClick} className="edit-icon-button">✏️</button>

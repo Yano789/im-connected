@@ -57,9 +57,9 @@ function SavedPostBody() {
       </div>
       <div className="forumBody">
         {loading ? (
-          <p>{("Loading")}</p>
+          <p>{t("Loading")}</p>
         ) : error ? (
-          <p>Error: {error}</p>
+          <p>{t("Error: {error}")}</p>
         ) : posts.length > 0 ? (
           posts.map((post) => (
             <ForumCard
@@ -88,7 +88,7 @@ function SavedPostBody() {
             />
           ))
         ) : (
-          <p>{("No Saved Posts")}</p>
+          <p>{t("No Saved Posts")}</p>
         )}
       </div>
     </div>

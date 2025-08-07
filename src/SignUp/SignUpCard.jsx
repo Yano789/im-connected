@@ -4,6 +4,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import SignUpPeople from "../assets/SignUpPeople.png";
 import "./SignUpCard.css";
+import { useTranslation } from "react-i18next";
+
+import { t } from "i18next";
 
 const validatePassword = (password) => {
   const errors = [];
@@ -42,6 +45,7 @@ const countries = [
 ];
 
 function SignUpCard() {
+  const {t} = useTranslation();
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [number, setNumber] = useState("");
@@ -66,7 +70,7 @@ function SignUpCard() {
     setStatus("");
 
     if (password !== confirmPassword) {
-      setStatus("Passwords do not match!");
+      setStatus(t("Passwords do not match!"));
       setLoading(false);
       return;
     }
@@ -149,18 +153,18 @@ function SignUpCard() {
       <img src={SignUpPeople} alt="Sign Up Visual" className="signup-image" />
       <form onSubmit={handleSignUp} className="signup-form">
         <div className="welcome-section">
-          <h2 className="welcome-title">Create an account</h2>
+          <h2 className="welcome-title">{t("Create an account")}</h2>
           <p className="welcome-subtitle">
-            Already have an account?{" "}
-            <Link to="/login" className="register-link">Log In</Link>
+            {t("Already have an account?")}{" "}
+            <Link to="/login" className="register-link">{t("Log In")}</Link>
           </p>
         </div>
 
         <div className="form-field">
-          <label className="form-label">Name</label>
+          <label className="form-label">{t("Name")}</label>
           <input
             type="text"
-            placeholder="Enter your name"
+            placeholder={t("Enter your name")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
@@ -169,10 +173,10 @@ function SignUpCard() {
         </div>
 
         <div className="form-field">
-          <label className="form-label">Username</label>
+          <label className="form-label">{t("Username")}</label>
           <input
             type="text"
-            placeholder="Enter your username"
+            placeholder={t("Enter your username")}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -180,7 +184,7 @@ function SignUpCard() {
         </div>
 
         <div className="form-field">
-          <label className="form-label">Phone number</label>
+          <label className="form-label">{t("Phone number")}</label>
           <div className="phone-input-container">
             <div className="country-selector">
               <button
@@ -219,10 +223,10 @@ function SignUpCard() {
         </div>
 
         <div className="form-field">
-          <label className="form-label">Email address</label>
+          <label className="form-label">{t("Email address")}</label>
           <input
             type="email"
-            placeholder="Enter your email address"
+            placeholder={t("Enter your email address")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -232,13 +236,13 @@ function SignUpCard() {
         <div className="password-row">
           <div className="form-field password-group">
             <label className="password-label">
-              Password
+              {t("Password")}
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="password-toggle">
                 {passwordVisible ? <EyeOff size={14} /> : <Eye size={14} />}
-                <span>{passwordVisible ? "Hide" : "Show"}</span>
+                <span>{passwordVisible ? t("Hide") : t("Show")}</span>
               </button>
             </label>
             <input
@@ -251,13 +255,13 @@ function SignUpCard() {
 
           <div className="form-field password-group">
             <label className="password-label">
-              Confirm Password
+              {t("Confirm Password")}
               <button
                 type="button"
                 onClick={toggleConfirmPasswordVisibility}
                 className="password-toggle">
                 {confirmPasswordVisible ? <EyeOff size={14} /> : <Eye size={14} />}
-                <span>{confirmPasswordVisible ? "Hide" : "Show"}</span>
+                <span>{confirmPasswordVisible ? t("Hide") : t("Show")}</span>
               </button>
             </label>
             <input
@@ -272,19 +276,19 @@ function SignUpCard() {
         {password && (
           <div className="password-requirements">
             <div className={`requirement ${password.length >= 8 ? "met" : "unmet"}`}>
-              ✓ At least 8 characters
+              {t("✓ At least 8 characters")}
             </div>
             <div className={`requirement ${/[A-Z]/.test(password) ? "met" : "unmet"}`}>
-              ✓ One uppercase letter
+              {t("✓ One uppercase letter")}
             </div>
             <div className={`requirement ${/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) ? "met" : "unmet"}`}>
-              ✓ One special character
+              {t("✓ One special character")}
             </div>
           </div>
         )}
 
         <button type="submit" className="signup-button" disabled={loading}>
-          {loading ? "Signing up..." : "Sign Up"}
+          {loading ? t("Signing up...") : t("Sign Up")}
         </button>
 
         {status &&

@@ -3,6 +3,7 @@ import SignUpPeople from "../assets/SignUpPeople.png";
 import "./Authentication.css";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
+import { useTranslation } from "react-i18next";
 
 function Auth() {
     const inputsRef = useRef([]);
@@ -11,6 +12,7 @@ function Auth() {
     const email = localStorage.getItem("email");
     const navigate = useNavigate();
     const { setUser } = useContext(AuthContext);
+    const {t} = useTranslation();
 
     useEffect(() => {
         setTimeout(() => {
@@ -121,15 +123,15 @@ function Auth() {
         <div className="auth-container">
             <div className="auth-card">
                 <div className="auth-header">
-                    <div className="auth-title">Authentication</div>
+                    <div className="auth-title">{t("Authentication")}</div>
                     <div className="auth-subtitle-container">
                         <div className="auth-subtitle">
-                            We sent a 6 digit code to your email
+                            {t("We sent a 6 digit code to your email")}
                         </div>
                         <div className="auth-resend">
-                            Didn't get the code? Click {' '}
-                            <button className="auth-resend-link" onClick={handleResend}>here</button>
-                            {' '}to resend.
+                            {t("Didn't get the code? Click")} {' '}
+                            <button className="auth-resend-link" onClick={handleResend}>{t("here")}</button>
+                            {' '}{t("to resend.")}
                         </div>
                     </div>
                 </div>
@@ -152,7 +154,7 @@ function Auth() {
                     </div>
 
                     <button type="submit" className="auth-signup-button" disabled={loading}>
-                        {loading ? "Verifying..." : "Sign Up"}
+                        {loading ? t("Verifying...") : t("Sign Up")}
                     </button>
                 </form>
 

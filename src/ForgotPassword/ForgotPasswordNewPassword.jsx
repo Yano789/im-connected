@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import LoginPeople from "../assets/LoginPeople.png";
 import "./ForgotPassword.css";
+import { useTranslation } from "react-i18next";
 
 const validatePassword = (password) => {
   const errors = [];
@@ -32,6 +33,7 @@ function ForgotPasswordNewPassword() {
   const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const {t} = useTranslation();
 
   const navigate = useNavigate();
   const email = localStorage.getItem("resetEmail");
@@ -102,27 +104,27 @@ function ForgotPasswordNewPassword() {
       <img src={LoginPeople} alt="Forgot Password Visual" className="forgot-password-image" />
       <form onSubmit={handleSubmit} className="forgot-password-form">
         <div className="welcome-section">
-          <h2 className="welcome-title">Set New Password</h2>
+          <h2 className="welcome-title">{t("Set New Password")}</h2>
           <p className="welcome-subtitle">
-            Enter your new password below
+            {t("Enter your new password below")}
           </p>
         </div>
 
         <div className="password-row">
           <div className="form-field password-group">
             <label className="password-label">
-              New Password
+              {t("New Password")}
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
                 className="password-toggle">
                 {passwordVisible ? <EyeOff size={14} /> : <Eye size={14} />}
-                <span>{passwordVisible ? "Hide" : "Show"}</span>
+                <span>{passwordVisible ? t("Hide") : t("Show")}</span>
               </button>
             </label>
             <input
               type={passwordVisible ? "text" : "password"}
-              placeholder="Enter new password"
+              placeholder={t("Enter new password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -131,18 +133,18 @@ function ForgotPasswordNewPassword() {
 
           <div className="form-field password-group">
             <label className="password-label">
-              Confirm Password
+              {t("Confirm Password")}
               <button
                 type="button"
                 onClick={toggleConfirmPasswordVisibility}
                 className="password-toggle">
                 {confirmPasswordVisible ? <EyeOff size={14} /> : <Eye size={14} />}
-                <span>{confirmPasswordVisible ? "Hide" : "Show"}</span>
+                <span>{confirmPasswordVisible ? t("Hide") : t("Show")}</span>
               </button>
             </label>
             <input
               type={confirmPasswordVisible ? "text" : "password"}
-              placeholder="Confirm new password"
+              placeholder={t("Confirm new password")}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -154,13 +156,13 @@ function ForgotPasswordNewPassword() {
         {password && 
         (<div className="password-requirements">
             <div className={`requirement ${password.length >= 8 ? "met" : "unmet"}`}>
-              ✓ At least 8 characters
+              {t("✓ At least 8 characters")}
             </div>
             <div className={`requirement ${/[A-Z]/.test(password) ? "met" : "unmet"}`}>
-              ✓ One uppercase letter
+              {t("✓ One uppercase letter")}
             </div>
             <div className={`requirement ${/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password) ? "met" : "unmet"}`}>
-              ✓ One special character
+              {t("✓ One special character")}
             </div>
           </div>
         )}
@@ -169,7 +171,7 @@ function ForgotPasswordNewPassword() {
           type="submit"
           className="forgot-password-button"
           disabled={loading}>
-          {loading ? "Resetting..." : "Reset Password"}
+          {loading ? t("Resetting...") : t("Reset Password")}
         </button>
 
         {status && (
@@ -180,7 +182,7 @@ function ForgotPasswordNewPassword() {
 
         <div className="back-to-login">
           <Link to="/login" className="register-link">
-            ← Back to Login
+            {t("← Back to Login")}
           </Link>
         </div>
       </form>

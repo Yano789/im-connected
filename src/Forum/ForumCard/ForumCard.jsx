@@ -4,6 +4,7 @@ import LikesIcon from "../../assets/Likes.png";
 import UnlikesIcon from "../../assets/Unlikes.png";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 function ForumCard(props) {
   const {
@@ -24,6 +25,7 @@ function ForumCard(props) {
   const [likeCount, setLikeCount] = useState(postLikes);
   const navigate = useNavigate();
   const encodedPostId = encodeURIComponent(postId);
+  const {t} = useTranslation();
 
   useEffect(() => {
     setLiked(initiallyLiked);
@@ -71,7 +73,7 @@ function ForumCard(props) {
           <div className="titleOfPostParent">
             <div className="postTitle">{postTitle}</div>
             <div className="postedParent">
-              <div className="posted">Posted:</div>
+              <div className="posted">{t("Posted:")}</div>
               <div className="postDate">{postDate}</div>
             </div>
           </div>
@@ -88,7 +90,7 @@ function ForumCard(props) {
               ))
             ) : (
               <div className="tagItem">
-                <div className="name">No tags</div>
+                <div className="name">{t("No tags")}</div>
               </div>
             )}
           </div>

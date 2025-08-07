@@ -5,8 +5,11 @@ import UserInfoCard from "../UserInfoCard/UserInfoCard";
 import PreferencesCard from "../PreferencesCard/PreferencesCard";
 import i18next from "i18next";
 import { applyTextSize } from "../TextSize";
+import { useTranslation } from "react-i18next";
 
 function ProfilePage() {
+	const {t} = useTranslation();
+
   const [userData, setUserData] = useState("");
 
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -162,12 +165,12 @@ function ProfilePage() {
             </div>
           )}
           <h1>
-            How are you{" "}
+            {t("How are you")}{" "}
             <span className="profile-name">
               {userData?.name?.split(" ")[0] || "User"}
             </span>
           </h1>
-          <p>Manage your profile here</p>
+          <p>{t("Manage your profile here")}</p>
         </div>
         <div className="profile-layout">
           <div className="profile-left-column">

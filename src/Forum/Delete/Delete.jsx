@@ -2,6 +2,7 @@ import "./Delete.css";
 import TrashIcon from "../../assets/Trash.png";
 import { useState } from "react";
 
+
 function Delete({ postToDelete, onDelete }) {
   const [isDeleting, setIsDeleting] = useState(false);
 

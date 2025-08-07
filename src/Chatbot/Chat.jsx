@@ -3,6 +3,7 @@ import "./Chat.css";
 import ChatWindow from "./components/chatWindow";
 import { summarize_text } from "./utils/summary";
 import Header from "../TopHeader/Header/Header";
+import { useTranslation } from "react-i18next";
 
 const functionCallHandler = async (toolCall) => {
   // only handle summary function

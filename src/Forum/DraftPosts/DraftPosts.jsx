@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import "./DraftPosts.css";
 import DraftEntry from "../DraftEntry/DraftEntry";
+import { useTranslation } from "react-i18next";
 
 function DraftPosts({ refreshTrigger, onDraftSelected }) {
   const [drafts, setDrafts] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  const {t} = useTranslation();
   const fetchDrafts = async () => {
     try {
       const response = await fetch(
@@ -87,10 +89,10 @@ function DraftPosts({ refreshTrigger, onDraftSelected }) {
     <div className="draftsDiv">
       <div className="draftsMain">
         <div className="draftsTitle">
-          <div className="myDrafts">Drafts</div>
-          {loading && <div>Loading drafts...</div>}
-          {error && <div className="error">Error: {error}</div>}
-          {!loading && drafts.length === 0 && <div>No drafts available.</div>}
+          <div className="myDrafts">{t("Drafts")}</div>
+          {loading && <div>{t("Loading drafts...")}</div>}
+          {error && <div className="error">{t("Error: {error}")}</div>}
+          {!loading && drafts.length === 0 && <div>{t("No drafts available.")}</div>}
           {drafts.map((draft) => (
             <DraftEntry
               key={draft._id}

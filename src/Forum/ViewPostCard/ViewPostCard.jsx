@@ -115,7 +115,7 @@ function ViewPostCard() {
   };
 
   if (error) return <p>{error}</p>;
-  if (!postData) return <p>Loading post...</p>;
+  if (!postData) return <p>{t("Loading post...")}</p>;
 
   const { title, content, username, createdAt, tags = [], media } = postData;
 
