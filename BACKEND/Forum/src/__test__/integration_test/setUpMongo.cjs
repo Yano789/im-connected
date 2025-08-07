@@ -2,13 +2,15 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const path = require("path");
 // Load environment variables from .env.test
-dotenv.config({ path: path.resolve(__dirname, ".env.test") });
+dotenv.config({
+  path: path.resolve(__dirname, "../../__test__/integration_test/.env.test")
+});
+console.log("[DEBUG] Loading env from:", path.resolve(__dirname, "../../__test__/integration_test/.env.test"));
 if (process.env.NODE_ENV !== "test") {
   throw new Error("❌ You are running tests in a non-test environment. Aborting.");
 }
 beforeAll(async () => {
   const uri = process.env.MONGODB_URI;
-
   if (!uri) {
     throw new Error("❌ MONGODB_URI is not defined in .env.test");
   }

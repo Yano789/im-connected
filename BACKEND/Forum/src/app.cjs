@@ -1,5 +1,8 @@
 //mongodb
-require("./config/db.cjs");
+if (process.env.NODE_ENV !== "test") {
+  require("./config/db.cjs");
+}
+
 const express = require("express");
 const bodyParser = express.json;
 const cookieParser = require("cookie-parser");

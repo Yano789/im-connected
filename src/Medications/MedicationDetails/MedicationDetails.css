@@ -1,8 +1,8 @@
 .details-card {
-    background-color: #fff;
+    background-color: var(--border-1);
     border-radius: 16px;
     padding: 2rem;
-    box-shadow: 0 10px 0px #F87575, 0 12px 28px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 0px var(--med-accent), 0 12px 28px rgba(0, 0, 0, 0.3);
     overflow: hidden; 
     transition: all 0.3s ease-in-out; 
 }
@@ -15,7 +15,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #888;
+    color: var(--placeholder-colour);
     font-size: 1.2rem;
     min-height: 400px; 
 }
@@ -30,7 +30,7 @@
 .detail-section {
     padding-bottom: 1.5rem;
     margin-bottom: 1.5rem;
-    border-bottom: 2px solid #fbe0e0;
+    border-bottom: 2px solid var(--button-colour-2);
 }
 
 .detail-section:last-of-type {
@@ -41,14 +41,14 @@
 .section-header {
     font-size: 0.9rem;
     font-weight: bold;
-    color: #555;
+    color: var(--border-2);
     margin: 0 0 0.5rem 0;
     text-transform: uppercase;
 }
 
 .section-content {
     margin: 0;
-    color: #333;
+    color: var(--border-2);
     overflow-wrap: break-word;
 }
 
@@ -66,7 +66,7 @@
     align-items: center;
     gap: 0.25rem;
     font-size: 0.8rem;
-    color: #555;
+    color: var(--shadow-3);
     opacity: 0.5; 
     transition: opacity 0.2s;
 }
@@ -85,7 +85,7 @@
     max-width: 250px;
     border-radius: 8px;
     margin-top: 0.5rem;
-    border: 1px solid #eee;
+    border: 1px solid var(--border-1);
 }
 
 .no-image-placeholder {
@@ -94,12 +94,12 @@
     min-height: 100px;
     border-radius: 8px;
     margin-top: 0.5rem;
-    border: 2px dashed #ddd;
+    border: 2px dashed var(--shadow-2);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: #f9f9f9;
+    background-color: var(--border-1);
     color: #666;
     text-align: center;
     padding: 1rem;
@@ -117,8 +117,8 @@
 
 .edit-button {
     width: 100%;
-    background-color: #F87575;
-    color: white;
+    background-color: var(--med-accent);
+    color: var(--border-1);
     border: none;
     padding: 1rem;
     font-size: 1rem;
@@ -130,12 +130,12 @@
 }
 
 .edit-button:hover {
-    background-color: #e56b6f;
+    background-color: var(--med-accent);
 }
 
 .warning-text {
-    background-color: #fff3cd;
-    border: 1px solid #ffeaa7;
+    background-color: var(--shadow-1);
+    border: 1px solid var(--shadow-3);
     border-radius: 8px;
     padding: 1rem;
     color: #856404;

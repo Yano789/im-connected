@@ -68,7 +68,7 @@ describe('GET /api/v1/user/threadId (chat‑bot feature)', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.threadId).toBe('T999');
     expect(global.fetch).toHaveBeenCalledWith(
-      'http://localhost:3000/api/assistants/threads',
+      "http://ai-chatbot:3000/api/assistants/threads",
       { method: 'POST' }
     );
     expect(mockUser.save).toHaveBeenCalled();

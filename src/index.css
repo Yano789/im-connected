@@ -22,13 +22,15 @@
   --placeholder-colour: #9ca3af; /* grey */
   --success-text: #10b981;  /* green */
   --error-text: #BA1111; /* red */
-  --med-accent: #DB7570; /* salmon pink */
+  --med-accent: #F87575; /* salmon pink */
   --chatbot-accent: #F19C67; /* orange */
   --forum-accent: #94C2BF; /* blue */
   --profile-accent: #ABD9A9; /* green */
   --password-toggle: #555;  /* dark grey */
   --area-code: #6b7280;  /* lightish grey */
   --phone-input: #1f2937;  /* phone input colour */
+  --
+
 }
 
 html {
