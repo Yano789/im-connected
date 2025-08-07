@@ -1,6 +1,8 @@
 import "./PreferencesCard.css";
+import { useTranslation } from "react-i18next";
 
 function PreferencesCard({ preferences = {}, onPreferenceChange }) {
+  const {t} = useTranslation();
   const {
     preferredLanguage = "",
     textSize = "",
@@ -10,7 +12,7 @@ function PreferencesCard({ preferences = {}, onPreferenceChange }) {
   return (
     <div className="preferences-card">
       <div className="preference-group">
-        <h3 className="preference-label">Preferred Language</h3>
+        <h3 className="preference-label">{t("Preferred Language")}</h3>
         <div className="preference-options">
           <button
             onClick={() => onPreferenceChange("preferredLanguage", "en")}
@@ -48,31 +50,31 @@ function PreferencesCard({ preferences = {}, onPreferenceChange }) {
       </div>
 
       <div className="preference-group">
-        <h3 className="preference-label">Text Size</h3>
+        <h3 className="preference-label">{t("Text Size")}</h3>
         <div className="preference-options">
           <button
             onClick={() => onPreferenceChange("textSize", "Small")}
             className={textSize === "Small" ? "pref-button selected" : "pref-button"}
           >
-            Small
+            {t("Small")}
           </button>
           <button
             onClick={() => onPreferenceChange("textSize", "Medium")}
             className={textSize === "Medium" ? "pref-button selected" : "pref-button"}
           >
-            Medium
+            {t("Medium")}
           </button>
           <button
             onClick={() => onPreferenceChange("textSize", "Large")}
             className={textSize === "Large" ? "pref-button selected" : "pref-button"}
           >
-            Large
+            {t("Large")}
           </button>
         </div>
       </div>
 
       <div className="preference-group">
-        <h3 className="preference-label">Content Mode</h3>
+        <h3 className="preference-label">{t("Content Mode")}</h3>
         <div className="preference-options content-modes">
           <button
             onClick={() => onPreferenceChange("contentMode", "Easy Reader Mode")}
@@ -82,7 +84,7 @@ function PreferencesCard({ preferences = {}, onPreferenceChange }) {
                 : "pref-button content-button"
             }
           >
-            Easy Reader Mode
+            {t("Easy Reader Mode")}
           </button>
           <button
             onClick={() => onPreferenceChange("contentMode", "Default Mode")}
@@ -92,7 +94,7 @@ function PreferencesCard({ preferences = {}, onPreferenceChange }) {
                 : "pref-button content-button"
             }
           >
-            Default Mode
+            {t("Default Mode")}
           </button>
         </div>
       </div>

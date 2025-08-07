@@ -20,11 +20,13 @@ import ChatPage from './Chatbot/Chat';
 import LoginSignUpBackground from "./assets/LoginSignUpBackground.jpg";
 import Dashboard from "./Dashboard/Dashboard/Dashboard";
 import Splashscreen from './Splashscreen/Splashscreen';
+import { useTranslation } from "react-i18next";
 
 function AppContent() {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading } = useContext(AuthContext);
+  const {t} = useTranslation();
 
   const protectedRoutes = [
     "/forum",
@@ -86,7 +88,7 @@ function AppContent() {
   }, [user, loading, location, navigate]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div>{("Loading...")}</div>;
   }
 
   return (

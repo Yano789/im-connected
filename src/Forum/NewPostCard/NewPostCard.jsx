@@ -226,7 +226,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
             className="addTextWrapper"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder={("Add Post Contents")}
+            placeholder={t("Add Post Contents")}
           />
         </div>
         <MediaUploader

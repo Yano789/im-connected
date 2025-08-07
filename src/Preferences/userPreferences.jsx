@@ -11,12 +11,14 @@ import MentalHealth from "../assets/MentalHealth.png";
 import Money from "../assets/Money.png";
 import Wheelchair from "../assets/Wheelchair.png";
 import i18next from "i18next";
+import { useTranslation } from "react-i18next";
 
 const UserPreferences = () => {
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [selectedTextSize, setSelectedTextSize] = useState("Medium");
   const [selectedContentMode, setSelectedContentMode] = useState("Easy Read");
   const [selectedTopics, setSelectedTopics] = useState([]);
+  const {t} = useTranslation();
 
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
@@ -30,35 +32,35 @@ const UserPreferences = () => {
   ];
 
   const textSizes = [
-    { id: "Small", label: "Small", fontSize: "18px" },
-    { id: "Medium", label: "Medium", fontSize: "24px" },
-    { id: "Big", label: "Big", fontSize: "32px" },
+    { id: "Small", label: t("Small"), fontSize: "18px" },
+    { id: "Medium", label: t("Medium"), fontSize: "24px" },
+    { id: "Big", label: t("Big"), fontSize: "32px" },
   ];
 
   const contentModes = [
-    { id: "Easy Read", label: "Easy Reader Mode" },
-    { id: "Default", label: "Default Mode" },
+    { id: "Easy Read", label: t("Easy Reader Mode") },
+    { id: "Default", label: t("Default Mode") },
   ];
 
   const careRecipientTopics = [
     {
       id: "physical-disability",
-      label: "Physical Disability & Chronic Illness",
+      label: t("Physical Disability & Chronic Illness"),
       icon: <img src={Wheelchair} alt="Wheelchair" />,
     },
     {
       id: "end-of-life",
-      label: "End of Life Care",
+      label: t("End of Life Care"),
       icon: <img src={Elderly} alt="Elderly" />,
     },
     {
       id: "mental-disability",
-      label: "Mental Disability",
+      label: t("Mental Disability"),
       icon: <img src={Depression} alt="Depression" />,
     },
     {
       id: "pediatric-care",
-      label: "Pediatric Care",
+      label: t("Pediatric Care"),
       icon: <img src={Children} alt="Children" />,
     },
   ];
@@ -66,22 +68,22 @@ const UserPreferences = () => {
   const caregiverTopics = [
     {
       id: "personal-mental-health",
-      label: "Personal Mental Health",
+      label: t("Personal Mental Health"),
       icon: <img src={MentalHealth} alt="MentalHealth" />,
     },
     {
       id: "financial-legal",
-      label: "Financial & Legal Help",
+      label: t("Financial & Legal Help"),
       icon: <img src={Money} alt="Money" />,
     },
     {
       id: "hospitals",
-      label: "Hospitals and Clinics",
+      label: t("Hospitals and Clinics"),
       icon: <img src={Hospital} alt="Hospital" />,
     },
     {
       id: "subsidies-govt",
-      label: "Subsidies and Govt Support",
+      label: t("Subsidies and Govt Support"),
       icon: <img src={Govt} alt="Govt" />,
     },
   ];
@@ -157,15 +159,15 @@ const UserPreferences = () => {
       <div className="signup-preferences-card">
         <div className="preferences-content">
           <div className="header-section">
-            <h1 className="greeting">Hi {username}!</h1>
-            <p className="subtitle">We want to get to know you better</p>
+            <h1 className="greeting">{t("Hi")} {username}!</h1>
+            <p className="subtitle">{t("We want to get to know you better")}</p>
           </div>
 
           <div className="main-content">
             <div className="left-column">
               <div className="signup-preference-group">
                 <label className="signup-preference-label">
-                  Preferred Language
+                  {t("Preferred Language")}
                 </label>
                 <div className="language-options">
                   {languages.map((lang) => (
@@ -186,7 +188,7 @@ const UserPreferences = () => {
               </div>
 
               <div className="signup-preference-group">
-                <label className="signup-preference-label">Text Size</label>
+                <label className="signup-preference-label">{t("Text Size")}</label>
                 <div className="text-size-options">
                   {textSizes.map((size) => (
                     <button
@@ -204,7 +206,7 @@ const UserPreferences = () => {
               </div>
 
               <div className="signup-preference-group">
-                <label className="signup-preference-label">Content Mode</label>
+                <label className="signup-preference-label">{t("Content Mode")}</label>
                 <div className="content-mode-options">
                   {contentModes.map((mode) => (
                     <div
@@ -238,12 +240,12 @@ const UserPreferences = () => {
             <div className="right-column">
               <div className="signup-preference-group">
                 <label className="signup-preference-label">
-                  Topics Interested In
+                  {t("Topics Interested In")}
                 </label>
 
                 <div className="topics-header">
-                  <span>For Care Recipient</span>
-                  <span>For Caregiver</span>
+                  <span>{t("For Care Recipient")}</span>
+                  <span>{t("For Caregiver")}</span>
                 </div>
 
                 <div className="topics-grid">
@@ -295,7 +297,7 @@ const UserPreferences = () => {
 
           <div className="footer-section">
             <button className="continue-btn" onClick={handleContinue}>
-              Continue
+              {t("Continue")}
             </button>
           </div>
         </div>

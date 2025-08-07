@@ -13,6 +13,8 @@ import ForumIcon from "../assets/ForumIconSplashscreen.png";
 
 import "./Splashscreen.css";
 
+import { useTranslation } from "react-i18next";
+
 const services = [
   {
     id: "medication",
@@ -45,6 +47,8 @@ const services = [
 
 export default function SplashScreen() {
   const [selectedService, setSelectedService] = useState(services[1]); 
+  const navigate = useNavigate();
+  const {t} = useTranslation();
 
   return (
     <div className="splash-screen" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
@@ -52,17 +56,17 @@ export default function SplashScreen() {
         {/* Left side */}
         <div className="header-left">
           <p className="sponsor-text">
-            A collaboration between SUTD & Lion Befrienders
+            {t("A collaboration between SUTD & Lion Befrienders")}
           </p>
           <div className="logo-row">
             <h1 className="logo-text">
-              <em>im</em>
-              <span className="logo-bold">Connected</span>
+              <em>{t("im")}</em>
+              <span className="logo-bold">{t("Connected")}</span>
               <img src={HeartLogo} alt="Heart logo" className="heart-logo" />
             </h1>
           </div>
           <p className="tagline">
-            A supportive platform for caregivers and care recipients
+            {t("A supportive platform for caregivers and care recipients")}
           </p>
         </div>
 
@@ -72,15 +76,15 @@ export default function SplashScreen() {
             {/* language switcher */}
             <button className="lang-button">
               <img src={GlobeImg} alt="Language" className="globe-icon" />
-              English <span className="chevron-down">▼</span>
+              {t("English")} <span className="chevron-down">▼</span>
             </button>
 
             {/* sign up / sign in */}
             <Link to="/signup">
-              <button className="top-button signup-btn">Sign Up</button>
+              <button className="top-button signup-btn">{t("Sign Up")}</button>
             </Link>
             <Link to="/login">
-              <button className="top-button signin-btn">Log In</button>
+              <button className="top-button signin-btn">{t("Log In")}</button>
             </Link>
           </div>
 
@@ -95,7 +99,7 @@ export default function SplashScreen() {
 
       {/* Services section */}
       <section className="services-section">
-        <h2 className="services-title">Services we provide:</h2>
+        <h2 className="services-title">{t("Services we provide:")}</h2>
         <div className="services-grid">
           {/* left: service cards */}
           <div className="cards-grid">

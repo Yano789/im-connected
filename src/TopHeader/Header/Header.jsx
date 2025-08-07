@@ -75,8 +75,8 @@ function Header() {
         <div className="sitelogo">
           <img className="applicationIcon" alt="" src={AppIcon} />
           <div className="imconnected">
-            <i>im</i>
-            <span className="connected">Connected</span>
+            <i>{t("im")}</i>
+            <span className="connected">{t("Connected")}</span>
           </div>
         </div>
         <div className="search">
