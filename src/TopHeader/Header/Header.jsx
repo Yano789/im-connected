@@ -6,6 +6,8 @@ import { AuthContext } from "../../AuthContext";
 import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import i18next from "i18next";
+
 
 function Header() {
   const { setUser } = useContext(AuthContext);
@@ -39,7 +41,10 @@ function Header() {
 
       if (res.ok) {
         setUser(null);
-        navigate("/login", { replace: true });
+        await i18next.changeLanguage("en");
+        navigate("/", { replace: true });
+
+
       } else {
         console.error("Logout failed");
       }

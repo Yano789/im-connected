@@ -1,11 +1,42 @@
 import DashboardBody from "../DashboardBody/DashboardBody";
 import Header from "../../TopHeader/Header/Header";
-function Dashboard(){
-    return (
-       <div>
-        <Header/>
-        <DashboardBody/>
-       </div>
-    );
-};
-export default Dashboard
+import { useEffect,useState } from "react";
+import i18next from "i18next";
+function Dashboard() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserAndSetLanguage = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:5001/api/v1/user/getUser",
+          {
+            credentials: "include",
+          }
+        );
+        const user = await response.json();
+
+        const preferredLang = user?.preferences?.preferredLanguage || "en";
+        console.log(preferredLang);
+        if (i18next.language !== preferredLang) {
+          await i18next.changeLanguage(preferredLang);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user or set language:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserAndSetLanguage();
+  }, []);
+
+  if (loading) return null;
+  return (
+    <div>
+      <Header />
+      <DashboardBody />
+    </div>
+  );
+}
+export default Dashboard;

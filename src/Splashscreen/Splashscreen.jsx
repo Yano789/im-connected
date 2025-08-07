@@ -10,7 +10,6 @@ import GlobeImg from "../assets/Globe.png";
 import PillboxIcon from "../assets/PillboxIconSplashscreen.png";
 import ChatbotIcon from "../assets/ChatbotIconSplashscreen.png";
 import ForumIcon from "../assets/ForumIconSplashscreen.png";
-import { useNavigate } from "react-router-dom";
 
 import "./Splashscreen.css";
 

@@ -1,7 +1,7 @@
 // LoginCard.jsx
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import {Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { AuthContext } from "../AuthContext";
 import LoginPeople from "../assets/LoginPeople.png";
 import "./LoginCard.css";
@@ -15,7 +15,7 @@ function LoginCard() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const { setUser } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -45,7 +45,7 @@ function LoginCard() {
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", 
+        credentials: "include",
         body: JSON.stringify(requestBody),
       });
 
@@ -65,7 +65,7 @@ function LoginCard() {
         setStatus("Login successful!");
         setUser(data);
         console.log("Authenticated User:", data);
-        navigate("/forum");
+        navigate("/dashboard");
       } else {
         setStatus(`Login failed: ${data.error || JSON.stringify(data)}`);
       }
@@ -83,13 +83,15 @@ function LoginCard() {
 
   return (
     <div className="login-container">
-      <img src={LoginPeople} alt="Login Visual" className="login-image"/>
+      <img src={LoginPeople} alt="Login Visual" className="login-image" />
       <form onSubmit={handleLogin} className="login-form">
         <div className="welcome-section">
           <h2 className="welcome-title">{t("Welcome back!")}</h2>
           <p className="welcome-subtitle">
             {t("Don't have an account?")}{" "}
-            <Link to="/signup" className="register-link">{t("Register Now!")}</Link>
+            <Link to="/signup" className="register-link">
+              {t("Register Now!")}
+            </Link>
           </p>
         </div>
 
@@ -111,7 +113,8 @@ function LoginCard() {
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="password-toggle">
+              className="password-toggle"
+            >
               {passwordVisible ? <EyeOff size={14} /> : <Eye size={14} />}
               <span>{passwordVisible ? t("Hide") : t("Show")}</span>
             </button>
@@ -130,7 +133,7 @@ function LoginCard() {
         </div>
 
         <label className="remember-me">
-          <input 
+          <input
             type="checkbox"
             className="checkbox"
             checked={rememberMe}
@@ -144,13 +147,16 @@ function LoginCard() {
         </button>
 
         {status && (
-          <div className={`status-message ${status.includes("successful") ? "success" : "error"}`}>
+          <div
+            className={`status-message ${
+              status.includes("successful") ? "success" : "error"
+            }`}
+          >
             {status}
           </div>
         )}
       </form>
     </div>
-
   );
 }
 
