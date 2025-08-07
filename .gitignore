@@ -25,6 +25,7 @@ dist-ssr
 
 # env
 **/openai-assistants-quickstart/.env
+BACKEND/Forum/src/test/integration_test/.env.test
 
 *.env
 node_modules
