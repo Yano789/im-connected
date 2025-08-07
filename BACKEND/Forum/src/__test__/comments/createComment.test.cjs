@@ -20,7 +20,7 @@ describe('createComment', () => {
     beforeEach(() => {
         jest.clearAllMocks();
     });
-    it('should create a comment when valid data is provided', async () => {
+    test('should create a comment when valid data is provided', async () => {
         User.findOne.mockResolvedValue({ username: 'john' });
         Post.updateOne.mockResolvedValue({ matchedCount: 1 });
         hashData.mockResolvedValue('fakeHashedId');
@@ -40,14 +40,14 @@ describe('createComment', () => {
         expect(result).toEqual(savedComment);
     });
 
-    it('should throw error if username does not exist', async () => {
+    test('should throw error if username does not exist', async () => {
         User.findOne.mockResolvedValue(null);
         await expect(
             createComment({ postId: 'x', parentCommentId: null, username: 'ghost', content: 'x' })
         ).rejects.toThrow('Username does not exist');
     });
 
-    it('should throw error if post is not found', async () => {
+    test('should throw error if post is not found', async () => {
         User.findOne.mockResolvedValue({ username: 'john' });
         Post.updateOne.mockResolvedValue({ matchedCount: 0 });
         await expect(
@@ -55,7 +55,7 @@ describe('createComment', () => {
         ).rejects.toThrow('Post not found');
     });
 
-    it('should throw error if comment fails to save', async () => {
+    test('should throw error if comment fails to save', async () => {
         User.findOne.mockResolvedValue({ username: 'john' });
         Post.updateOne.mockResolvedValue({ matchedCount: 1 });
         hashData.mockResolvedValue('hashed');

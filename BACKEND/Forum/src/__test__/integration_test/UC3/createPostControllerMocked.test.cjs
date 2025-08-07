@@ -1,10 +1,10 @@
-// Step 1: Mock the entire controller BEFORE any imports
 jest.mock("../../../domains/post/controller.cjs", () => ({
   createPost: jest.fn(async (data) => {
-    // simulate cacheBuster effect on media urls if media exists
+    // simulate media upload without appending cache buster to the signed URL
     const media = (data.media || []).map((file) => ({
       ...file,
-      url: file.url + "?cb=1234567890",
+      url: file.url, // no ?cb=1234567890
+      secure_url: file.secure_url || file.url,
     }));
 
     return {
@@ -21,6 +21,7 @@ jest.mock("../../../domains/post/controller.cjs", () => ({
   }),
 }));
 
+
 // Optional: mock internal utils
 let postIdCounter = 0;
 jest.mock("../../../utils/hashData.cjs", () => ({
@@ -31,9 +32,6 @@ jest.mock("../../../utils/hashData.cjs", () => ({
   verifyHashedData: jest.fn(),
 }));
 
-jest.mock("../../../utils/cacheBuster.cjs", () =>
-  jest.fn((url) => `${url}?cb=1234567890`)
-);
 
 // Step 2: Import AFTER mocks
 const path = require("path");

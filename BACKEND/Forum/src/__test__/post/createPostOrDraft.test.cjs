@@ -1,13 +1,21 @@
 jest.mock("./../../domains/post/model.cjs");
 jest.mock("./../../utils/hashData.cjs");
 jest.mock("./../../domains/user/model.cjs");
-jest.mock("./../../utils/cacheBuster.cjs")
+jest.mock("../../config/googleConfig.cjs", () => ({
+  bucket: {
+    file: jest.fn().mockReturnThis(),
+    getSignedUrl: jest.fn().mockResolvedValue(["http://example.com/signed.jpg"]),
+  },
+  url: jest.fn().mockImplementation(async (publicId) => {
+    return `http://example.com/${publicId}.jpg`;
+  }),
+}));
 
 const { Post } = require("../../domains/post/model.cjs");
 const { hashData } = require("../../utils/hashData.cjs");
 const User = require("../../domains/user/model.cjs");
 const { createPost} = require("../../domains/post/controller.cjs");
-const addCacheBuster = require("./../../utils/cacheBuster.cjs")
+
 
 describe("create post/draft", () => {
   const fixedTime = 1752934590239;
@@ -98,7 +106,7 @@ describe("create post/draft", () => {
     hashData.mockResolvedValueOnce("hashedMediaPost");
 
     // Mock cache buster behavior
-    addCacheBuster.mockImplementation((url) => url + "?cb=mocked");
+
 
     const saveMock = jest.fn().mockResolvedValue({
   _id: "456",
@@ -121,13 +129,9 @@ describe("create post/draft", () => {
 
     const post = await createPost(mockData);
 
-    expect(addCacheBuster).toHaveBeenCalledTimes(2);
-    expect(addCacheBuster).toHaveBeenCalledWith("http://example.com/image1.jpg");
-    expect(addCacheBuster).toHaveBeenCalledWith("http://example.com/image2.jpg");
-
     expect(post.media).toEqual([
-      { url: "http://example.com/image1.jpg?cb=mocked" },
-      { url: "http://example.com/image2.jpg?cb=mocked" }
+      { url: "http://example.com/image1.jpg" },
+      { url: "http://example.com/image2.jpg" }
     ]);
   });
 });

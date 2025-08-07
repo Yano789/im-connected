@@ -8,9 +8,6 @@ jest.mock("../../../utils/hashData.cjs", () => ({
   verifyHashedData: jest.fn(),
 }));
 
-jest.mock("../../../utils/cacheBuster.cjs", () =>
-  jest.fn((url) => `${url}?cb=1234567890`)
-);
 
 // Now import app and other dependencies AFTER mocks
 const path = require("path");
@@ -77,17 +74,7 @@ describe("Create Post", () => {
 
     // Check mocks called
     const { hashData } = require("../../../utils/hashData.cjs");
-    const addCacheBuster = require("../../../utils/cacheBuster.cjs");
     expect(hashData).toHaveBeenCalled();
-
-    if (response.body.media) {
-      response.body.media.forEach((file) => {
-        expect(addCacheBuster).toHaveBeenCalledWith(
-          expect.stringContaining("https://res.cloudinary.com/")
-        );
-        expect(file.url).toMatch(/\?cb=1234567890$/);
-      });
-    }
   });
 
   test("should fail if required fields are missing", async () => {
@@ -163,10 +150,6 @@ describe("Create Post", () => {
       expect(response.body).toHaveProperty("media");
       expect(response.body.media.length).toBe(1);
       expect(response.body.tags).toEqual(["Mental Disability", "Pediatric Care"]);
-
-      response.body.media.forEach((file) => {
-        expect(file.url).toMatch(/\?cb=1234567890$/);
-      });
     },
     15000 // Increased timeout for file upload test
   );

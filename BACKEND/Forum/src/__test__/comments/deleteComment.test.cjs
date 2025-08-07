@@ -20,7 +20,7 @@ describe("deleteComment", () => {
         parentCommentId: null,
     };
 
-    it('should delete a valid top-level comment and update post', async () => {
+    test('should delete a valid top-level comment and update post', async () => {
         Comment.findOne.mockResolvedValue(mockComment);
         Comment.updateMany.mockResolvedValue({});
         Comment.deleteOne.mockResolvedValue({});
@@ -42,7 +42,7 @@ describe("deleteComment", () => {
         expect(result).toEqual(mockComment);
     });
 
-    it('should delete a nested comment and reparent its children', async () => {
+    test('should delete a nested comment and reparent its children', async () => {
         const nestedComment = {
             ...mockComment,
             parentCommentId: 'parent123',
@@ -66,7 +66,7 @@ describe("deleteComment", () => {
         expect(result).toEqual(nestedComment);
     });
 
-    it('should throw error if comment does not exist', async () => {
+    test('should throw error if comment does not exist', async () => {
         Comment.findOne.mockResolvedValue(null);
 
         await expect(
@@ -74,7 +74,7 @@ describe("deleteComment", () => {
         ).rejects.toThrow('Comment does not exist!');
     });
 
-    it('should throw error if username does not match', async () => {
+    test('should throw error if username does not match', async () => {
         Comment.findOne.mockResolvedValue({ ...mockComment, username: 'jane' });
 
         await expect(

@@ -4,240 +4,123 @@ const User = require("../user/model.cjs");
 const Comment = require("../comment/model.cjs")
 const createNestedComment = require("../../utils/buildNestedComments.cjs")
 const translate = require("./../../domains/translation/controller.cjs")
-const { v2: cloudinary } = require("cloudinary");
 const savedPost = require("../savedPosts/model.cjs")
-const addCacheBuster = require("./../../utils/cacheBuster.cjs")
-const path = require("path");
-const crypto = require("crypto");
-const { encrypt } = require("../../utils/crypt.cjs");
-const { gcsClient } = require("../../config/googleConfig.cjs");
+const { gcsClient } = require('../../config/googleConfig.cjs');
 
 
 
 const createPost = async (data) => {
-  const uploadedFiles = []; // Track successful uploads
+  const { title, content, tags, username, draft, media = [] } = data;
+  const user = await User.findOne({ username });
+  if (!user) throw new Error("Username does not exist");
+
+  const now = Date.now();
+  const postId = await hashData(username + now);
+
+  const newPost = new Post({
+    postId,
+    title,
+    content,
+    username,
+    tags,
+    createdAt: now,
+    draft,
+    media,  // directly save media info
+  });
+
+  return await newPost.save();
+};
+
+
+
+const editDraft = async (data) => {
   try {
-    const { title, content, tags, username, draft, media = [] } = data;
+    const { postId, content, title, tags, username, draft, newMedia, mediaToRemove } = data;
+    const existingDraft = await Post.findOne({ postId });
 
-    const user = await User.findOne({ username });
-    if (!user) throw new Error("Username does not exist");
+    if (!existingDraft) throw new Error("Draft does not exist");
+    if (existingDraft.username !== username) throw new Error("Unauthorized");
+    if (!existingDraft.draft) throw new Error("Cannot edit a published post");
 
-    const now = Date.now();
-    const postId = await hashData(username + now);
+    const currentMedia = existingDraft.media || [];
+    const toRemoveSet = new Set(mediaToRemove || []);
+    const mediaToDelete = currentMedia.filter(m => toRemoveSet.has(m.public_id));
 
-    const processedMedia = await Promise.all(
-      media.map(async (file) => {
-        // Check if GCS is available, otherwise use Cloudinary
-        if (gcsClient) {
-          // Use Google Cloud Storage
-          const encryptedBuffer = encrypt(file.buffer);
-          const folder = "forum_uploads";
-          const ext = path.extname(file.originalname).slice(1);
-          const base = path.basename(file.originalname, `.${ext}`);
-          const randomSuffix = crypto.randomBytes(6).toString("hex");
-          const publicId = `${folder}/${Date.now()}-${base}-${randomSuffix}.${ext}`;
-          const fileRef = gcsClient.bucket.file(publicId);
-
-          await fileRef.save(encryptedBuffer, {
-            metadata: {
-              contentType: file.mimetype,
-              metadata: {
-                originalName: file.originalname,
-                encrypted: "true",
-                uploadedBy: username,
-                uploadTime: new Date().toISOString(),
-              },
-            },
-            resumable: false,
-            validation: "crc32c",
-          });
-
-          uploadedFiles.push({ type: 'gcs', id: publicId }); // Track uploaded GCS file
-
-          return {
-            public_id: publicId,
-            resource_type: file.mimetype.startsWith("video") ? "video" : "image",
-            original_filename: file.originalname,
-            mimetype: file.mimetype,
-            format: ext,
-            url: addCacheBuster(`/media/${publicId}`),
-          };
-        } else {
-          // Fallback to Cloudinary
-          console.log('Using Cloudinary fallback for file upload');
-          const uploadResult = await cloudinary.uploader.upload_stream(
-            {
-              resource_type: file.mimetype.startsWith("video") ? "video" : "image",
-              folder: "forum_uploads",
-            },
-            (error, result) => {
-              if (error) throw error;
-              return result;
-            }
-          );
-
-          // Convert buffer to stream for Cloudinary upload
-          const streamUpload = (buffer) => {
-            return new Promise((resolve, reject) => {
-              const stream = cloudinary.uploader.upload_stream(
-                {
-                  resource_type: file.mimetype.startsWith("video") ? "video" : "image",
-                  folder: "forum_uploads",
-                },
-                (error, result) => {
-                  if (error) {
-                    reject(error);
-                  } else {
-                    resolve(result);
-                  }
-                }
-              );
-              stream.end(file.buffer);
-            });
-          };
-
-          const result = await streamUpload(file.buffer);
-          uploadedFiles.push({ type: 'cloudinary', id: result.public_id }); // Track uploaded Cloudinary file
-
-          return {
-            public_id: result.public_id,
-            resource_type: file.mimetype.startsWith("video") ? "video" : "image",
-            original_filename: file.originalname,
-            mimetype: file.mimetype,
-            format: result.format,
-            url: result.secure_url,
-          };
-        }
-      })
-    );
-
-    const newPost = new Post({
-      postId,
-      title,
-      content,
-      username,
-      tags,
-      createdAt: now,
-      draft,
-      media: processedMedia,
+    // Delete media files from GCS instead of Cloudinary
+    const deletePromises = mediaToDelete.map(async (file) => {
+      try {
+        await gcsClient.bucket.file(file.public_id).delete();
+        console.log(`Deleted GCS file: ${file.public_id}`);
+      } catch (err) {
+        console.error(`Error deleting media ${file.public_id}:`, err);
+      }
     });
+    await Promise.all(deletePromises);
 
-    return await newPost.save();
-  } catch (error) {
-    // Clean up uploaded files on error
-    if (uploadedFiles.length > 0) {
-      await Promise.all(
-        uploadedFiles.map(async (upload) => {
-          try {
-            if (upload.type === 'gcs' && gcsClient) {
-              await gcsClient.bucket.file(upload.id).delete();
-            } else if (upload.type === 'cloudinary') {
-              await cloudinary.uploader.destroy(upload.id);
-            }
-          } catch (err) {
-            console.warn(`Failed to delete ${upload.id}:`, err.message);
-          }
-        })
-      );
-    }
+    // Compose updated media array
+    const updatedMedia = [
+      ...currentMedia.filter(m => !toRemoveSet.has(m.public_id)),
+      ...(newMedia || []),
+    ];
 
-    throw error;
+    existingDraft.title = title;
+    existingDraft.content = content;
+    existingDraft.tags = tags;
+    existingDraft.media = updatedMedia;
+    existingDraft.edited = true;
+    existingDraft.draft = draft;
+
+    await existingDraft.save();
+
+    return existingDraft;
+  } catch (err) {
+    throw err;
   }
 };
-const editDraft = async (data) => {
-    try {
-        const { postId, content, title, tags, username, draft, newMedia, mediaToRemove } = data;
-        const existingDraft = await Post.findOne({ postId });
 
-        if (!existingDraft) throw Error("Draft does not exist");
-        if (existingDraft.username !== username) throw new Error("unauthorized");
-        if (!existingDraft.draft) throw Error("Cannot edit a published post");
-
-        const currentMedia = existingDraft.media || [];
-        const toRemoveSet = new Set(mediaToRemove || []);
-        const mediaToDelete = currentMedia.filter(m => toRemoveSet.has(m.public_id));
-
-
-        const deletePromises = mediaToDelete.map(async (file) => {
-            try {
-
-                return await cloudinary.uploader.destroy(file.public_id, {
-                    resource_type: file.type === "video" ? "video" : "image",
-                });
-            } catch (err) {
-                console.error(`Error deleting media ${file.public_id}:`, err);
-                return null;
-            }
-        });
-        await Promise.all(deletePromises);
-
-
-        const updatedMedia = [
-            ...currentMedia.filter(m => !toRemoveSet.has(m.public_id)),
-            ...(newMedia || []),
-        ];
-
-        existingDraft.title = title;
-        existingDraft.content = content;
-        existingDraft.tags = tags;
-        existingDraft.media = updatedMedia;
-        existingDraft.edited = true;
-        existingDraft.draft = draft;
-
-
-
-        await existingDraft.save();
-
-
-        return existingDraft;
-    } catch (err) {
-        throw err;
-    }
-};
+module.exports = { editDraft };
 
 const deletePost = async (data) => {
-    try {
-        const { postId, username } = data;
+  try {
+    const { postId, username } = data;
 
-        const existingPost = await Post.findOne({ postId });
-        if (!existingPost) {
-            throw new Error("Post does not exist");
-        }
-
-        if (existingPost.username !== username) {
-            throw new Error("Unauthorized");
-        }
-
-        if (existingPost.media && existingPost.media.length > 0) {
-            const deletionPromises = existingPost.media.map(async (file) => {
-                console.log(`Deleting media: public_id=${file.public_id}, type=${file.type}`);
-                try {
-                    const result = await cloudinary.uploader.destroy(file.public_id, {
-                        resource_type: file.type === "video" ? "video" : "image",
-                    });
-
-                    return result;
-                } catch (err) {
-
-                    throw err;
-                }
-            });
-
-            await Promise.all(deletionPromises);
-        }
-
-
-        await Promise.all([
-            Post.deleteOne({ postId: postId, draft: false }),
-            Comment.deleteMany({ postId: postId }),
-            savedPost.deleteMany({ savedPostId: postId })
-        ]);
-
-        return existingPost;
-    } catch (error) {
-
-        throw error;
+    const existingPost = await Post.findOne({ postId });
+    if (!existingPost) {
+      throw new Error("Post does not exist");
     }
+
+    if (existingPost.username !== username) {
+      throw new Error("Unauthorized");
+    }
+
+    if (existingPost.media && existingPost.media.length > 0) {
+      const deletionPromises = existingPost.media.map(async (file) => {
+        console.log(`Deleting media: public_id=${file.public_id}, type=${file.type}`);
+        try {
+          // Delete file from GCS bucket
+          await gcsClient.bucket.file(file.public_id).delete();
+          return { success: true, public_id: file.public_id };
+        } catch (err) {
+          console.error(`Failed to delete media ${file.public_id}:`, err);
+          // Optionally handle errors or return failure object
+          return { success: false, public_id: file.public_id, error: err };
+        }
+      });
+
+      await Promise.all(deletionPromises);
+    }
+
+    // Delete the post, related comments, and saved posts
+    await Promise.all([
+      Post.deleteOne({ postId: postId, draft: false }),
+      Comment.deleteMany({ postId: postId }),
+      savedPost.deleteMany({ savedPostId: postId }),
+    ]);
+
+    return existingPost;
+  } catch (error) {
+    throw error;
+  }
 };
 
 
@@ -304,14 +187,27 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
         }
 
 
-        posts.forEach(post => {
+        for (let post of posts) {
             if (post.media && post.media.length > 0) {
-                post.media = post.media.map(file => ({
+                post.media = await Promise.all(
+                post.media.map(async (file) => {
+                    let signedUrl;
+                    try {
+                    signedUrl = await gcsClient.url(file.public_id);
+                    } catch (err) {
+                    console.error(`Failed to get signed URL for ${file.public_id}`, err);
+                    signedUrl = file.url; // fallback to stored url or whatever you have
+                    }
+                    return {
                     ...file,
-                    url: addCacheBuster(file.url),
-                }));
+                    url:signedUrl, // add cache buster if you want
+                    secure_url: signedUrl,
+                    };
+                })
+                );
             }
-        });
+            }
+            console.log("Signed media URL example:", posts[0]?.media?.[0]?.url);
 
         if (preferredLang) {
             for (let post of posts) {
@@ -346,60 +242,70 @@ const modeLimit = async (data) => {
     */
 
 const getPostWithComment = async (data) => {
-    const { postId, username } = data
-    const user = await User.findOne({ username }).lean();
-    const preferredLang = user?.preferences?.preferredLanguage
-    console.log(preferredLang)
+  const { postId, username } = data;
+  const user = await User.findOne({ username }).lean();
+  const preferredLang = user?.preferences?.preferredLanguage;
 
-    try {
-        let [post, comments] = await Promise.all([
-            Post.findOne({ postId }).lean(),
-            Comment.find({ postId }).sort({ createdAt: -1 }).lean()
-        ]);
-        if (!post) {
-            throw Error("Post not found");
-        }
-        if (post.comments !== comments.length) {
-            await Post.updateOne({ postId, draft: false }, { comments: comments.length });
-            post.comments = comments.length; // update in local memory
+  try {
+    let [post, comments] = await Promise.all([
+      Post.findOne({ postId }).lean(),
+      Comment.find({ postId }).sort({ createdAt: -1 }).lean()
+    ]);
+    if (!post) throw Error("Post not found");
+
+    if (post.comments !== comments.length) {
+      await Post.updateOne({ postId, draft: false }, { comments: comments.length });
+      post.comments = comments.length; // update local copy
+    }
+
+    // Replace URLs with signed URLs from GCS
+    if (post.media && post.media.length > 0) {
+      post.media = await Promise.all(post.media.map(async (file) => {
+        let signedUrl;
+        try {
+          signedUrl = await gcsClient.url(file.public_id);
+        } catch (err) {
+          console.error(`Failed to get signed URL for ${file.public_id}`, err);
+          signedUrl = file.url; // fallback
         }
         
-
-        if (post.media && post.media.length > 0) {
-            post.media = post.media.map(file => ({
-                ...file,
-                url: addCacheBuster(file.url),
-            }));
-        }
-
-        let translatedComments = null
-        if (preferredLang) {
-            post.title = await translate(post.title, preferredLang);
-            post.content = await translate(post.content, preferredLang);
-            translatedComments = await Promise.all(
-      comments.map(async (comment) => {
-        const translatedContent = await translate(comment.content, preferredLang);
-
         return {
-          ...comment,
-          content: translatedContent,
+          ...file,
+          url: signedUrl,
+          secure_url: signedUrl,
         };
-      })
-    );
-        }
-
-        const nestedComments = await createNestedComment(translatedComments)
-        const response = {
-            ...post,
-            commentArray: nestedComments,
-            commentCount: comments.length
-        }
-        console.log(response)
-        return response
-    } catch (error) {
-        throw error
+      }));
     }
-}
+
+    let translatedComments = null;
+    if (preferredLang) {
+      post.title = await translate(post.title, preferredLang);
+      post.content = await translate(post.content, preferredLang);
+
+      translatedComments = await Promise.all(
+        comments.map(async (comment) => {
+          const translatedContent = await translate(comment.content, preferredLang);
+          return {
+            ...comment,
+            content: translatedContent,
+          };
+        })
+      );
+    } else {
+      translatedComments = comments; // no translation
+    }
+
+    const nestedComments = await createNestedComment(translatedComments);
+
+    return {
+      ...post,
+      commentArray: nestedComments,
+      commentCount: comments.length,
+    };
+  } catch (error) {
+    throw error;
+  }
+};
 
 
 /*
@@ -421,81 +327,107 @@ const getAllMyPosts = async (data) => {
     }
 }*/
 
-const getAllMyDrafts = async (data) => {
-    try {
-        const username = data
-        const user = await User.findOne({ username }).lean();
-        const preferredLang = user?.preferences?.preferredLanguage
-        console.log(preferredLang)
-        const myDrafts = await Post.find({ username, draft: true }).sort({ createdAt: -1 });
-        myDrafts.forEach(draft => {
-            if (draft.media && draft.media.length > 0) {
-                draft.media = draft.media.map(file => ({
-                    ...file,
-                    url: addCacheBuster(file.url),
-                }));
-            }
-        });
+const getAllMyDrafts = async (username) => {
+  try {
+    const user = await User.findOne({ username }).lean();
+    const preferredLang = user?.preferences?.preferredLanguage;
+    const myDrafts = await Post.find({ username, draft: true }).sort({ createdAt: -1 });
 
-        if (preferredLang) {
-            for (let draft of myDrafts) {
-                draft.title = await translate(draft.title, preferredLang);
-                draft.content = await translate(draft.content, preferredLang);
-            }
-        }
-
-        return myDrafts
-    } catch (error) {
-        throw error
+    // Replace media URLs with signed URLs
+    for (const draft of myDrafts) {
+      if (draft.media && draft.media.length > 0) {
+        draft.media = await Promise.all(draft.media.map(async (file) => {
+          try {
+            const signedUrl = await gcsClient.url(file.public_id);
+            return {
+              ...file,
+              url:signedUrl,
+              secure_url: signedUrl,
+            };
+          } catch (err) {
+            console.error(`Failed to get signed URL for ${file.public_id}`, err);
+            return file; // fallback to original file object
+          }
+        }));
+      }
     }
-}
 
-const getMyDraft = async (data) => {
-    try {
-        const { username, postId } = data
-        const user = await User.findOne({ username }).lean();
-        const preferredLang = user?.preferences?.preferredLanguage
-        console.log(preferredLang)
-        const myDraft = await Post.findOne({ username: username, postId: postId, draft: true })
-        if (myDraft?.media && myDraft.media.length > 0) {
-            myDraft.media = myDraft.media.map(file => ({
-                ...file,
-                url: addCacheBuster(file.url),
-            }));
-        }
-        if (preferredLang) {
-            myDraft.title = await translate(myDraft.title, preferredLang);
-            myDraft.content = await translate(myDraft.content, preferredLang);
-        }
-
-        return myDraft
-    } catch (error) {
-        throw error
+    if (preferredLang) {
+      for (let draft of myDrafts) {
+        draft.title = await translate(draft.title, preferredLang);
+        draft.content = await translate(draft.content, preferredLang);
+      }
     }
-}
+
+    return myDrafts;
+  } catch (error) {
+    throw error;
+  }
+};
+
+const getMyDraft = async ({ username, postId }) => {
+  try {
+    const user = await User.findOne({ username }).lean();
+    const preferredLang = user?.preferences?.preferredLanguage;
+    const myDraft = await Post.findOne({ username, postId, draft: true });
+
+    if (!myDraft) throw new Error("Draft not found");
+
+    if (myDraft.media && myDraft.media.length > 0) {
+      myDraft.media = await Promise.all(myDraft.media.map(async (file) => {
+        try {
+          const signedUrl = await gcsClient.url(file.public_id);
+          return {
+            ...file,
+            url: signedUrl,
+            secure_url: signedUrl,
+          };
+        } catch (err) {
+          console.error(`Failed to get signed URL for ${file.public_id}`, err);
+          return file; // fallback
+        }
+      }));
+    }
+
+    if (preferredLang) {
+      myDraft.title = await translate(myDraft.title, preferredLang);
+      myDraft.content = await translate(myDraft.content, preferredLang);
+    }
+
+    return myDraft;
+  } catch (error) {
+    throw error;
+  }
+};
 
 const deleteDrafts = async (data) => {
-    try {
-        const { username, postId } = data
-        const deletedDraft = await Post.findOne({ username: username, postId: postId, draft: true })
-        if (!deletedDraft) {
-            throw Error("Draft does not exist")
-        }
-        const deleteMedia = deletedDraft.media?.map((file) =>
-            cloudinary.uploader.destroy(file.public_id, {
-                resource_type: file.type === "video" ? "video" : "image",
-            })
-        );
-
-        if (deleteMedia && deleteMedia.length > 0) {
-            await Promise.all(deleteMedia);
-        }
-        await Post.deleteOne({ username, postId, draft: true });
-        return deletedDraft
-    } catch (error) {
-        throw error
+  try {
+    const { username, postId } = data;
+    const deletedDraft = await Post.findOne({ username, postId, draft: true });
+    if (!deletedDraft) {
+      throw Error("Draft does not exist");
     }
-}
+
+    // Delete media from GCS
+    const deleteMedia = (deletedDraft.media || []).map(async (file) => {
+      try {
+        return await gcsClient.bucket.file(file.public_id).delete();
+      } catch (err) {
+        console.warn(`Failed to delete file ${file.public_id} from GCS:`, err.message);
+        return null; // continue deleting others
+      }
+    });
+
+    if (deleteMedia.length > 0) {
+      await Promise.all(deleteMedia);
+    }
+
+    await Post.deleteOne({ username, postId, draft: true });
+    return deletedDraft;
+  } catch (error) {
+    throw error;
+  }
+};
 
 const getPostByTitle = async (data) => {
     try {
@@ -557,4 +489,4 @@ const searchPosts = async (data) => {
 
 
 
-module.exports = { createPost, editDraft, deletePost, getFilteredPosts, getPostWithComment, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle,searchPosts,escapeRegex,addCacheBuster};
+module.exports = { createPost, editDraft, deletePost, getFilteredPosts, getPostWithComment, getAllMyDrafts, getMyDraft, deleteDrafts, getPostByTitle,searchPosts,escapeRegex};

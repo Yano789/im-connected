@@ -1,17 +1,24 @@
 jest.mock("../../domains/post/model.cjs");
-jest.mock("cloudinary", () => ({
-  v2: {
-    uploader: {
-      destroy: jest.fn()
-    }
-  }
+
+const mockDelete = jest.fn().mockResolvedValue();
+
+jest.mock("../../config/googleConfig.cjs", () => ({
+  gcsClient: {
+    bucket: {
+      file: jest.fn(() => ({
+        delete: mockDelete,
+      })),
+    },
+  },
+  url: jest.fn().mockImplementation(async (publicId) => {
+    return `http://example.com/${publicId}.jpg`;
+  }),
 }));
 
 const { Post, allowedTags } = require("../../domains/post/model.cjs");
-const { v2: cloudinary } = require("cloudinary");
 const { editDraft } = require("../../domains/post/controller.cjs");
 
-describe("editing drafts", () => {
+describe("editing drafts with GCS media only", () => {
   const fixedTime = 1752934590239;
 
   beforeEach(() => {
@@ -32,7 +39,7 @@ describe("editing drafts", () => {
     draft: true
   };
 
-  test("successfully edits a draft", async () => {
+  test("successfully edits a draft without media removal", async () => {
     const mockSave = jest.fn().mockResolvedValue(true);
 
     Post.findOne.mockResolvedValueOnce({
@@ -58,66 +65,7 @@ describe("editing drafts", () => {
     expect(result.draft).toBe(true);
   });
 
-  test("throws error if draft does not exist", async () => {
-    Post.findOne.mockResolvedValueOnce(null);
-
-    await expect(editDraft(baseData)).rejects.toThrow("Draft does not exist");
-  });
-
-  test("throws error if user is unauthorized", async () => {
-    Post.findOne.mockResolvedValueOnce({
-      postId: "post123",
-      username: "someoneElse",
-      draft: true
-    });
-
-    await expect(editDraft(baseData)).rejects.toThrow("unauthorized");
-  });
-
-  test("throws error if post is already published", async () => {
-    Post.findOne.mockResolvedValueOnce({
-      postId: "post123",
-      username: "user1",
-      draft: false
-    });
-
-    await expect(editDraft(baseData)).rejects.toThrow("Cannot edit a published post");
-  });
-
-  test("handles media removal and addition", async () => {
-    const mockSave = jest.fn().mockResolvedValue(true);
-
-    const mockDraft = {
-      postId: "post123",
-      username: "user1",
-      draft: true,
-      media: [
-        { public_id: "keep_me", type: "image" },
-        { public_id: "remove_me", type: "video" }
-      ],
-      save: mockSave
-    };
-
-    Post.findOne.mockResolvedValueOnce(mockDraft);
-    cloudinary.uploader.destroy.mockResolvedValueOnce({ result: "ok" });
-
-    const result = await editDraft({
-      ...baseData,
-      mediaToRemove: ["remove_me"],
-      newMedia: [{ public_id: "new_file", type: "image" }]
-    });
-
-    expect(cloudinary.uploader.destroy).toHaveBeenCalledTimes(1);
-    expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("remove_me", { resource_type: "video" });
-
-    expect(result.media).toEqual([
-      { public_id: "keep_me", type: "image" },
-      { public_id: "new_file", type: "image" }
-    ]);
-    expect(mockSave).toHaveBeenCalled();
-  });
-
-  test("handles multiple media removals", async () => {
+  test("deletes media from GCS and edits draft", async () => {
     const mockSave = jest.fn().mockResolvedValue(true);
 
     const mockDraft = {
@@ -133,7 +81,6 @@ describe("editing drafts", () => {
     };
 
     Post.findOne.mockResolvedValueOnce(mockDraft);
-    cloudinary.uploader.destroy.mockResolvedValue({ result: "ok" });
 
     const result = await editDraft({
       ...baseData,
@@ -141,48 +88,69 @@ describe("editing drafts", () => {
       newMedia: []
     });
 
-    expect(cloudinary.uploader.destroy).toHaveBeenCalledTimes(2);
-    expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("remove1", { resource_type: "image" });
-    expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("remove2", { resource_type: "video" });
+    // Expect GCS file.delete to be called for each mediaToRemove
+    expect(mockDelete).toHaveBeenCalledTimes(2);
+    expect(require("../../config/googleConfig.cjs").gcsClient.bucket.file).toHaveBeenCalledWith("remove1");
+    expect(require("../../config/googleConfig.cjs").gcsClient.bucket.file).toHaveBeenCalledWith("remove2");
 
-    expect(result.media).toEqual([
-      { public_id: "keep", type: "image" }
-    ]);
+    // Check that media array in the draft excludes the removed ones and includes the kept media only
+    expect(result.media).toEqual([{ public_id: "keep", type: "image" }]);
     expect(mockSave).toHaveBeenCalled();
   });
 
-  test("handles errors in cloudinary destroy without failing", async () => {
+  test("handles errors deleting media from GCS gracefully", async () => {
     const mockSave = jest.fn().mockResolvedValue(true);
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     const mockDraft = {
       postId: "post123",
       username: "user1",
       draft: true,
-      media: [
-        { public_id: "remove_me", type: "image" }
-      ],
+      media: [{ public_id: "remove_err", type: "image" }],
       save: mockSave
     };
 
     Post.findOne.mockResolvedValueOnce(mockDraft);
-    cloudinary.uploader.destroy.mockRejectedValueOnce(new Error("Cloudinary error"));
-
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    mockDelete.mockRejectedValueOnce(new Error("GCS deletion failed"));
 
     const result = await editDraft({
       ...baseData,
-      mediaToRemove: ["remove_me"],
+      mediaToRemove: ["remove_err"],
       newMedia: []
     });
 
-    expect(cloudinary.uploader.destroy).toHaveBeenCalledWith("remove_me", { resource_type: "image" });
+    expect(mockDelete).toHaveBeenCalledWith();
     expect(consoleErrorSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Error deleting media remove_me"),
+      expect.stringContaining("Error deleting media remove_err"),
       expect.any(Error)
     );
+
     expect(result.media).toEqual([]);
     expect(mockSave).toHaveBeenCalled();
 
     consoleErrorSpy.mockRestore();
+  });
+
+  test("throws error if draft does not exist", async () => {
+    Post.findOne.mockResolvedValueOnce(null);
+    await expect(editDraft(baseData)).rejects.toThrow("Draft does not exist");
+  });
+
+  test("throws error if user unauthorized", async () => {
+    Post.findOne.mockResolvedValueOnce({
+      postId: "post123",
+      username: "someoneElse",
+      draft: true
+    });
+    await expect(editDraft(baseData)).rejects.toThrow("Unauthorized");
+  });
+
+  test("throws error if post already published", async () => {
+    Post.findOne.mockResolvedValueOnce({
+      postId: "post123",
+      username: "user1",
+      draft: false
+    });
+    await expect(editDraft(baseData)).rejects.toThrow("Cannot edit a published post");
   });
 });

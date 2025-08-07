@@ -3,38 +3,35 @@ const {createPost,editDraft,deletePost,getFilteredPosts,getPostWithComment,getAl
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams,validateQuery} = require("./../../middleware/validate.cjs")
 const {postDraftSchema,querySchema,paramsSchema,postTitleParamSchema,searchBarParamSchema} = require("./../../utils/validators/postValidator.cjs")
-const upload = require("./../../config/storage.cjs");
+const upload = require("../../config/googleStorage.cjs");
 const normalizeTagsMiddleware = require("./../../middleware/normalizeTags.cjs");
-const {cloudinary} = require("./../../config/cloudinary.cjs");
+const { gcsClient } = require("../../config/googleConfig.cjs"); // Update path if needed
 const router = express.Router();
 
 //create post/Draft
-router.post(
-  "/create",
-  auth,
-  upload.array("media", 5), // <-- using custom GCS-based middleware
-  normalizeTagsMiddleware,
-  validateBody(postDraftSchema),
-  async (req, res) => {
-    try {
-      const { title, content, tags, draft = false } = req.body;
-      const username = req.currentUser.username;
-      console.log("User:", username);
+router.post("/create", auth, upload.array("media", 5), normalizeTagsMiddleware, validateBody(postDraftSchema), async (req, res) => {
+  try {
+    const { title, content, tags, draft = false } = req.body;
+    const username = req.currentUser.username;
 
-      const media = (req.files || []).map(file => ({
-        url: file.url, // this is now `/media/...` from GCS upload
-        type: file.resource_type,
-        public_id: file.public_id,
-      }));
+    // Use req.files as returned by multer GCS storage (already encrypted and uploaded)
+    const media = (req.files || []).map(file => ({
+      url: file.url,
+      type: file.resource_type,
+      public_id: file.public_id,
+      original_filename: file.originalname,
+      mimetype: file.mimetype,
+      format: file.format,
+    }));
 
-      const createdPost = await createPost({ title, content, tags, username, draft, media });
-      res.status(200).json(createdPost);
-    } catch (error) {
-      // No need to call cloudinary.uploader.destroy anymore
-      res.status(400).json({ error: error.message || error.toString() });
-    }
+    const createdPost = await createPost({ title, content, tags, username, draft, media });
+
+    res.status(200).json(createdPost);
+  } catch (error) {
+    res.status(400).json({ error: error.message || error.toString() });
   }
-);
+});
+
 
 
 
@@ -159,40 +156,74 @@ router.delete("/myDrafts/:post/delete",auth,validateParams(paramsSchema),async(r
 
 
 //edit draft via postId
-router.put("/myDrafts/:post/edit", auth, validateParams(paramsSchema), upload.array("media", 5), normalizeTagsMiddleware, validateBody(postDraftSchema), async (req, res) => {
+
+
+router.put(
+  "/myDrafts/:post/edit",
+  auth,
+  validateParams(paramsSchema),
+  upload.array("media", 5),
+  normalizeTagsMiddleware,
+  validateBody(postDraftSchema),
+  async (req, res) => {
     try {
-        const postId = req.params.post;
-        const { title, content, tags, draft = true } = req.body;
-        const username = req.currentUser.username;
+      const postId = req.params.post;
+      const { title, content, tags, draft = true } = req.body;
+      const username = req.currentUser.username;
 
-        let mediaToRemove = [];
+      let mediaToRemove = [];
+      if (req.body.mediaToRemove) {
+        const raw = req.body.mediaToRemove;
+        mediaToRemove = Array.isArray(raw) ? raw : [raw];
+      }
 
-        if (req.body.mediaToRemove) {
-            const raw = req.body.mediaToRemove;
-            mediaToRemove = Array.isArray(raw) ? raw : [raw];
-        }
+      console.log("Parsed mediaToRemove:", mediaToRemove);
 
-        console.log("Parsed mediaToRemove:", mediaToRemove);
+      // 1. Map uploaded files to media objects
+      let newMedia = [];
+      if (req.files && req.files.length > 0) {
+        newMedia = req.files.map(file => ({
+          url: file.url,  // from GCS multer engine
+          type: file.mimetype.startsWith("video") ? "video" : "image",
+          public_id: file.filename, // filename = GCS object name
+          original_filename: file.originalname,
+          mimetype: file.mimetype,
+        }));
+      }
 
-        let newMedia = [];
-        if (req.files && req.files.length > 0) {
-            newMedia = req.files.map(file => ({
-                url: file.path,
-                type: file.mimetype.startsWith("video") ? "video" : "image",
-                public_id: file.filename,
-            }));
-        }
+      // 2. Remove old media from GCS
+      if (mediaToRemove.length > 0) {
+        await Promise.all(
+          mediaToRemove.map(async (publicId) => {
+            try {
+              await gcsClient.bucket.file(publicId).delete();
+              console.log(`Deleted GCS file: ${publicId}`);
+            } catch (err) {
+              console.warn(`Failed to delete ${publicId}:`, err.message);
+            }
+          })
+        );
+      }
 
-        const updatedDraft = await editDraft({ postId, content, title, tags, username, draft, newMedia, mediaToRemove });
-        res.status(200).json(updatedDraft);
+      // 3. Pass everything to service
+      const updatedDraft = await editDraft({
+        postId,
+        content,
+        title,
+        tags,
+        username,
+        draft,
+        newMedia,
+        mediaToRemove
+      });
+
+      res.status(200).json(updatedDraft);
     } catch (error) {
-        if (req.files && req.files.length > 0) {
-            await Promise.all(
-                req.files.map(file => cloudinary.uploader.destroy(file.filename, { resource_type: "auto" }))
-            );
-        }
-        res.status(400).send(error.message);
+      console.error(error);
+      res.status(400).json({ error: error.message || error.toString() });
     }
-});
+  }
+);
+
 
 module.exports = router
