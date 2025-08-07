@@ -1,13 +1,16 @@
 # Multi-stage build for Railway deployment
 FROM node:20-alpine as frontend-build
 
+# Set memory limit for Node.js
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
 WORKDIR /app
 
 # Copy package files for frontend
 COPY package.json package-lock.json* ./
 
 # Install frontend dependencies
-RUN npm ci
+RUN npm install
 
 # Copy frontend source code
 COPY . .
@@ -18,13 +21,16 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine
 
+# Set memory limit for Node.js
+ENV NODE_OPTIONS="--max-old-space-size=1024"
+
 WORKDIR /app
 
 # Copy backend files
 COPY BACKEND/Forum/ ./
 
 # Install backend dependencies
-RUN npm ci --only=production
+RUN npm install --only=production
 
 # Copy built frontend to serve as static files
 COPY --from=frontend-build /app/dist ./public
