@@ -10,24 +10,35 @@ class GoogleCloudStorageService {
   constructor() {
     this.forumBackendUrl = process.env.FORUM_BACKEND_URL || 'http://localhost:5001';
     
-    // Check for required environment variables
+    // Check for required environment variables with warnings instead of errors
     if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
-      console.error('❌ GOOGLE_CLOUD_PROJECT_ID environment variable is required');
-      throw new Error('GOOGLE_CLOUD_PROJECT_ID environment variable is required');
+      console.warn('⚠️ GOOGLE_CLOUD_PROJECT_ID environment variable is not set');
     }
 
     if (!process.env.GCS_BUCKET_NAME) {
-      console.error('❌ GCS_BUCKET_NAME environment variable is required');
-      throw new Error('GCS_BUCKET_NAME environment variable is required');
+      console.warn('⚠️ GCS_BUCKET_NAME environment variable is not set');
     }
     
-    // Initialize Google Cloud Storage client
-    this.storage = new Storage({
-      projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
-      keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE,
-    });
-    
-    this.bucket = this.storage.bucket(process.env.GCS_BUCKET_NAME);
+    // Only initialize Google Cloud Storage client if we have the required variables
+    if (process.env.GOOGLE_CLOUD_PROJECT_ID && process.env.GCS_BUCKET_NAME) {
+      try {
+        this.storage = new Storage({
+          projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
+          keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE,
+        });
+        
+        this.bucket = this.storage.bucket(process.env.GCS_BUCKET_NAME);
+        console.log('✅ Google Cloud Storage client initialized successfully');
+      } catch (error) {
+        console.error('❌ Failed to initialize Google Cloud Storage client:', error.message);
+        this.storage = null;
+        this.bucket = null;
+      }
+    } else {
+      console.warn('⚠️ Google Cloud Storage client not initialized - missing environment variables');
+      this.storage = null;
+      this.bucket = null;
+    }
   }
 
   /**
@@ -91,8 +102,22 @@ class GoogleCloudStorageService {
         }
       });
       
+      console.log('Upload response status:', response.status);
+      console.log('Upload response headers:', Object.fromEntries(response.headers.entries()));
+      
       if (!response.ok) {
-        throw new Error(`Google Cloud Storage upload failed: ${response.status} ${response.statusText}`);
+        const errorText = await response.text();
+        console.error('Upload failed with status:', response.status, 'Error:', errorText);
+        throw new Error(`Google Cloud Storage upload failed: ${response.status} ${response.statusText} - ${errorText}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      console.log('Response content-type:', contentType);
+      
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Expected JSON response but got:', contentType, 'Response:', responseText.substring(0, 500));
+        throw new Error(`Expected JSON response but got ${contentType}. This usually means the server returned an error page.`);
       }
       
       const result = await response.json();

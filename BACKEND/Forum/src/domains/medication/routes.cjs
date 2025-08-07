@@ -173,21 +173,32 @@ router.get('/user-data', auth, async (req, res) => {
 // Upload medication image to Google Cloud Storage
 router.post('/upload-image', auth, upload.single('medicationImage'), async (req, res) => {
     try {
+        console.log('Upload medication image request received');
+        
         if (!req.file) {
+            console.error('No file provided in request');
             return res.status(400).json({ 
                 error: 'No image file provided',
                 message: 'Please provide a medication image to upload'
             });
         }
 
+        console.log('File received:', {
+            filename: req.file.filename,
+            originalname: req.file.originalname,
+            mimetype: req.file.mimetype,
+            size: req.file.size
+        });
+
         // The file is already uploaded to Google Cloud Storage by the custom storage engine
         const uploadResult = {
-            url: req.file.secure_url || req.file.url,
+            url: req.file.secure_url || req.file.url || req.file.path,
             public_id: req.file.public_id || req.file.filename,
             type: 'image',
             format: req.file.format,
             bytes: req.file.bytes || req.file.size,
-            resource_type: req.file.resource_type || 'image'
+            resource_type: req.file.resource_type || 'image',
+            original_filename: req.file.originalname
         };
 
         console.log('Medication image uploaded to Google Cloud Storage:', uploadResult);
@@ -201,10 +212,12 @@ router.post('/upload-image', auth, upload.single('medicationImage'), async (req,
     } catch (error) {
         console.error('Error uploading medication image:', error);
         
-        // Clean up uploaded file if there was an error
+        // Clean up uploaded file if there was an error and we have the file info
         if (req.file && req.file.public_id) {
             try {
+                console.log('Attempting cleanup of file:', req.file.public_id);
                 await gcsClient.destroy(req.file.public_id);
+                console.log('File cleanup successful');
             } catch (cleanupError) {
                 console.error('Error cleaning up uploaded file:', cleanupError);
             }
@@ -212,7 +225,8 @@ router.post('/upload-image', auth, upload.single('medicationImage'), async (req,
         
         res.status(500).json({
             error: 'Internal server error',
-            message: 'Failed to upload medication image'
+            message: 'Failed to upload medication image',
+            details: process.env.NODE_ENV === 'development' ? error.message : undefined
         });
     }
 });// Delete medication image from Google Cloud Storage

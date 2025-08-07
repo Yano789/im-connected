@@ -33,9 +33,34 @@ class MedicationGoogleCloudService {
                 body: formData,
             });
 
+            console.log('Upload response status:', response.status);
+            console.log('Upload response status text:', response.statusText);
+
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || `Upload failed: ${response.status}`);
+                let errorMessage = `Upload failed: ${response.status} ${response.statusText}`;
+                
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.message || errorData.error || errorMessage;
+                } catch (parseError) {
+                    // If we can't parse JSON, try to get text
+                    try {
+                        const errorText = await response.text();
+                        console.error('Server error response:', errorText.substring(0, 500));
+                        errorMessage = 'Server returned an error page instead of JSON. Check server logs.';
+                    } catch (textError) {
+                        console.error('Could not read error response:', textError);
+                    }
+                }
+                
+                throw new Error(errorMessage);
+            }
+
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                const responseText = await response.text();
+                console.error('Expected JSON but got:', contentType, 'Response:', responseText.substring(0, 500));
+                throw new Error('Server returned HTML instead of JSON. This usually indicates a server error.');
             }
 
             const result = await response.json();
