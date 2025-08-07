@@ -1,25 +1,7 @@
 {
   "version": 2,
+  "framework": "vite",
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
-  "installCommand": "npm ci",
-  "framework": "vite",
-  "routes": [
-    {
-      "src": "/api/v1/(.*)",
-      "dest": "/api/forum.js"
-    },
-    {
-      "src": "/api/scanner/(.*)",
-      "dest": "/api/scanner.js"
-    },
-    {
-      "src": "/api/assistants/(.*)",
-      "dest": "/api/assistants/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
+  "installCommand": "npm ci"
 }
