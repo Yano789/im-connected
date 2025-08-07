@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoginPeople from "../assets/LoginPeople.png";
 import "./ForgotPassword.css";
+import { useTranslation } from "react-i18next";
 
 function ForgotPasswordOTP() {
   const inputsRef = useRef([]);
@@ -9,6 +10,7 @@ function ForgotPasswordOTP() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const email = localStorage.getItem("resetEmail");
+  const {t} = useTranslation();
 
   useEffect(() => {
     if (!email) {
@@ -113,17 +115,17 @@ function ForgotPasswordOTP() {
       <img src={LoginPeople} alt="Forgot Password Visual" className="forgot-password-image" />
       <form onSubmit={handleSubmit} className="forgot-password-form">
         <div className="welcome-section">
-          <h2 className="welcome-title">Enter Reset Code</h2>
+          <h2 className="welcome-title">{t("Enter Reset Code")}</h2>
           <p className="welcome-subtitle">
-            We sent a 6-digit code to {email}
+            {t("We sent a 6-digit code to")} {email}
           </p>
           <div className="resend-section">
             <p className="resend-text">
-              Didn't get the code? Click {' '}
+              {t("Didn't get the code? Click")} {' '}
               <button type="button" className="resend-link" onClick={handleResend}>
-                here
+                {t("here")}
               </button>
-              {' '}to resend.
+              {' '}{t("to resend.")}
             </p>
           </div>
         </div>
@@ -149,7 +151,7 @@ function ForgotPasswordOTP() {
           className="forgot-password-button"
           disabled={loading}
         >
-          {loading ? "Verifying..." : "Verify Code"}
+          {loading ? t("Verifying...") : t("Verify Code")}
         </button>
 
         {status && (
@@ -163,7 +165,7 @@ function ForgotPasswordOTP() {
             type="button"
             className="register-link"
             onClick={() => navigate("/forgotpassword")}>
-            ← Back to Email
+            {t("← Back to Email")}
           </button>
         </div>
       </form>

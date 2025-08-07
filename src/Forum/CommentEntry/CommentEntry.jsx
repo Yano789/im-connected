@@ -81,7 +81,7 @@ function CommentEntry({ comment, postId, refreshComments, onDelete }) {
             onChange={(e) => setEditedContent(e.target.value)}
           />
           <div className="commentFunction">
-            <div onClick={handleEdit} className="cursor-pointer">Save</div>
+            <div onClick={handleEdit} className="cursor-pointer">{t("Save")}</div>
             <div
               onClick={() => {
                 setIsEditing(false);
@@ -89,7 +89,7 @@ function CommentEntry({ comment, postId, refreshComments, onDelete }) {
               }}
               className="cursor-pointer"
             >
-              Cancel
+              {t("Cancel")}
             </div>
           </div>
         </>
@@ -97,9 +97,9 @@ function CommentEntry({ comment, postId, refreshComments, onDelete }) {
         <>
           <div className="commentContent">{editedContent}</div>
           <div className="commentFunction">
-            <div className="cursor-pointer" onClick={handleDelete}>Delete</div>
-            <div className="cursor-pointer" onClick={() => setIsReplying(!isReplying)}>Reply</div>
-            <div onClick={() => setIsEditing(true)} className="cursor-pointer">Edit</div>
+            <div className="cursor-pointer" onClick={handleDelete}>{t("Delete")}</div>
+            <div className="cursor-pointer" onClick={() => setIsReplying(!isReplying)}>{t("Reply")}</div>
+            <div onClick={() => setIsEditing(true)} className="cursor-pointer">{t("Edit")}</div>
           </div>
         </>
       )}
@@ -108,11 +108,11 @@ function CommentEntry({ comment, postId, refreshComments, onDelete }) {
         <div className="replySection">
           <textarea
             className="replyInput"
-            placeholder="Write your reply..."
+            placeholder={t("Write your reply...")}
             value={replyContent}
             onChange={(e) => setReplyContent(e.target.value)}
           />
-          <button onClick={handleReply} className="replyButton">Post Reply</button>
+          <button onClick={handleReply} className="replyButton">{t("Post Reply")}</button>
         </div>
       )}
 

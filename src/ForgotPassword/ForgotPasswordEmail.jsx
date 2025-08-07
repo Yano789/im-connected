@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import LoginPeople from "../assets/LoginPeople.png";
 import "./ForgotPassword.css";
+import { useTranslation } from "react-i18next";
 
 function ForgotPasswordEmail() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const {t} = useTranslation();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,17 +49,17 @@ function ForgotPasswordEmail() {
       <img src={LoginPeople} alt="Forgot Password Visual" className="forgot-password-image" />
       <form onSubmit={handleSubmit} className="forgot-password-form">
         <div className="welcome-section">
-          <h2 className="welcome-title">Forgot Password?</h2>
+          <h2 className="welcome-title">{t("Forgot Password?")}</h2>
           <p className="welcome-subtitle">
-            Don't worry! Enter your email address and we'll send you a reset code.
+            {t("Don't worry! Enter your email address and we'll send you a reset code.")}
           </p>
         </div>
 
         <div className="form-field">
-          <label className="form-label">Email address</label>
+          <label className="form-label">{t("Email address")}</label>
           <input
             type="email"
-            placeholder="Enter your email address"
+            placeholder={t("Enter your email address")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -70,7 +72,7 @@ function ForgotPasswordEmail() {
           className="forgot-password-button"
           disabled={loading}
         >
-          {loading ? "Sending..." : "Send Reset Code"}
+          {loading ? t("Sending...") : t("Send Reset Code")}
         </button>
 
         {status && (
@@ -81,7 +83,7 @@ function ForgotPasswordEmail() {
 
         <div className="back-to-login">
           <Link to="/login" className="register-link">
-            ← Back to Login
+            {t("← Back to Login")}
           </Link>
         </div>
       </form>

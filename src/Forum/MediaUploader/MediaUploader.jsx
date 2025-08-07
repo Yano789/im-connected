@@ -49,7 +49,7 @@ function MediaUploader({
       {/* Existing media (from backend) */}
       {existingMedia.length > 0 && (
         <div className="existingMediaContainer">
-          <h4>Previously Uploaded:</h4>
+          <h4>{t("Previously Uploaded:")}</h4>
           <div className="mediaPreviewGrid">
             {existingMedia.map((media, index) => (
               <div className="mediaItem" key={index}>
@@ -74,7 +74,7 @@ function MediaUploader({
       {/* New media (not uploaded yet) */}
       {mediaFiles.length > 0 && (
         <div className="newMediaContainer">
-          <h4>New Media:</h4>
+          <h4>{t("New Media:")}</h4>
           <div className="mediaPreviewGrid">
             {mediaFiles.map((file, index) => {
               const previewURL = URL.createObjectURL(file);

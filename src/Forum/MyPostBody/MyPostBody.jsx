@@ -5,12 +5,14 @@ import ToPost from "../ToPost/ToPost";
 import TopicSelector from "../TopicSelector/TopicSelector";
 import Delete from "../Delete/Delete";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 
 function MyPostBody() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [myPosts, setMyPosts] = useState([]);
   const [likedPostIds, setLikedPostIds] = useState(new Set());  // <-- Added liked posts state
+  const {t} = useTranslation();
 
   const removePost = (id) => {
     setMyPosts((prev) => prev.filter((post) => post.postId !== id));
@@ -91,9 +93,9 @@ function MyPostBody() {
 
       <div className="forumBody">
         {loading ? (
-          <p>Loading...</p>
+          <p>{("Loading...")}</p>
         ) : error ? (
-          <p>Error: {error}</p>
+          <p>{t("Error: {error}")}</p>
         ) : myPosts.length > 0 ? (
           myPosts.map((post) => (
             <ForumCard
@@ -117,7 +119,7 @@ function MyPostBody() {
             />
           ))
         ) : (
-          <p>You haven’t posted anything yet.</p>
+          <p>{t("You haven’t posted anything yet.")}</p>
         )}
       </div>
 

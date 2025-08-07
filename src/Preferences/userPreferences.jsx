@@ -15,11 +15,11 @@ import { useTranslation } from "react-i18next";
 import { applyTextSize } from "../Profile/TextSize";
 
 const UserPreferences = () => {
-  const { t } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [selectedTextSize, setSelectedTextSize] = useState("Medium");
   const [selectedContentMode, setSelectedContentMode] = useState("Easy Read");
   const [selectedTopics, setSelectedTopics] = useState([]);
+  const {t} = useTranslation();
 
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
@@ -46,12 +46,12 @@ const UserPreferences = () => {
   ];
 
   const textSizes = [
-    { id: "Small", label: "Small", fontSize: "18px" },
-    { id: "Medium", label: "Medium", fontSize: "24px" },
-    { id: "Large", label: "Big", fontSize: "32px" },
+    { id: "Small", label: t("Small"), fontSize: "18px" },
+    { id: "Medium", label: t("Medium"), fontSize: "24px" },
+    { id: "Big", label: t("Big"), fontSize: "32px" },
   ];
 
-  const getContentModes = () => [
+  const contentModes = [
     { id: "Easy Read", label: t("Easy Reader Mode") },
     { id: "Default", label: t("Default Mode") },
   ];
@@ -60,25 +60,21 @@ const UserPreferences = () => {
     {
       id: "physical-disability",
       label: t("Physical Disability & Chronic Illness"),
-      englishLabel: "Physical Disability & Chronic Illness",
       icon: <img src={Wheelchair} alt="Wheelchair" />,
     },
     {
       id: "end-of-life",
       label: t("End of Life Care"),
-      englishLabel: "End of Life Care",
       icon: <img src={Elderly} alt="Elderly" />,
     },
     {
       id: "mental-disability",
       label: t("Mental Disability"),
-      englishLabel: "Mental Disability",
       icon: <img src={Depression} alt="Depression" />,
     },
     {
       id: "pediatric-care",
       label: t("Pediatric Care"),
-      englishLabel: "Pediatric Care",
       icon: <img src={Children} alt="Children" />,
     },
   ];
@@ -87,25 +83,21 @@ const UserPreferences = () => {
     {
       id: "personal-mental-health",
       label: t("Personal Mental Health"),
-      englishLabel: "Personal Mental Health",
       icon: <img src={MentalHealth} alt="MentalHealth" />,
     },
     {
       id: "financial-legal",
       label: t("Financial & Legal Help"),
-      englishLabel: "Financial & Legal Help",
       icon: <img src={Money} alt="Money" />,
     },
     {
       id: "hospitals",
       label: t("Hospitals and Clinics"),
-      englishLabel: "Hospitals and Clinics",
       icon: <img src={Hospital} alt="Hospital" />,
     },
     {
       id: "subsidies-govt",
       label: t("Subsidies and Govt Support"),
-      englishLabel: "Subsidies and Govt Support",
       icon: <img src={Govt} alt="Govt" />,
     },
   ];
@@ -232,12 +224,15 @@ const UserPreferences = () => {
           <div className="header-section">
             <h1 className="greeting">{t("Hi")} {username}!</h1>
             <p className="subtitle">{t("We want to get to know you better")}</p>
+            <h1 className="greeting">{t("Hi")} {username}!</h1>
+            <p className="subtitle">{t("We want to get to know you better")}</p>
           </div>
 
           <div className="main-content">
             <div className="left-column">
               <div className="signup-preference-group">
                 <label className="signup-preference-label">
+                  {t("Preferred Language")}
                   {t("Preferred Language")}
                 </label>
                 <div className="language-options">
@@ -303,9 +298,12 @@ const UserPreferences = () => {
               <div className="signup-preference-group">
                 <label className="signup-preference-label">
                   {t("Topics Interested In")}
+                  {t("Topics Interested In")}
                 </label>
 
                 <div className="topics-header">
+                  <span>{t("For Care Recipient")}</span>
+                  <span>{t("For Caregiver")}</span>
                   <span>{t("For Care Recipient")}</span>
                   <span>{t("For Caregiver")}</span>
                 </div>
