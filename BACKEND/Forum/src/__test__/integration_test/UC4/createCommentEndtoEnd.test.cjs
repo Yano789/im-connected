@@ -51,6 +51,10 @@ describe("Create a comment to a post", () => {
             process.env.TOKEN_KEY,
             { expiresIn: process.env.TOKEN_EXPIRY }
         );
+
+                await User.deleteMany()
+        await Post.deleteMany()
+        await Comment.deleteMany()
     })
 
 
