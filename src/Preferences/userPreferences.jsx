@@ -15,7 +15,6 @@ import { useTranslation } from "react-i18next";
 import { applyTextSize } from "../Profile/TextSize";
 
 const UserPreferences = () => {
-  const { t } = useTranslation();
   const [selectedLanguage, setSelectedLanguage] = useState("en");
   const [selectedTextSize, setSelectedTextSize] = useState("Medium");
   const [selectedContentMode, setSelectedContentMode] = useState("Easy Read");
