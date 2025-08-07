@@ -1,9 +1,8 @@
 
 .Title{
   align-self: stretch;
-color: #FFB266;
+color: var(--chatbot-accent);
 text-align: center;
-font-family: 'Poppins', sans-serif;
 font-size: 64px;
 font-style: normal;
 font-weight: 400;
@@ -11,8 +10,7 @@ line-height: normal;
 }
 
 .Title2{
-color: #383838;
-font-family: 'Poppins', sans-serif;
+color: var(--border-2);
 font-size: 64px;
 font-style: normal;
 font-weight: 400;
@@ -20,9 +18,8 @@ line-height: normal;
 }
 
 .SubTitle{
-color: #383838;
+color: var(--border-2);
 text-align: center;
-font-family: 'Poppins', sans-serif;
 font-size: 40px;
 font-style: normal;
 font-weight: 400;
@@ -36,9 +33,9 @@ line-height: normal;
   max-width: 1205px;
   margin: 0 auto;
   height: 70vh;
-  background: #FFFDF9;
+  background: var(--border-1);
   border-radius: 16px;
-  box-shadow: 0px 20px 0px #FFB266, 0px 13px 20px rgba(0, 0, 0, 0.25);
+  box-shadow: 0px 20px 0px var(--chatbot-accent), 0px 13px 20px rgba(0, 0, 0, 0.25);
   padding: 32px 24px 16px 24px;
   box-sizing: border-box;
 }
@@ -46,20 +43,19 @@ line-height: normal;
 .chatHeader h1 {
   font-size: 48px;
   text-align: center;
-  font-family: Poppins, sans-serif;
   font-weight: 400;
   margin: 0;
   color: #383838;
 }
 
 .highlight {
-  color: #FFB266;
+  color: var(--chatbot-accent);
 }
 
 .subtext {
   text-align: center;
   font-size: 18px;
-  color: #585858;
+  color: var(--shadow-3);
   margin-bottom: 20px;
 }
 
@@ -98,10 +94,10 @@ flex: 1 0 0;
 }
 
 .userBubble {
-  background: #FFF7EF;
-  color: #000;
+  background: var(--button-colour-2);
+  color: var(--border-2);
   padding: 12px 16px;
-  border-radius: 20px 20px 0px 20px; /* match Figma: sharp bottom-right */
+  border-radius: 20px 20px 0px 20px;
   box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.15);
   font-family: system-ui;
   font-size: 17px;
@@ -125,10 +121,10 @@ flex: 1 0 0;
 }
 
 .assistantBubble {
-  background: rgba(255, 178, 102, 0.60);
-  color: #000;
+  background:var(--button-colour-1);
+  color: var(--border-2);
   padding: 12px 16px;
-  border-radius: 20px 20px 20px 0px; /* match Figma: sharp bottom-right */
+  border-radius: 20px 20px 20px 0px;
   box-shadow: 2px 3px 4px rgba(0, 0, 0, 0.15);
   font-family: system-ui;
   font-size: 17px;
@@ -146,7 +142,7 @@ flex: 1 0 0;
   display: flex;
   align-items: center;
   margin-top: 16px;
-  background: #FFDBA8;
+  background: var(--chatbot-accent);
   border-radius: 16px;
   padding: 8px 16px;
   font-family: system-ui;

@@ -1,11 +1,8 @@
 .medication-wrapper {
     padding-bottom: 1rem;
     margin-bottom: 1rem;
-    /* This is the separator line between each medication */
     border-bottom: 2px solid #fbe0e0;
 }
-
-/* Removes the line from the very last item in the list */
 .medication-wrapper:last-child {
     border-bottom: none;
     margin-bottom: 0;
@@ -15,11 +12,11 @@
 .med-item-layout {
     display: flex;
     gap: 1.5rem;
-    align-items: stretch; /* Makes columns equal height */
+    align-items: stretch; 
 }
 
 .med-name-container {
-    flex: 1; /* Takes up 1 part of the available space */
+    flex: 1; 
 }
 
 .med-name-button {

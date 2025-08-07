@@ -1,9 +1,9 @@
 .card {
-    background-color: #fff;
+    background-color: var(--border-1);
     border-radius: 16px;
     padding: 1.5rem;
     position: relative;
-    box-shadow: 0 10px 0px #F87575, 0 8px 24px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 0px var(--med-accent), 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .card-header {
@@ -11,7 +11,7 @@
     font-weight: bold;
     margin: 0;
     padding-bottom: 1rem;
-    border-bottom: 4px solid #F87575; 
+    border-bottom: 4px solid var(--med-accent);
 }
 
 .recipient-list {
@@ -25,7 +25,7 @@
     align-items: center;
     padding: 1rem 0.25rem;
     cursor: pointer;
-    border-bottom: 4px solid #F87575;
+    border-bottom: 4px solid var(--med-accent);
 }
 
 .recipient-item.last-item {
@@ -34,7 +34,7 @@
 
 .switch-button, .show-button {
     border: none;
-    background-color: #f0f0f0;
+    background-color: var(--shadow-2);
     padding: 0.4rem 1rem;
     border-radius: 20px;
     font-size: 0.9rem;
@@ -42,8 +42,8 @@
 }
 
 .show-button {
-    background-color: #F87575;
-    color: white;
+    background-color: var(--med-accent);
+    color:var(--border-1);
 }
 
 .recipient-buttons {
@@ -54,8 +54,8 @@
 
 .delete-recipient-button {
     border: none;
-    background-color: #dc3545;
-    color: white;
+    background-color: var(--error-text);
+    color: var(--border-1);
     width: 24px;
     height: 24px;
     border-radius: 50%;
@@ -69,7 +69,7 @@
 }
 
 .delete-recipient-button:hover {
-    background-color: #c82333;
+    background-color: var(--med-accent);
 }
 
 .add-recipient-button {
@@ -81,11 +81,10 @@
     cursor: pointer;
     font-weight: 500;
     text-align: center;
-    color: #555;
+    color: var(--shadow-3);
     border-radius: 8px;
 }
 
-/* --- Animation Logic is now ONLY for the line --- */
 .add-recipient-inline-form {
     display: flex;
     flex-wrap: wrap; 
@@ -96,7 +95,7 @@
 .animated-line {
   width: 100%;
   height: 4px;
-  background-color: #F87575;
+  background-color: var(--med-accent);
   margin-bottom: 0.5rem;
   animation: spreadFromMiddle 0.2s ease-out forwards;
 }
@@ -120,8 +119,8 @@
 
 .save-new-button {
     border: none;
-    background-color: #52b788;
-    color: white;
+    background-color: var(--success-text);
+    color: var(--border-1);
     font-weight: bold;
     padding: 0 1rem;
     border-radius: 8px;
