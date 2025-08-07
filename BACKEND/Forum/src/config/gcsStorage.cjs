@@ -1,13 +1,24 @@
 const { Storage } = require('@google-cloud/storage');
 
+// Validate required environment variables
+if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
+  console.error('❌ Missing GOOGLE_CLOUD_PROJECT_ID environment variable');
+  throw new Error('GOOGLE_CLOUD_PROJECT_ID is required for Google Cloud Storage');
+}
+
+if (!process.env.GCS_BUCKET_NAME) {
+  console.error('❌ Missing GCS_BUCKET_NAME environment variable');
+  throw new Error('GCS_BUCKET_NAME is required for Google Cloud Storage');
+}
+
 const storage = new Storage({
   projectId: process.env.GOOGLE_CLOUD_PROJECT_ID,
   keyFilename: process.env.GOOGLE_CLOUD_KEY_FILE,
 });
 
 const gcsClient = {
-  bucket: storage.bucket(process.env.GCS_BUCKET_NAME || 'default-bucket'),
-  bucketName: process.env.GCS_BUCKET_NAME || 'default-bucket',
+  bucket: storage.bucket(process.env.GCS_BUCKET_NAME),
+  bucketName: process.env.GCS_BUCKET_NAME,
 
   // Upload file to Google Cloud Storage
   uploadBuffer: async (buffer, fileName, mimeType) => {

@@ -13,7 +13,7 @@ jest.mock('../../middleware/auth.cjs', () => {
     next();
   };
 });
-jest.mock("../../config/googleConfig.cjs", () => ({
+jest.mock("../../config/gcsStorage.cjs", () => ({
   gcsClient: {
     url: jest.fn(async (publicId) => `http://example.com/${publicId}.jpg`),
   },
