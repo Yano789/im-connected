@@ -4,6 +4,7 @@ import "./Authentication.css";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../config/api";
 
 function Auth() {
     const inputsRef = useRef([]);
@@ -56,7 +57,7 @@ function Auth() {
 
     const handleResend = async () => {
         try {
-            const response = await fetch("http://localhost:5001/api/v1/email_verification", {
+            const response = await fetch(API_ENDPOINTS.EMAIL_VERIFICATION, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -88,7 +89,7 @@ function Auth() {
 
         const code = inputsRef.current.map((input) => input.value).join("");
         try {
-            const res = await fetch("http://localhost:5001/api/v1/email_verification/verify", {
+            const res = await fetch(API_ENDPOINTS.EMAIL_VERIFICATION_VERIFY, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

@@ -86,7 +86,7 @@
 }
 
 .tagItem {
-  background-color: var(--button-colour-2-onselect);
+  background-color: var(--button-colour-2);
   border: 1px solid var(--border-2);
   padding: 0.5rem 1rem; 
   border-radius: 20px;

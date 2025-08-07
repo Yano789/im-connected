@@ -19,7 +19,7 @@ router.post("/", validateBody(loginSchema), async (req, res) => {
     const cookieOptions = {
       httpOnly: true,
       secure: isProduction,
-      sameSite: "Strict",
+      sameSite: isProduction ? "None" : "Strict", // Use "None" in production for cross-origin
       maxAge: 24 * 60 * 60 * 1000
     };
 
@@ -74,10 +74,11 @@ router.post("/preferences", validateBody(preferencesSchema), async (req, res) =>
 
 //logout
 router.post("/logout", (req, res) => {
+  const isProduction = process.env.NODE_ENV === "production";
   res.clearCookie("token", {
     httpOnly: true,
-    secure: true,
-    sameSite: "Strict"
+    secure: isProduction,
+    sameSite: isProduction ? "None" : "Strict"
   });
   return res.status(200).send("Logged out successfully");
 });

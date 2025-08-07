@@ -61,21 +61,21 @@ function AppContent() {
     if (user) {  // if logged in
       if (authRoutes.includes(currentPath) || currentPath === "/auth") {
         console.log("Redirecting authenticated user from auth route to forum");
-        navigate("/forum", { replace: true });
+        navigate("/dashboard", { replace: true });
       }
       else if (currentPath === "/preferences" && !canVerifyEmail) {
         console.log("Redirecting authenticated user from preferences to forum");
-        navigate("/forum", { replace: true });
+        navigate("/dashboard", { replace: true });
       }
     } 
     else {    // if not logged in (not a user)
       if (protectedRoutes.includes(currentPath)) {
         console.log("Redirecting unauthenticated user from protected route to login");
-        navigate("/login", { replace: true });
+        navigate("/", { replace: true });
       }
       else if (verificationRoutes.includes(currentPath) && !canVerifyEmail) {
         console.log("Redirecting unauthenticated user from verification route to login");
-        navigate("/login", { replace: true });
+        navigate("/", { replace: true });
       }
       else if (forgotPasswordRoutes.includes(currentPath)) {
         const resetEmail = localStorage.getItem("resetEmail");
