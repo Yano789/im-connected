@@ -1,5 +1,6 @@
 // API configuration for Railway deployment
-const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname === 'localhost' 
+const API_BASE_URL = typeof window !== 'undefined' && 
+  (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? (__API_URL__ || 'http://localhost:5001')
   : ''; // Empty string for relative paths in production (same domain)
 
@@ -25,6 +26,10 @@ export const API_ENDPOINTS = {
   // Comment endpoints
   COMMENT_EDIT: (postId, commentId) => `${API_BASE_URL}/api/v1/${encodeURIComponent(postId)}/comment/${encodeURIComponent(commentId)}/edit`,
   COMMENT_CREATE: (postId) => `${API_BASE_URL}/api/v1/${encodeURIComponent(postId)}/comment/create`,
+  
+  // Saved posts endpoints
+  SAVED_POSTS: `${API_BASE_URL}/api/v1/saved`,
+  SAVED_POST_ACTION: (postId, action) => `${API_BASE_URL}/api/v1/saved/${encodeURIComponent(postId)}/${action}`,
 };
 
 export { API_BASE_URL };

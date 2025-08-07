@@ -35,7 +35,7 @@ app.use(bodyParser());
 // Serve static files from the public directory (built frontend)
 if (process.env.NODE_ENV === "production") {
   // In Docker, files are copied to ./public relative to the working directory (/app)
-  const publicPath = path.join(__dirname, "../../public");
+  const publicPath = path.join(__dirname, "../public");
   app.use(express.static(publicPath));
   
   // Debug: Log the public directory path
@@ -48,7 +48,7 @@ app.use("/api/v1",routes);
 // Serve frontend for all non-API routes in production
 if (process.env.NODE_ENV === "production") {
   app.get("*", (req, res) => {
-    const indexPath = path.join(__dirname, "../../public/index.html");
+    const indexPath = path.join(__dirname, "../public/index.html");
     console.log("Attempting to serve index.html from:", indexPath);
     res.sendFile(indexPath);
   });

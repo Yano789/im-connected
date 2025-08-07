@@ -6,6 +6,7 @@ import TopicSelector from "../TopicSelector/TopicSelector";
 import Bookmark from "../Bookmark/Bookmark";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function ForumBody() {
   const [posts, setPosts] = useState([]);
@@ -50,7 +51,7 @@ function ForumBody() {
       setLoading(true);
       try {
         const params = new URLSearchParams(query).toString();
-        const res = await fetch(`http://localhost:5001/api/v1/post/?${params}`, {
+        const res = await fetch(`${API_ENDPOINTS.POST_BASE}/?${params}`, {
           method: "GET",
           credentials: "include",
         });
@@ -71,7 +72,7 @@ function ForumBody() {
     const fetchSavedAndLiked = async () => {
       try {
 
-        const savedRes = await fetch("http://localhost:5001/api/v1/saved", {
+        const savedRes = await fetch(API_ENDPOINTS.SAVED_POSTS, {
           method: "GET",
           credentials: "include",
         });

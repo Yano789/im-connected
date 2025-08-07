@@ -7,7 +7,7 @@ if (!process.env.NODE_ENV) {
 
 const app = require("./app.cjs");
 
-const {PORT}  = process.env;
+const PORT = process.env.PORT || 5001;
 
 const startApp = ()=>{
     app.listen(PORT, '0.0.0.0', () => {

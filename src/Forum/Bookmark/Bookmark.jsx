@@ -2,6 +2,7 @@ import "./Bookmark.css";
 import BookmarkIcon from "../../assets/Bookmark.png";
 import UnbookmarkIcon from "../../assets/Unbookmark.png";
 import { useState } from "react";
+import { API_ENDPOINTS } from "../../config/api.js";
 
 function Bookmark({ postId, initialBookmarked}) {
   const [bookmarked, setBookmarked] = useState(initialBookmarked);
@@ -10,7 +11,7 @@ function Bookmark({ postId, initialBookmarked}) {
   const handleBookmarkClick = async (e) => {
     e.stopPropagation();
 
-    const url = `http://localhost:5001/api/v1/saved/${encodeURIComponent(postId)}/${bookmarked ? "delete" : "save"}`;
+    const url = API_ENDPOINTS.SAVED_POST_ACTION(postId, bookmarked ? "delete" : "save");
     const method = bookmarked ? "DELETE" : "POST";
 
     try {
