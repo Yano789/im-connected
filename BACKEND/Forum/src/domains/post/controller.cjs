@@ -46,10 +46,10 @@ const editDraft = async (data) => {
     const toRemoveSet = new Set(mediaToRemove || []);
     const mediaToDelete = currentMedia.filter(m => toRemoveSet.has(m.public_id));
 
-    // Delete media files from GCS instead of Cloudinary
+    // Delete media files from GCS using destroy method
     const deletePromises = mediaToDelete.map(async (file) => {
       try {
-        await gcsClient.bucket.file(file.public_id).delete();
+        await gcsClient.destroy(file.public_id);
         console.log(`Deleted GCS file: ${file.public_id}`);
       } catch (err) {
         console.error(`Error deleting media ${file.public_id}:`, err);
@@ -97,8 +97,8 @@ const deletePost = async (data) => {
       const deletionPromises = existingPost.media.map(async (file) => {
         console.log(`Deleting media: public_id=${file.public_id}, type=${file.type}`);
         try {
-          // Delete file from GCS bucket
-          await gcsClient.bucket.file(file.public_id).delete();
+          // Delete file from GCS bucket using destroy method
+          await gcsClient.destroy(file.public_id);
           return { success: true, public_id: file.public_id };
         } catch (err) {
           console.error(`Failed to delete media ${file.public_id}:`, err);

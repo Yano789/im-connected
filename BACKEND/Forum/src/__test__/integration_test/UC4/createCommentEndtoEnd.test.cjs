@@ -15,28 +15,28 @@ describe("Create a comment to a post", () => {
         await Post.deleteMany()
         await Comment.deleteMany()
     })
-
-
-      async function createUserAndTokenAndPost() {
-        const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
-        const username = `testuser4_${uniqueId}`;
-        const email = `testuser_${uniqueId}@test.com`;
-    
-        const user = await User.create({
-          name: "JOE",
-          username,
-          number: uniqueId.toString(),
-          email,
-          password: "password",
-          verified: true,
-          threadId: null,
+    beforeEach(async () => {
+        //create the mock data user and post , to make comments to
+        user = await User.create({
+            name: "sean",
+            username: "Bearson",
+            number: "+6512421535",
+            email: "test@example.com",
+            password: "hashed-password",
+            verified: true,
+            preferences: {
+                preferredLanguage: "en",
+                textSize: "Medium",
+                contentMode: "Default",
+                topics: ["Pediatric Care"]
+            }
         });
 
-        const post = await Post.create({
-            postId: uniqueId.toString(),
-            title: `Test Post${uniqueId}`,
+        post = await Post.create({
+            postId: "testpostId123",
+            title: "Test Post",
             content: "This is a test",
-            username: username,
+            username: "jane",
             tags: ["Mental Disability", "Pediatric Care"],
             createdAt: Date.now(),
             edited: false,
@@ -45,19 +45,20 @@ describe("Create a comment to a post", () => {
             draft: false,
             media: []
         })
-    
-        const token = jwt.sign(
-          { userId: user._id, username: user.username, email: user.email },
-          process.env.TOKEN_KEY,
-          { expiresIn: process.env.TOKEN_EXPIRY }
+
+        token = jwt.sign(
+            { userId: user._id, username: user.username, email: user.email },
+            process.env.TOKEN_KEY,
+            { expiresIn: process.env.TOKEN_EXPIRY }
         );
-    
-        return { user, token , post };
-      }
+
+                await User.deleteMany()
+        await Post.deleteMany()
+        await Comment.deleteMany()
+    })
 
 
     test("should create a new comment",async()=>{
-        const {user,token,post} = await createUserAndTokenAndPost();
         const res = await request(app)
             .post(`/api/v1/${post.postId}/comment/create`)
             .set("Cookie",[`token=${token}`])
@@ -73,7 +74,6 @@ describe("Create a comment to a post", () => {
     })
 
     test("should fail with invalid postId",async()=>{
-                const {token} = await createUserAndTokenAndPost();
         const res = await request(app)
             .post("/api/v1/invalidPostId/comment/create")
             .set("Cookie",[`token=${token}`])
@@ -87,8 +87,6 @@ describe("Create a comment to a post", () => {
     })
 
     test("should fail without right auth token",async()=>{
-        const {post} = await createUserAndTokenAndPost();
-
         const res = await request(app)
             .post(`/api/v1/${post.postId}/comment/create`)
             .set("Cookie",["token=fakeToken"])
@@ -96,7 +94,6 @@ describe("Create a comment to a post", () => {
                 parentCommentId:null,
                 content:"Another comment"
             })
-            console.log(res.text)
     expect(res.statusCode).toBe(401);
     expect(res.text).toMatch("Invalid Token provided!");   
     })
