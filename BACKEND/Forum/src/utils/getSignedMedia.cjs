@@ -1,4 +1,4 @@
-const { gcsClient } = require('../config/googleConfig.cjs');
+const { gcsClient } = require('../config/gcsStorage.cjs');
 
 async function attachSignedMediaUrls(post) {
   if (!post.media || !Array.isArray(post.media)) return post;

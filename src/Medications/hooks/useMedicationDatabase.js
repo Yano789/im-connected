@@ -304,7 +304,7 @@ export const useMedicationDatabase = () => {
 
     /**
      * Delete medication image
-     * @param {string} publicId - Cloudinary public ID
+     * @param {string} publicId - Google Cloud Storage public ID
      * @param {string} medicationId - Optional medication ID
      */
     const deleteMedicationImage = useCallback(async (publicId, medicationId = null) => {

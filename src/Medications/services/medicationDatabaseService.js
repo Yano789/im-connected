@@ -373,7 +373,7 @@ class MedicationDatabaseService {
 
     /**
      * Delete medication image
-     * @param {string} publicId - Cloudinary public ID
+     * @param {string} publicId - Google Cloud Storage public ID
      * @param {string} medicationId - Optional medication ID to remove association
      * @returns {Promise<Object>} Response confirming deletion
      */

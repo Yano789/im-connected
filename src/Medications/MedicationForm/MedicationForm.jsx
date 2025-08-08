@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './MedicationForm.css';
 import medicationScannerService from '../services/medicationScannerService';
-import medicationCloudinaryService from '../services/medicationCloudinaryService';
+import medicationGoogleCloudService from '../services/medicationGoogleCloudService';
 import { useTranslation } from 'react-i18next';
 
 const getPeriodFromTime = (time) => {
@@ -213,7 +213,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
             // Create preview URL but don't set it as the permanent image
             const previewUrl = URL.createObjectURL(file);
             setPreviewUrl(previewUrl);
-            // Don't set formData.image to blob URL - it will be set to Cloudinary URL after upload
+            // Don't set formData.image to blob URL - it will be set to Google Cloud Storage URL after upload
         }
     };
 
@@ -252,8 +252,8 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
             setUploadSuccess('');
             
             try {
-                console.log('Uploading medication image to Cloudinary...');
-                const uploadResult = await medicationCloudinaryService.uploadMedicationImage(selectedFile);
+                console.log('Uploading medication image to Google Cloud Storage...');
+                const uploadResult = await medicationGoogleCloudService.uploadMedicationImage(selectedFile);
                 
                 if (uploadResult && uploadResult.url) {
                     finalFormData.image = uploadResult.url;
@@ -264,7 +264,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                     throw new Error(t('Failed to upload image - no URL returned'));
                 }
             } catch (error) {
-                console.error('Error uploading image to Cloudinary:', error);
+                console.error('Error uploading image to Google Cloud Storage:', error);
                 setUploadError(t('Failed to upload image: {{message}}', { message: error.message }));
                 setIsUploading(false);
                 return; // Don't save if image upload fails

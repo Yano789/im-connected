@@ -27,7 +27,7 @@ vi.mock('../../Medications/services/medicationScannerService', () => ({
   },
 }));
 
-vi.mock('../../Medications/services/medicationCloudinaryService', () => ({
+vi.mock('../../Medications/services/medicationGoogleCloudService', () => ({
   default: {
     uploadMedicationImage: vi.fn(() => Promise.resolve({ 
         url: 'http://new-image.com', 

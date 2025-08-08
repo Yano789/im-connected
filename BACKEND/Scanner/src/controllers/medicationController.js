@@ -1,13 +1,13 @@
 import fs from 'fs';
 import mongoose from 'mongoose';
 import { CareRecipient, Medication } from '../models/index.js';
-import { OCRService, CloudinaryService, MedicationInfoService } from '../services/index.js';
+import { OCRService, GoogleCloudStorageService, MedicationInfoService } from '../services/index.js';
 import constants from '../utils/constants.js';
 
 class MedicationController {
   constructor() {
     this.ocrService = new OCRService();
-    this.cloudinaryService = new CloudinaryService();
+    this.googleCloudStorageService = new GoogleCloudStorageService();
     this.medicationInfoService = new MedicationInfoService();
   }
 
@@ -135,15 +135,15 @@ class MedicationController {
 
       console.log(`OCR extraction completed. Found ${medications.length} medications.`);
 
-      // Upload original image to Cloudinary
+      // Upload original image to Google Cloud Storage
       let imageData = null;
       const authToken = req.headers.authorization?.replace('Bearer ', '');
       
       try {
-        imageData = await this.cloudinaryService.uploadImage(req.file.path, authToken);
-        console.log('Image uploaded to Cloudinary successfully');
+        imageData = await this.googleCloudStorageService.uploadImage(req.file.path, authToken);
+        console.log('Image uploaded to Google Cloud Storage successfully');
       } catch (uploadError) {
-        console.warn('Cloudinary upload failed, proceeding without cloud storage:', uploadError.message);
+        console.warn('Google Cloud Storage upload failed, proceeding without cloud storage:', uploadError.message);
       }
 
       // Save medications to database
@@ -189,7 +189,7 @@ class MedicationController {
       if (imageData?.url && fs.existsSync(req.file.path)) {
         try {
           fs.unlinkSync(req.file.path);
-          console.log('Local file cleaned up after Cloudinary upload');
+          console.log('Local file cleaned up after Google Cloud Storage upload');
         } catch (cleanupError) {
           console.warn('Failed to clean up local file:', cleanupError.message);
         }

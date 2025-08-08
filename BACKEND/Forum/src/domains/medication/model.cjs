@@ -19,7 +19,7 @@ const MedicationSchema = new Schema({
     dosage: { type: String, default: '' },
     schedule: { type: String, default: '' },
     warnings: { type: String, default: '' },
-    image: { type: String, default: '' }, // Cloudinary URL or base64
+    image: { type: String, default: '' }, // GCS URL or base64
     dosages: [{
         time: { type: String, required: true },
         taken: { type: Boolean, default: false }

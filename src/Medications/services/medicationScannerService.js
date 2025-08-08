@@ -593,12 +593,12 @@ class MedicationService {
         throw new Error('Scanner service is not available in production. OCR scanning is only available in development mode.');
       }
 
-      // First, upload the image to Cloudinary
-      console.log('Scanner Service: Uploading image to Cloudinary...');
+      // First, upload the image to Google Cloud Storage
+      console.log('Scanner Service: Uploading image to Google Cloud Storage...');
       const uploadResult = await this.uploadImage(imageFile);
       
       if (!uploadResult || !uploadResult.data || !uploadResult.data.url) {
-        throw new Error('Failed to upload image to Cloudinary');
+        throw new Error('Failed to upload image to Google Cloud Storage');
       }
 
       console.log('Scanner Service: Image uploaded successfully:', uploadResult.data.url);
@@ -654,7 +654,7 @@ class MedicationService {
   }
 
   /**
-   * Upload an image file to Cloudinary
+   * Upload an image file to Google Cloud Storage
    * @param {File} imageFile - The image file to upload
    * @returns {Promise<Object>} - Upload result with URL
    */
@@ -682,7 +682,7 @@ class MedicationService {
   }
 
   /**
-   * Delete an image from Cloudinary
+   * Delete an image from Google Cloud Storage
    * @param {string} publicId - The public ID of the image to delete
    * @returns {Promise<Object>} - Deletion result
    */
