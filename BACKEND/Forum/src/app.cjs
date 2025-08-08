@@ -46,13 +46,15 @@ if (process.env.NODE_ENV === "production") {
 app.use("/api/v1",routes);
 
 // Serve frontend for all non-API routes in production
+// Serve frontend for all non-API routes in production
 if (process.env.NODE_ENV === "production") {
-  app.get("*", (req, res) => {
+  app.get(/^(?!\/api).*/, (req, res) => {  // Matches everything except /api routes
     const indexPath = path.join(__dirname, "../public/index.html");
     console.log("Attempting to serve index.html from:", indexPath);
     res.sendFile(indexPath);
   });
 }
+
 
 app.use((err, req, res, next) => {
   console.error("Global error handler caught:", err);
