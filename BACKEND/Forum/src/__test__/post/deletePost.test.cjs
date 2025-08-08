@@ -5,7 +5,7 @@ jest.mock("./../../domains/savedPosts/model.cjs");
 
 const mockDelete = jest.fn().mockResolvedValue();
 
-jest.mock("../../config/gcsStorage.cjs", () => ({
+jest.mock("../../config/googleConfig.cjs", () => ({
   gcsClient: {
     bucket: {
       file: jest.fn(() => ({
@@ -67,7 +67,7 @@ describe("deleting post", () => {
     expect(result).toEqual(mockPost);
   });
 
-  test("successfully delete post with media and calls Google Cloud Storage destroy", async () => {
+  test("successfully delete post with media and calls cloudinary destroy", async () => {
     const mockPostWithMedia = {
       postId: "123",
       username: "username",
@@ -87,7 +87,7 @@ describe("deleting post", () => {
 
     expect(Post.findOne).toHaveBeenCalledWith({ postId: "123" });
     expect(mockDelete).toHaveBeenCalledTimes(2);
-    const { gcsClient } = require("../../config/gcsStorage.cjs");
+    const { gcsClient } = require("../../config/googleConfig.cjs");
     expect(gcsClient.bucket.file).toHaveBeenCalledWith("media1");
     expect(gcsClient.bucket.file).toHaveBeenCalledWith("media2");
 

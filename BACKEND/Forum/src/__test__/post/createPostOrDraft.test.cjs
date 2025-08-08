@@ -1,7 +1,7 @@
 jest.mock("./../../domains/post/model.cjs");
 jest.mock("./../../utils/hashData.cjs");
 jest.mock("./../../domains/user/model.cjs");
-jest.mock("../../config/gcsStorage.cjs", () => ({
+jest.mock("../../config/googleConfig.cjs", () => ({
   bucket: {
     file: jest.fn().mockReturnThis(),
     getSignedUrl: jest.fn().mockResolvedValue(["http://example.com/signed.jpg"]),

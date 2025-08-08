@@ -1,4 +1,3 @@
-// Mock your internal helpers similarly BEFORE imports
 let postIdCounter = 0;
 jest.mock("../../../utils/hashData.cjs", () => ({
   hashData: jest.fn(() => {

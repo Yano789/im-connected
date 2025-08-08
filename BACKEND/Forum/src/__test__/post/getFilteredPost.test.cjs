@@ -1,7 +1,7 @@
 jest.mock("../../domains/post/model.cjs");
 jest.mock("../../domains/user/model.cjs");
 jest.mock("../../domains/translation/controller.cjs");
-jest.mock("../../config/gcsStorage.cjs", () => ({
+jest.mock("../../config/googleConfig.cjs", () => ({
   gcsClient: {
     url: jest.fn(async (publicId) => `http://example.com/${publicId}.jpg`),
   },
@@ -10,7 +10,7 @@ jest.mock("../../config/gcsStorage.cjs", () => ({
 const { Post } = require("../../domains/post/model.cjs");
 const User = require("../../domains/user/model.cjs");
 const translate = require("../../domains/translation/controller.cjs");
-const { gcsClient } = require("../../config/gcsStorage.cjs");
+const { gcsClient } = require("../../config/googleConfig.cjs");
 
 const { getFilteredPosts } = require("../../domains/post/controller.cjs");
 
