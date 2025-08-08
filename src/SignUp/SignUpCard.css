@@ -1,8 +1,13 @@
 .signup-container {
-  padding-top: 2vh;
-  padding-right: 5vw; 
-  justify-content: flex-start; 
-  align-items: flex-end; 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  padding: 5vh 5vw;
+  box-sizing: border-box;
+  overflow-y: auto;
+  font-size: clamp(14px, 2.2vh, 18px);
 }
 
 .signup-image {
@@ -20,9 +25,12 @@
 }
 
 .signup-form {
-  position: fixed;
-  top: 50%;
-  right: 15%;
+  transform: none;
+  max-height: none;
+  margin-top: auto;
+  margin-bottom: auto;
+  top: auto;
+  right: auto;
   width: 500px;
   background: var(--border-1);
   box-shadow: 0px 5px 4px rgba(0, 0, 0, 0.25);
@@ -34,8 +42,7 @@
   gap: 2px;
   z-index: 2;
   box-sizing: border-box;
-  max-height: 90vh;
-  transform: translateY(-50%);
+  position: relative;
 }
 
 .welcome-section {
@@ -45,12 +52,12 @@
 .welcome-title {
   color: var(--border-2);
   font-weight: 500;
-  font-size: 32px;
+  font-size: clamp(20px, 3.2vh, 28px);
   margin: 0;
 }
 
 .welcome-subtitle {
-  font-size: 12px;
+  font-size: clamp(11px, 1.6vh, 14px);
   color: var(--text-colour);
   margin-top: 4px;
   margin-bottom: 0;
@@ -59,7 +66,7 @@
 .register-link {
   text-decoration: underline;
   cursor: pointer;
-  font-size: 12px;
+  font-size: clamp(12px, 2vh, 14px);
 }
 
 .form-field {
@@ -70,7 +77,7 @@
 }
 
 .form-label {
-  font-size: 12px;
+  font-size: clamp(12px, 2vh, 14px);
   color: var(--text-colour);
 }
 
@@ -79,7 +86,7 @@
   border-radius: 6px;
   height: 38px;
   border: 1px solid rgba(102, 102, 102, 0.35);
-  font-size: 14px !important;
+  font-size: clamp(12px, 2vh, 14px) !important;
   color: var(--text-colour);
   box-sizing: border-box;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -93,15 +100,15 @@
 
 .form-input::placeholder {
   color: var(--placeholder-colour);
-  font-size: 14px;
-  font-family: 'Poppins', sans-serif;
+  font-size: clamp(12px, 2vh, 14px);
+  font-family: "Poppins", sans-serif;
 }
 
 .phone-input-container {
   display: flex;
   align-items: center;
   border: 1px solid rgba(102, 102, 102, 0.35);
-  border-radius: 6px; 
+  border-radius: 6px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   position: relative;
   height: 38px;
@@ -121,7 +128,7 @@
   display: flex;
   align-items: center;
   padding: 0 8px;
-  height: 100%; 
+  height: 100%;
   background: none;
   border: none;
   cursor: pointer;
@@ -179,14 +186,14 @@
 
 .country-name {
   flex: 1;
-  font-size: 14px;
-  color: var(--text-colour)
+  font-size: clamp(12px, 2vh, 14px);
+  color: var(--text-colour);
 }
 
 .country-code {
-  font-size: 14px;
+  font-size: clamp(12px, 2vh, 14px);
   color: var(--shadow-3);
-  font-family: 'SF Mono', Monaco, monospace;
+  font-family: "SF Mono", Monaco, monospace;
 }
 
 .dial-code {
@@ -194,7 +201,7 @@
   height: 100%;
   display: flex;
   align-items: center;
-  font-size: 14px;
+  font-size: clamp(12px, 2vh, 14px);
   color: var(--area-code);
   border-right: 1px solid var(--shadow-1);
 }
@@ -204,7 +211,7 @@
   border: none;
   outline: none;
   padding: 0 8px;
-  font-size: 14px;
+  font-size: clamp(12px, 2vh, 14px);
   color: var(--phone-input);
   height: 38px;
   background: transparent;
@@ -216,7 +223,7 @@
 }
 
 .password-label {
-  font-size: 12px;
+  font-size: clamp(12px, 2vh, 14px);
   color: var(--border-2);
   display: flex;
   justify-content: space-between;
@@ -228,7 +235,7 @@
   background: none;
   border: none;
   color: var(--border-2);
-  font-size: 12px;
+  font-size: clamp(12px, 2vh, 14px);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -244,7 +251,7 @@
 .password-row input {
   flex: 1;
   min-width: 0;
-  font-size: 14px !important;
+  font-size: clamp(12px, 2vh, 14px);
   color: var(--text-colour);
 }
 
@@ -258,7 +265,7 @@
 
 .forgot-password {
   align-self: flex-end;
-  font-size: 12px;
+  font-size: clamp(10px, 2vh, 12px);
   color: var(--password-toggle);
   text-decoration: underline;
   cursor: pointer;
@@ -268,28 +275,28 @@
 }
 
 .password-requirements {
-  font-size: 12px;
+  font-size: clamp(10px, 2vh, 12px);
 }
 
 .requirement {
   margin: 2px 0;
-  font-size: 11px;
+  ffont-size: clamp(10px, 2vh, 12px);
   transition: color 0.2s ease;
 }
 
 .requirement.met {
-  color: var(--success-text)
+  color: var(--success-text);
 }
 
 .requirement.unmet {
-  color: var(--error-text)
+  color: var(--error-text);
 }
 
 .remember-me {
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: clamp(10px, 2vh, 12px);
   user-select: none;
   cursor: pointer;
 }
@@ -307,7 +314,7 @@
   border-radius: 12px;
   background-color: var(--button-colour-1);
   color: var(--text-colour);
-  font-size: 14px;
+  font-size: clamp(12px, 2vh, 14px);
   font-weight: 400;
   cursor: pointer;
   width: 60%;
@@ -331,7 +338,7 @@
 }
 
 .status-message {
-  font-size: 14px;
+  font-size: clamp(12px, 2vh, 14px);
   margin-top: 10px;
   text-align: center;
 }
@@ -349,61 +356,66 @@
     right: 5%;
     width: 90%;
     max-width: 400px;
-    top: 50%;             
+    top: 50%;
     transform: translateY(-50%);
     padding: 30px;
     gap: 15px;
   }
 
-  .signup-image {
-    max-height: 60vh;
-    height: 300px;
+  .signup-container {
+    padding: 2.5vh 5vw;
   }
-  
+
+  .signup-image {
+    display: none;
+  }
+
   .password-row {
-    flex-direction: column;  
-    gap: 12px;              
+    flex-direction: column;
+    gap: 12px;
   }
 
   .password-group {
-    width: 100%;           
+    width: 100%;
   }
 }
 
 @media (max-width: 480px) {
   .signup-form {
-    right: 2.5%;
-    width: 95%;
-    max-width: none;       
-    top: 50%;              
-    transform: translateY(-50%);
-    padding: 20px;
-    gap: 15px;
+    position: relative;
+    width: 90vw;
+    max-width: none;
+    height: auto;
+    padding: 15px;
+    gap: 2px;
+    top: auto;
+    right: auto;
+    transform: none;
   }
 
   .welcome-title {
-    font-size: 28px;
+    font-size: clamp(18px, 2.5vh, 24px);
   }
 
   .password-row {
-    flex-direction: column;  
-    gap: 12px;              
+    flex-direction: column;
+    gap: 12px;
   }
 
   .password-group {
-    width: 100%;           
+    width: 100%;
   }
 }
 
 @media (max-width: 768px) {
   .password-row {
-    flex-wrap: wrap;     
+    flex-wrap: wrap;
     gap: 12px;
   }
 
   .password-group {
-    flex: 1 1 48%;       
-    min-width: 0;       
+    flex: 1 1 48%;
+    min-width: 0;
   }
 }
 
@@ -411,10 +423,10 @@
   .password-row {
     gap: 10px;
   }
-  
+
   .password-row input {
     width: calc(50% - 5px);
-    font-size: 14px !important;
+    font-size: clamp(12px, 2vh, 14px);
     color: var(--text-colour);
   }
 }
@@ -423,10 +435,10 @@
   .password-row {
     gap: 8px;
   }
-  
+
   .password-row input {
     width: calc(50% - 4px);
-    font-size: 14px !important;
+    font-size: clamp(12px, 2vh, 14px);
     color: var(--text-colour);
   }
 }
@@ -436,14 +448,14 @@
     flex-direction: column;
     gap: 8px;
   }
-  
+
   .password-group {
     width: 100%;
   }
-  
+
   .password-row input {
     width: 100%;
-    font-size: 14px !important;
+    font-size: clamp(12px, 2vh, 14px);
     color: var(--text-colour);
   }
 }
