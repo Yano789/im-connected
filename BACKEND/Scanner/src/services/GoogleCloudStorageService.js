@@ -9,7 +9,19 @@ import fetch from 'node-fetch';
 class GoogleCloudStorageService {
   constructor() {
     this.forumBackendUrl = process.env.FORUM_BACKEND_URL || 'http://localhost:5001';
-    
+    this.initialized = false;
+    this.storage = null;
+    this.bucket = null;
+  }
+
+  /**
+   * Initialize Google Cloud Storage client
+   */
+  _initialize() {
+    if (this.initialized) {
+      return;
+    }
+
     // Check for required environment variables
     if (!process.env.GOOGLE_CLOUD_PROJECT_ID) {
       console.warn('⚠️ GOOGLE_CLOUD_PROJECT_ID environment variable is not set');
@@ -54,12 +66,16 @@ class GoogleCloudStorageService {
       this.storage = null;
       this.bucket = null;
     }
+
+    this.initialized = true;
   }
 
   /**
    * Upload image to Google Cloud Storage directly
    */
   async uploadImageDirect(imagePath) {
+    this._initialize();
+    
     try {
       if (!this.bucket) {
         throw new Error('Google Cloud Storage bucket not initialized. Check environment variables.');
@@ -101,6 +117,8 @@ class GoogleCloudStorageService {
    * Upload image to Google Cloud Storage via Forum backend (preferred method)
    */
   async uploadImage(imagePath, authToken = null) {
+    this._initialize();
+    
     try {
       console.log('Uploading image to Google Cloud Storage via Forum backend:', imagePath);
       
@@ -156,6 +174,8 @@ class GoogleCloudStorageService {
    * Delete image from Google Cloud Storage directly
    */
   async deleteImageDirect(publicId) {
+    this._initialize();
+    
     try {
       if (!this.bucket) {
         throw new Error('Google Cloud Storage bucket not initialized. Check environment variables.');
@@ -181,6 +201,8 @@ class GoogleCloudStorageService {
    * Delete image from Google Cloud Storage via Forum backend (preferred method)
    */
   async deleteImage(publicId, authToken = null) {
+    this._initialize();
+    
     try {
       console.log('Deleting image from Google Cloud Storage via Forum backend:', publicId);
       

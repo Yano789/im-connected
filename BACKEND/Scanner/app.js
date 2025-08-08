@@ -6,7 +6,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Load environment variables from the root .env file
-dotenv.config({ path: path.join(__dirname, '../../.env') });
+const envPath = path.join(__dirname, '../../.env');
+console.log('Scanner: Loading .env from:', envPath);
+const result = dotenv.config({ path: envPath });
+
+if (result.error) {
+  console.error('Scanner: Error loading .env file:', result.error);
+} else {
+  console.log('Scanner: Successfully loaded .env file');
+  console.log('Scanner: GOOGLE_CLOUD_PROJECT_ID =', process.env.GOOGLE_CLOUD_PROJECT_ID ? 'SET' : 'NOT SET');
+  console.log('Scanner: GCS_BUCKET_NAME =', process.env.GCS_BUCKET_NAME ? 'SET' : 'NOT SET');
+}
 
 import express from 'express';
 import mongoose from 'mongoose';

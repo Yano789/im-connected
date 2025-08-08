@@ -17,7 +17,7 @@ router.use("/otp",OTPRoutes);
 router.use("/email_verification",EmailVerificationRoutes);
 router.use("/forgot_password",ForgotPasswordRoutes);
 router.use("/post",postRoutes);
-router.use("/:post/comment",commentRoutes);
+router.use("/post/:post/comment",commentRoutes);
 router.use("/saved",savedPostRoutes);
 router.use("/like",likedPostRoutes);
 router.use("/medication",medicationRoutes);
