@@ -22,7 +22,7 @@ router.post("/create", auth ,validateParams(postParamSchema),validateBody(create
 
 
 //edit comment via commentId
-router.put("/:post/:comment/edit",auth,validateParams(postAndCommentParamsSchema),validateBody(editCommentBodySchema),async (req, res) => {
+router.put("/:comment/edit",auth,validateParams(postAndCommentParamsSchema),validateBody(editCommentBodySchema),async (req, res) => {
     try {
         const commentId = req.params.comment
         const username = req.currentUser.username;
@@ -37,7 +37,7 @@ router.put("/:post/:comment/edit",auth,validateParams(postAndCommentParamsSchema
 //delete comments via commentId, should be able to retain the nested comments as well
 // if top level comment, the next nested comment shld be the next top level comment
 // if nested, then its parent command id shld go to the predessesor level comment
-router.delete("/:post/:comment/delete", auth ,validateParams(postAndCommentParamsSchema),async (req, res) => {
+router.delete("/:comment/delete", auth ,validateParams(postAndCommentParamsSchema),async (req, res) => {
     try {
         const postId = req.params.post
         const commentId = req.params.comment
