@@ -5,7 +5,7 @@ const User = require("../../../domains/user/model.cjs");
 const Comment = require("../../../domains/comment/model.cjs")
 const { Post } = require("../../../domains/post/model.cjs")
 const jwt = require("jsonwebtoken");
-
+//testing the whole route+controller flow
 describe("Create a comment to a post", () => {
     beforeAll(async()=>{
         await User.deleteMany()

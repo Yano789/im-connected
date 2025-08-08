@@ -23,7 +23,9 @@ const postAndCommentParamsSchema  = Joi.object({
 
 
 const createCommentBodySchema = Joi.object({
-  parentCommentId: Joi.string().allow(null).optional(), 
+  parentCommentId: Joi.string().allow(null).optional().messages({
+    "string.base": "Parent comment ID must be a string"
+  }),
   content: Joi.string().min(1).required().messages({
     "any.required": "Content is required",
     "string.empty": "Content cannot be empty",

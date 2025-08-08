@@ -50,7 +50,7 @@ router.delete("/:post/:comment/delete", auth ,validateParams(postAndCommentParam
 })
 
 //get only all the comments in a nested structure
-router.get("/:post",auth,validateParams(postParamSchema),async (req, res) => {
+router.get("/",auth,validateParams(postParamSchema),async (req, res) => {
     try {
         const postId = req.params.post
         const username = req.currentUser.username
@@ -62,7 +62,7 @@ router.get("/:post",auth,validateParams(postParamSchema),async (req, res) => {
 })
 
 //get a specific comment
-router.get("/:post/:comment",auth,validateParams(postAndCommentParamsSchema),async(req,res)=>{
+router.get("/:comment",auth,validateParams(postAndCommentParamsSchema),async(req,res)=>{
     try {
         const postId = req.params.post
         const commentId = req.params.comment
