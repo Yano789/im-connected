@@ -3,10 +3,10 @@ const { createComment, editComment, deleteComment, getAllComments,getComment } =
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams} = require("./../../middleware/validate.cjs")
 const {postParamSchema,createCommentBodySchema,editCommentBodySchema,postAndCommentParamsSchema} = require("./../../utils/validators/commentValidators.cjs")
-const router = express.Router({ mergeParams: true });
+const router = express.Router();
 
-//create comment
-router.post("/create", auth ,validateParams(postParamSchema),validateBody(createCommentBodySchema),async (req, res) => {
+//create comment for a specific post
+router.post("/:post/create", auth ,validateParams(postParamSchema),validateBody(createCommentBodySchema),async (req, res) => {
     try {
         const postId = req.params.post
         const username = req.currentUser.username;
@@ -22,7 +22,7 @@ router.post("/create", auth ,validateParams(postParamSchema),validateBody(create
 
 
 //edit comment via commentId
-router.put("/:comment/edit",auth,validateParams(postAndCommentParamsSchema),validateBody(editCommentBodySchema),async (req, res) => {
+router.put("/:post/:comment/edit",auth,validateParams(postAndCommentParamsSchema),validateBody(editCommentBodySchema),async (req, res) => {
     try {
         const commentId = req.params.comment
         const username = req.currentUser.username;
@@ -37,7 +37,7 @@ router.put("/:comment/edit",auth,validateParams(postAndCommentParamsSchema),vali
 //delete comments via commentId, should be able to retain the nested comments as well
 // if top level comment, the next nested comment shld be the next top level comment
 // if nested, then its parent command id shld go to the predessesor level comment
-router.delete("/:comment/delete", auth ,validateParams(postAndCommentParamsSchema),async (req, res) => {
+router.delete("/:post/:comment/delete", auth ,validateParams(postAndCommentParamsSchema),async (req, res) => {
     try {
         const postId = req.params.post
         const commentId = req.params.comment
@@ -50,7 +50,7 @@ router.delete("/:comment/delete", auth ,validateParams(postAndCommentParamsSchem
 })
 
 //get only all the comments in a nested structure
-router.get("/",auth,validateParams(postParamSchema),async (req, res) => {
+router.get("/:post",auth,validateParams(postParamSchema),async (req, res) => {
     try {
         const postId = req.params.post
         const username = req.currentUser.username
@@ -62,7 +62,7 @@ router.get("/",auth,validateParams(postParamSchema),async (req, res) => {
 })
 
 //get a specific comment
-router.get("/:comment",auth,validateParams(postAndCommentParamsSchema),async(req,res)=>{
+router.get("/:post/:comment",auth,validateParams(postAndCommentParamsSchema),async(req,res)=>{
     try {
         const postId = req.params.post
         const commentId = req.params.comment

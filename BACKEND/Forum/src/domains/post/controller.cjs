@@ -5,7 +5,7 @@ const Comment = require("../comment/model.cjs")
 const createNestedComment = require("../../utils/buildNestedComments.cjs")
 const translate = require("./../../domains/translation/controller.cjs")
 const savedPost = require("../savedPosts/model.cjs")
-const { gcsClient } = require('../../config/googleConfig.cjs');
+const { gcsClient } = require('../../config/gcsStorage.cjs');
 
 
 
