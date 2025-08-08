@@ -7,9 +7,6 @@ const { Post } = require("../../../domains/post/model.cjs")
 const jwt = require("jsonwebtoken");
 
 describe("Create a comment to a post", () => {
-    let token
-    let user
-    let post
     beforeAll(async()=>{
         await User.deleteMany()
         await Post.deleteMany()
@@ -73,7 +70,7 @@ describe("Create a comment to a post", () => {
     })
 
     test("should fail with invalid postId",async()=>{
-                const {token} = await createUserAndTokenAndPost();
+        const {token} = await createUserAndTokenAndPost();
         const res = await request(app)
             .post("/api/v1/invalidPostId/comment/create")
             .set("Cookie",[`token=${token}`])

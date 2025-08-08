@@ -3,10 +3,10 @@ const { createComment, editComment, deleteComment, getAllComments,getComment } =
 const auth = require("./../../middleware/auth.cjs");
 const {validateBody,validateParams} = require("./../../middleware/validate.cjs")
 const {postParamSchema,createCommentBodySchema,editCommentBodySchema,postAndCommentParamsSchema} = require("./../../utils/validators/commentValidators.cjs")
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 //create comment for a specific post
-router.post("/:post/create", auth ,validateParams(postParamSchema),validateBody(createCommentBodySchema),async (req, res) => {
+router.post("/create", auth ,validateParams(postParamSchema),validateBody(createCommentBodySchema),async (req, res) => {
     try {
         const postId = req.params.post
         const username = req.currentUser.username;
