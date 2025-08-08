@@ -109,7 +109,7 @@ router.get('/threadId', auth, async (req, res) => {
     if (!threadId) {
       //Create a new thread via the Quick‑start POST /api/assistants/threads
 
-      const AI_BASE = process.env.AI_CHATBOT_URL || 'http://ai-chatbot:3000';
+      const AI_BASE = process.env.AI_CHATBOT_URL || 'http://localhost:3000';
       console.log('[threadId] no threadId in user, calling Quick-start API…');
       /*const createRes = await fetch(
         "http://localhost:3000/api/assistants/threads",
