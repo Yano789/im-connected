@@ -2,7 +2,7 @@ jest.mock("../../domains/post/model.cjs");
 
 const mockDelete = jest.fn().mockResolvedValue();
 
-jest.mock("../../config/gcsStorage.cjs", () => ({
+jest.mock("../../config/googleConfig.cjs", () => ({
   gcsClient: {
     bucket: {
       file: jest.fn(() => ({
@@ -90,8 +90,8 @@ describe("editing drafts with GCS media only", () => {
 
     // Expect GCS file.delete to be called for each mediaToRemove
     expect(mockDelete).toHaveBeenCalledTimes(2);
-    expect(require("../../config/gcsStorage.cjs").gcsClient.bucket.file).toHaveBeenCalledWith("remove1");
-    expect(require("../../config/gcsStorage.cjs").gcsClient.bucket.file).toHaveBeenCalledWith("remove2");
+    expect(require("../../config/googleConfig.cjs").gcsClient.bucket.file).toHaveBeenCalledWith("remove1");
+    expect(require("../../config/googleConfig.cjs").gcsClient.bucket.file).toHaveBeenCalledWith("remove2");
 
     // Check that media array in the draft excludes the removed ones and includes the kept media only
     expect(result.media).toEqual([{ public_id: "keep", type: "image" }]);
