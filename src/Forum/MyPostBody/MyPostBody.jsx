@@ -120,7 +120,7 @@ function MyPostBody() {
             />
           ))
         ) : (
-          <p>{t("You haven’t posted anything yet.")}</p>
+          <p>{t("You haven't posted anything yet.")}</p>
         )}
       </div>
 
