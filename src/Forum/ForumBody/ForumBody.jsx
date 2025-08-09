@@ -12,7 +12,7 @@ function ForumBody() {
   const [posts, setPosts] = useState([]);
   const [savedPostIds, setSavedPostIds] = useState(new Set());
   const [likedPostIds, setLikedPostIds] = useState(new Set());
-  const [selectedTopics, setSelectedTopics] = useState([]); // stores topic IDs
+  const [selectedTopics, setSelectedTopics] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { t } = useTranslation();
@@ -23,7 +23,6 @@ function ForumBody() {
     sort: "latest",
   });
 
-  // Map backend topic IDs to names
   const TAGS = {
     1: "All",
     2: "Physical Disability & Chronic Illness",
@@ -37,7 +36,7 @@ function ForumBody() {
   };
 
   const tagKeyMap = {
-    "All": "Tag1",
+    All: "Tag1",
     "Physical Disability & Chronic Illness": "Tag2",
     "Personal Mental Health": "Tag3",
     "Subsidies and Govt Support": "Tag4",
@@ -45,7 +44,7 @@ function ForumBody() {
     "End of Life Care": "Tag6",
     "Financial & Legal Help": "Tag7",
     "Mental Disability": "Tag8",
-    "Hospitals and Clinics": "Tag9"
+    "Hospitals and Clinics": "Tag9",
   };
 
   const updateQuery = (newParams) => {
@@ -56,11 +55,9 @@ function ForumBody() {
   };
 
   const handleTagFilterChange = (selection) => {
-    // `selection` will be array of topic IDs
     setSelectedTopics(selection);
 
     if (selection.includes(1)) {
-      // "All" selected
       updateQuery({ filter: "default", source: "all" });
     } else {
       const selectedTagNames = selection
@@ -68,11 +65,10 @@ function ForumBody() {
         .filter(Boolean)
         .sort((a, b) => a.localeCompare(b))
         .join(",");
-      updateQuery({ filter: selectedTagNames, source: "default"});
+      updateQuery({ filter: selectedTagNames, source: "default" });
     }
   };
 
-  // Fetch posts whenever query changes
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true);
@@ -82,7 +78,7 @@ function ForumBody() {
           method: "GET",
           credentials: "include",
         });
-        console.log(`${API_ENDPOINTS.POST_BASE}/?${params}`)
+        console.log(`${API_ENDPOINTS.POST_BASE}/?${params}`);
         if (!res.ok) throw new Error("Failed to fetch posts");
         const data = await res.json();
         setPosts(data);
@@ -96,7 +92,6 @@ function ForumBody() {
     fetchPosts();
   }, [query]);
 
-  // Fetch user preferences once on load
   useEffect(() => {
     const fetchUserPreferences = async () => {
       try {
@@ -106,26 +101,33 @@ function ForumBody() {
         });
         if (!res.ok) throw new Error("Failed to fetch user preferences");
         const data = await res.json();
-
-        // Assume backend sends topic IDs; if it sends names, adjust accordingly
         const topicIds = (data.preferences.topics || [])
           .map((t) => {
-            if (typeof t === "number") return t; // already ID
-            return Object.entries(TAGS).find(([id, name]) => name === t)?.[0] * 1;
+            if (typeof t === "number") return t;
+            return (
+              Object.entries(TAGS).find(([id, name]) => name === t)?.[0] * 1
+            );
           })
-          .filter(Boolean);
+          .filter(Boolean)
+          .slice(0, 2);
 
-        setSelectedTopics(topicIds);
-        handleTagFilterChange(topicIds);
+        if (topicIds.length === 0) {
+          setSelectedTopics([1]);
+          handleTagFilterChange([1]);
+        } else {
+          setSelectedTopics(topicIds);
+          handleTagFilterChange(topicIds);
+        }
       } catch (err) {
         console.error("Error fetching preferences:", err.message);
+        setSelectedTopics([1]);
+        handleTagFilterChange([1]);
       }
     };
 
     fetchUserPreferences();
   }, []);
 
-  // Fetch saved + liked posts once
   useEffect(() => {
     const fetchSavedAndLiked = async () => {
       try {

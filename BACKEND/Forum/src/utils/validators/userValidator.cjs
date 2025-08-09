@@ -62,7 +62,7 @@ const preferencesSchema = Joi.object({
   }),
   language: Joi.string()
     .valid("en", "zh", "ms", "ta")
-    .default("English"),
+    .default("en"),
   textSize: Joi.string()
     .valid("Small", "Medium", "Large")
     .default("Medium"),

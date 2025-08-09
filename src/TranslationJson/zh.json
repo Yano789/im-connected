@@ -48,7 +48,7 @@
   "Add a Comment": "添加评论",
   "Write something": "写点什么...",
   "Loading...": "正在加载...",
-  "No posts available": "暂无帖子",
+  "No posts available": "此主题尚无帖子，请选择其他帖子！",
   "Add Media": "将媒体拖放到此处，或单击上传（最多五个)",
   "Create Post": "创建帖子",
   "Title": "标题",
@@ -206,7 +206,7 @@
   "Username:": "用户名:",
   "Email Address:": "邮箱地址:",
   "Phone Number:": "电话号码:",
-  "Save Changes": "保存更改",    
+  "Save Changes": "保存更改",
   "How are you": "你好吗",
   "Manage your profile here": "在此管理你的个人资料",
   "Preferred Language": "首选语言",
@@ -246,7 +246,7 @@
   "Loading post...": "正在加载帖子...",
   "Loading": "正在加载",
   "Error: {error}": "错误: {error}",
-  "You haven’t posted anything yet.": "您还没有发布任何内容。",
+  "You haven't posted anything yet.": "您还没有发布任何内容。",
   "Previously Uploaded:": "先前上传:",
   "New Media:": "新媒体:",
   "Posted:": "已发布:",
@@ -281,5 +281,9 @@
   "Personal Mental Health": "个人心理健康",
   "Financial & Legal Help": "财务和法律援助",
   "Hospitals and Clinics": "医院和诊所",
-  "Subsidies and Govt Support": "补贴和政府支持"
+  "Subsidies and Govt Support": "补贴和政府支持",
+  "Title is required": "标题为必填项",
+  "Content is required": "内容为必填项",
+  "Content must be at least 20 characters": "内容必须至少包含 20 个字符",
+  "Please select at least 1 tag (max 2)": "请至少选择 1 个标签（最多 2 个"
 }

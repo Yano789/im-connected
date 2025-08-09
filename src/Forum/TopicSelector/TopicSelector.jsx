@@ -17,31 +17,72 @@ function TopicSelector({ onTagFilterChange, clickedTopics = [] }) {
 
   const TAGS = [
     { id: 1, name: "All", localName: t("Tag1"), image: AllIcon },
-    { id: 2, name: "Physical Disability & Chronic Illness", localName: t("Tag2"), image: WheelchairIcon },
-    { id: 3, name: "Personal Mental Health", localName: t("Tag3"), image: MentalHealthIcon },
-    { id: 4, name: "Subsidies and Govt Support", localName: t("Tag4"), image: GovtIcon },
-    { id: 5, name: "Pediatric Care", localName: t("Tag5"), image: ChildrenIcon },
-    { id: 6, name: "End of Life Care", localName: t("Tag6"), image: ElderlyIcon },
-    { id: 7, name: "Financial & Legal Help", localName: t("Tag7"), image: MoneyIcon },
-    { id: 8, name: "Mental Disability", localName: t("Tag8"), image: DepressionIcon },
-    { id: 9, name: "Hospitals and Clinics", localName: t("Tag9"), image: HospitalIcon },
+    {
+      id: 2,
+      name: "Physical Disability & Chronic Illness",
+      localName: t("Tag2"),
+      image: WheelchairIcon,
+    },
+    {
+      id: 3,
+      name: "Personal Mental Health",
+      localName: t("Tag3"),
+      image: MentalHealthIcon,
+    },
+    {
+      id: 4,
+      name: "Subsidies and Govt Support",
+      localName: t("Tag4"),
+      image: GovtIcon,
+    },
+    {
+      id: 5,
+      name: "Pediatric Care",
+      localName: t("Tag5"),
+      image: ChildrenIcon,
+    },
+    {
+      id: 6,
+      name: "End of Life Care",
+      localName: t("Tag6"),
+      image: ElderlyIcon,
+    },
+    {
+      id: 7,
+      name: "Financial & Legal Help",
+      localName: t("Tag7"),
+      image: MoneyIcon,
+    },
+    {
+      id: 8,
+      name: "Mental Disability",
+      localName: t("Tag8"),
+      image: DepressionIcon,
+    },
+    {
+      id: 9,
+      name: "Hospitals and Clinics",
+      localName: t("Tag9"),
+      image: HospitalIcon,
+    },
   ];
 
   const handleTopicClicked = (topicId) => {
     if (topicId === 1) {
-      // Select only All
       onTagFilterChange([1]);
       return;
     }
 
-    // Remove "All" if any specific topic is clicked
     const topicsExcludingAll = clickedTopics.filter((id) => id !== 1);
     let updatedTopics;
 
     if (topicsExcludingAll.includes(topicId)) {
       updatedTopics = topicsExcludingAll.filter((id) => id !== topicId);
+      if (updatedTopics.length === 0) {
+        updatedTopics = [1];
+      }
     } else {
-      if (topicsExcludingAll.length >= 2) return; // max 2 topics
+      if (topicsExcludingAll.length >= 2) return;
       updatedTopics = [...topicsExcludingAll, topicId];
     }
 

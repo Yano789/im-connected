@@ -2,7 +2,6 @@ import "./MyPostBody.css";
 import ForumCard from "../ForumCard/ForumCard";
 import Filter from "../Filter/Filter";
 import ToPost from "../ToPost/ToPost";
-import TopicSelector from "../TopicSelector/TopicSelector";
 import Delete from "../Delete/Delete";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
@@ -12,8 +11,8 @@ function MyPostBody() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [myPosts, setMyPosts] = useState([]);
-  const [likedPostIds, setLikedPostIds] = useState(new Set());  // <-- Added liked posts state
-  const {t} = useTranslation();
+  const [likedPostIds, setLikedPostIds] = useState(new Set());
+  const { t } = useTranslation();
 
   const removePost = (id) => {
     setMyPosts((prev) => prev.filter((post) => post.postId !== id));
@@ -26,6 +25,18 @@ function MyPostBody() {
     source: "personalized",
   });
 
+    const TAGS = {
+    1: "All",
+    2: "Physical Disability & Chronic Illness",
+    3: "Personal Mental Health",
+    4: "Subsidies and Govt Support",
+    5: "Pediatric Care",
+    6: "End of Life Care",
+    7: "Financial & Legal Help",
+    8: "Mental Disability",
+    9: "Hospitals and Clinics",
+  };
+
   const updateQuery = (newParams) => {
     setQuery((prev) => ({
       ...prev,
@@ -33,20 +44,16 @@ function MyPostBody() {
     }));
   };
 
-  // Fetch my posts on query change
   useEffect(() => {
     const fetchMyPosts = async () => {
       setLoading(true);
       try {
         const params = new URLSearchParams(query).toString();
-        const response = await fetch(
-          `${API_ENDPOINTS.POST_BASE}/?${params}`,
-          {
-            method: "GET",
-            credentials: "include",
-          }
-        );
-        console.log(`${API_ENDPOINTS.POST_BASE}/?${params}`)
+        const response = await fetch(`${API_ENDPOINTS.POST_BASE}/?${params}`, {
+          method: "GET",
+          credentials: "include",
+        });
+        console.log(`${API_ENDPOINTS.POST_BASE}/?${params}`);
         if (!response.ok) throw new Error("Failed to fetch your posts");
         const data = await response.json();
         setMyPosts(data);
@@ -59,7 +66,6 @@ function MyPostBody() {
     fetchMyPosts();
   }, [query]);
 
-  // Fetch liked posts ONCE on mount
   useEffect(() => {
     const fetchLikedPosts = async () => {
       try {
@@ -78,14 +84,6 @@ function MyPostBody() {
     fetchLikedPosts();
   }, []);
 
-  const handleTagFilterChange = (filterString) => {
-    if (!filterString || filterString === "") {
-      updateQuery({ filter: "default" });
-    } else {
-      updateQuery({ filter: filterString });
-    }
-  };
-
   return (
     <div className="forumMain">
       <div className="forumLeftBar">
@@ -95,7 +93,7 @@ function MyPostBody() {
 
       <div className="forumBody">
         {loading ? (
-          <p>{("Loading...")}</p>
+          <p>{"Loading..."}</p>
         ) : error ? (
           <p>{t("Error: {error}")}</p>
         ) : myPosts.length > 0 ? (
@@ -123,10 +121,6 @@ function MyPostBody() {
         ) : (
           <p>{t("You haven't posted anything yet.")}</p>
         )}
-      </div>
-
-      <div className="forumRightBar">
-        <TopicSelector onTagFilterChange={handleTagFilterChange} />
       </div>
     </div>
   );
