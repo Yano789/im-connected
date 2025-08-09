@@ -22,6 +22,7 @@ function ForumDashboard() {
       sort: sortType,
       mode: "default",
       filter: "default",
+      source: "all"
     });
 
     try {

@@ -27,12 +27,12 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
       label: t("Tag2"),
     },
     { key: "Personal Mental Health", label: t("Tag3") },
-    { key: "End of Life Care", label: t("Tag4") },
-    { key: "Financial & Legal Help", label: t("Tag5") },
-    { key: "Mental Disability", label: t("Tag6") },
-    { key: "Hospitals and Clinics", label: t("Tag7") },
-    { key: "Pediatric Care", label: t("Tag8") },
-    { key: "Subsidies and Govt Support", label: t("Tag9") },
+    { key: "Subsidies and Govt Support", label: t("Tag4") },
+    { key: "Pediatric Care", label: t("Tag5") },
+    { key: "End of Life Care", label: t("Tag6") },
+    { key: "Finacial & Legal Help", label: t("Tag7") },
+    { key: "Mental Disability", label: t("Tag8") },
+    { key: "Hospitals and Clinics", label: t("Tag9") },
   ];
 
   const resetForm = () => {

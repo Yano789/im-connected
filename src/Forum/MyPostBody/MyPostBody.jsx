@@ -46,6 +46,7 @@ function MyPostBody() {
             credentials: "include",
           }
         );
+        console.log(`${API_ENDPOINTS.POST_BASE}/?${params}`)
         if (!response.ok) throw new Error("Failed to fetch your posts");
         const data = await response.json();
         setMyPosts(data);
@@ -120,7 +121,7 @@ function MyPostBody() {
             />
           ))
         ) : (
-          <p>{t("You haven’t posted anything yet.")}</p>
+          <p>{t("You haven't posted anything yet.")}</p>
         )}
       </div>
 

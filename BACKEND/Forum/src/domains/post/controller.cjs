@@ -133,16 +133,16 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
         const preferredLang = user?.preferences?.preferredLanguage
         console.log(preferredTags)
 
-        if (tags.length === 0) {
+        if (tags.length === 0 && source !== "personalized") {
             if (Array.isArray(preferredTags) && preferredTags.length > 0) {
                 tags = preferredTags.map(tag => tag.trim()).filter(tag => tag.length > 0);
             }
         }
 
 
-        if (tags.length === 1) {
+        if (tags.length === 1 && source !== "personalized") {
             filter.tags = tags[0];
-        } else if (tags.length > 1) {
+        } else if (tags.length > 1 && source !== "personalized") {
             filter.tags = { $in: tags };
         }
 
@@ -179,7 +179,7 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
         console.log(filter)
 
         let num = mode ==="default"? 10 : 5 //mode limiter
-
+        console.log({ ...filter, draft: false })
         let posts = await Post.find({ ...filter, draft: false }).sort(sortOptions).limit(num);
         console.log(posts)
         if (posts.length === 0 && source === "default") {
