@@ -13,6 +13,7 @@
     "backendtest:forum": "cross-env NODE_ENV=test jest BACKEND/Forum/src --runInBand",
     "backendtest:forum/integration/UC4": "cross-env NODE_ENV=test dotenv_config_path=BACKEND/Forum/src/__test__/integration_test/.env.test jest BACKEND/Forum/src/__test__/integration_test/UC4 --runInBand",
     "backendtest:forum/integration/UC3": "cross-env NODE_ENV=test dotenv_config_path=BACKEND/Forum/src/__test__/integration_test/.env.test jest BACKEND/Forum/src/__test__/integration_test/UC3 --runInBand",
+    "backendtest:forum/integration/UC2": "cross-env NODE_ENV=test dotenv_config_path=BACKEND/Forum/src/__test__/integration_test/.env.test jest BACKEND/Forum/src/__test__/integration_test/UC2 --runInBand",
     "frontendtest": "vitest src",
     "build": "vite build",
     "build:pages": "NODE_ENV=production vite build",
