@@ -82,9 +82,11 @@ function ForumBody() {
           method: "GET",
           credentials: "include",
         });
+        console.log(`${API_ENDPOINTS.POST_BASE}/?${params}`)
         if (!res.ok) throw new Error("Failed to fetch posts");
         const data = await res.json();
         setPosts(data);
+        setError(null);
       } catch (err) {
         setError(err.message);
       } finally {

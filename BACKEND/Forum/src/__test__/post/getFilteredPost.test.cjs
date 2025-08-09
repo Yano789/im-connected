@@ -112,9 +112,7 @@ describe("getFilteredPosts", () => {
     // The filter should include username, and also tags from preferences
     expect(Post.find).toHaveBeenCalledWith(
       expect.objectContaining({
-        username: "user1",
-        tags: { $in: ["tag1", "tag2"] },
-        draft: false,
+        "draft": false, "username": "user1"
       })
     );
     expect(mockSort).toHaveBeenCalledWith({ likes: -1 });

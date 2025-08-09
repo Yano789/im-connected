@@ -9,6 +9,11 @@ console.log("[DEBUG] Loading env from:", path.resolve(__dirname, "../../__test__
 if (process.env.NODE_ENV !== "test") {
   throw new Error("❌ You are running tests in a non-test environment. Aborting.");
 }
+
+if (process.env.MONGODB_URI?.includes("mongodb+srv")) {
+  throw new Error("🚫 Refusing to connect to production database during tests.");
+}
+
 beforeAll(async () => {
   const uri = process.env.MONGODB_URI;
   if (!uri) {
