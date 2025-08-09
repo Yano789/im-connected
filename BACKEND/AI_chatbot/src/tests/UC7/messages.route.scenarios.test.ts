@@ -1,3 +1,4 @@
+export {};
 /*
 UC7 
 This integration test checks the route /api/assistants/threads/threadId/messages/route.ts with OpenAI mocked
