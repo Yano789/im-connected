@@ -6,7 +6,6 @@ import SplashChars from "../assets/SplashscreenCharacters.png";
 import AIChatUI from "../assets/AIChatUI.png";
 import MedicationUI from "../assets/MedicationUI.png";
 import ForumUI from "../assets/ForumUI.png";
-import GlobeImg from "../assets/Globe.png";
 import PillboxIcon from "../assets/PillboxIconSplashscreen.png";
 import ChatbotIcon from "../assets/ChatbotIconSplashscreen.png";
 import ForumIcon from "../assets/ForumIconSplashscreen.png";
@@ -73,12 +72,6 @@ export default function SplashScreen() {
         {/* Right side */}
         <div className="header-right">
           <div className="header-buttons">
-            {/* language switcher */}
-            <button className="lang-button">
-              <img src={GlobeImg} alt="Language" className="globe-icon" />
-              {t("English")} <span className="chevron-down">▼</span>
-            </button>
-
             {/* sign up / sign in */}
             <Link to="/signup">
               <button className="top-button signup-btn">{t("Sign Up")}</button>
