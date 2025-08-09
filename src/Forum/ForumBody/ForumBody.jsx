@@ -12,7 +12,7 @@ function ForumBody() {
   const [posts, setPosts] = useState([]);
   const [savedPostIds, setSavedPostIds] = useState(new Set());
   const [likedPostIds, setLikedPostIds] = useState(new Set());
-  const [selectedTopics, setSelectedTopics] = useState([]); // stores topic IDs
+  const [selectedTopics, setSelectedTopics] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { t } = useTranslation();

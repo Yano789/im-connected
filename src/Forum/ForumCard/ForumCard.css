@@ -27,6 +27,11 @@
   font-size: 0.875rem; 
   line-height: 1.5;
   word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 20;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (min-width: 640px) {
