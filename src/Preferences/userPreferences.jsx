@@ -19,22 +19,17 @@ const UserPreferences = () => {
   const [selectedTextSize, setSelectedTextSize] = useState("Medium");
   const [selectedContentMode, setSelectedContentMode] = useState("Easy Read");
   const [selectedTopics, setSelectedTopics] = useState([]);
-  const {t} = useTranslation();
+  const [error, setError] = useState("");
 
+  const {t} = useTranslation();
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
   const { setUser } = useContext(AuthContext);
 
-  //to set default options - replacing the localstorage since it kept track of pref last time
-  useEffect(() => {
-    setSelectedLanguage("en");
-    i18next.changeLanguage("en");
-
-    setSelectedTextSize("Medium");
-    applyTextSize("Medium");
-
-    setSelectedContentMode("Easy Read");
-
+useEffect(() => {
+    setSelectedLanguage("");
+    setSelectedTextSize("");
+    setSelectedContentMode("");
     setSelectedTopics([]);
   }, []);
 
@@ -46,9 +41,9 @@ const UserPreferences = () => {
   ];
 
   const textSizes = [
-    { id: "Small", label: t("Small"), fontSize: "18px" },
-    { id: "Medium", label: t("Medium"), fontSize: "24px" },
-    { id: "Large", label: t("Large"), fontSize: "32px" },
+    { id: "Small", label: t("Small"), fontSize: "14px" },
+    { id: "Medium", label: t("Medium"), fontSize: "16px" },
+    { id: "Large", label: t("Large"), fontSize: "20px" },
   ];
 
   const getContentModes = () => [
@@ -144,6 +139,7 @@ const UserPreferences = () => {
       setSelectedContentMode(value);
       console.log("Content mode changed to:", value);
     }
+    
 
     const preferences = {
       language: category === "language" ? value : selectedLanguage,
@@ -151,6 +147,7 @@ const UserPreferences = () => {
       contentMode: category === "contentMode" ? value : selectedContentMode,
       topics: selectedTopics,
     };
+
 
     try {
       const res = await fetch("http://localhost:5001/api/v1/user/preferences", {
@@ -174,6 +171,23 @@ const UserPreferences = () => {
 
   const handleContinue = async (e) => {
     e.preventDefault();
+    if (!selectedLanguage) {
+      return setError(t("Please select a preferred language."));
+    }
+    if (!selectedTextSize) {
+      return setError(t("Please select a text size."));
+    }
+    if (!selectedContentMode) {
+      return setError(t("Please select a content mode."));
+    }
+    if (selectedTopics.length < 1) {
+      return setError(t("Please select at least 1 topic."));
+    }
+    if (selectedTopics.length > 2) {
+      return setError(t("You can only select up to 2 topics."));
+    }
+
+     setError(""); 
 
     console.log("User preferences:", {
       language: selectedLanguage,
@@ -355,6 +369,7 @@ const UserPreferences = () => {
             <button className="continue-btn" onClick={handleContinue}>
               {t("Continue")}
             </button>
+             {error && <div className="error-message">{error}</div>}
           </div>
         </div>
       </div>
