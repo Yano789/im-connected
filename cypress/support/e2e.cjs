@@ -14,4 +14,9 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+// cypress/support/e2e.cjs
+
+// Use CommonJS require instead of import
+require('./commands.cjs')
+
+// You can also add other setup code here

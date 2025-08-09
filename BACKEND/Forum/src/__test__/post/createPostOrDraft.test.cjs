@@ -88,7 +88,7 @@ describe("create post/draft", () => {
     ).rejects.toThrow("Username does not exist");
   });
 
-  test("Create a post with media and addCacheBuster", async () => {
+  test("Create a post with media ", async () => {
     const username = "userWithMedia";
     const mockData = {
       title: "Media Post",

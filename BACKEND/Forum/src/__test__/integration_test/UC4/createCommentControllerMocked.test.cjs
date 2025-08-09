@@ -46,7 +46,7 @@ describe("Create a comment to a post", () => {
 
         const post = await Post.create({
             postId: uniqueId.toString(),
-            title: `Test Post${uniqueId}`,
+            title: `Test Post2${uniqueId}`,
             content: "This is a test",
             username: username,
             tags: ["Mental Disability", "Pediatric Care"],

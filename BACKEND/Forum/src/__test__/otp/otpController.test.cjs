@@ -44,7 +44,7 @@ describe("sendOTP", () => {
     }));
 
     const result = await sendOTP(mockData);
-
+    console.log(result)
     expect(OTP.deleteOne).toHaveBeenCalledWith({ email: mockEmail });
     expect(generateOTP).toHaveBeenCalled();
     expect(hashData).toHaveBeenCalledWith(mockOTP);
@@ -115,7 +115,7 @@ describe("verifyOTP", () => {
 
     await expect(
       verifyOTP({ email: "john@example.com", otp: "123456" })
-    ).rejects.toThrow("Code has expired. REquest for a new one.");
+    ).rejects.toThrow("Code has expired. Request for a new one.");
 
     expect(OTP.deleteOne).toHaveBeenCalledWith({ email: "john@example.com" });
   });

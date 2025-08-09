@@ -28,7 +28,7 @@ describe("sendEmail", () => {
     };
 
     const result = await sendEmail(mailOptions);
-
+    console.log(result)
     expect(mockSendMail).toHaveBeenCalledWith(mailOptions);
     expect(result).toEqual({ success: true });
   });

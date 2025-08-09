@@ -92,7 +92,7 @@ describe("getPostWithComment", () => {
     createNestedComment.mockResolvedValue(nestedMock);
 
     const result = await getPostWithComment({ postId: mockPostId, username: mockUsername });
-
+    console.log(result)
     expect(User.findOne).toHaveBeenCalledWith({ username: mockUsername });
     expect(Post.findOne).toHaveBeenCalledWith({ postId: mockPostId });
     expect(Comment.find).toHaveBeenCalledWith({ postId: mockPostId });

@@ -25,6 +25,7 @@ const authenticateUser = async (data) => {
         const authenticatedUser = await User.findOne({ username })
         return { token, authenticatedUser };
     } catch (error) {
+        console.log(error)
         throw error;
     }
 };
