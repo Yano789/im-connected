@@ -246,7 +246,7 @@
   "Loading post...": "பதிவை ஏற்றுகிறது...",
   "Loading": "ஏற்றுகிறது",
   "Error: {error}": "பிழை: {error}",
-  "You haven’t posted anything yet.": "நீங்கள் இன்னும் எதையும் பதிவிடவில்லை.",
+  "You haven't posted anything yet.": "நீங்கள் இன்னும் எதையும் பதிவிடவில்லை.",
   "Previously Uploaded:": "முன்பு பதிவேற்றப்பட்டது:",
   "New Media:": "புதிய ஊடகம்:",
   "Posted:": "பதிவிடப்பட்டது:",
@@ -281,6 +281,9 @@
   "Personal Mental Health": "தனிப்பட்ட மனநலம்",
   "Financial & Legal Help": "நிதி மற்றும் சட்ட உதவி",
   "Hospitals and Clinics": "மருத்துவமனைகள் மற்றும் மருத்துவமனைகள்",
-  "Subsidies and Govt Support": "சட்ட உதவிகள் மற்றும் அரசு ஆதரவு"
-  
+  "Subsidies and Govt Support": "சட்ட உதவிகள் மற்றும் அரசு ஆதரவு",
+  "Title is required": "தலைப்பு தேவை",
+  "Content is required": "உள்ளடக்கம் தேவை",
+  "Content must be at least 20 characters": "உள்ளடக்கம் குறைந்தது 20 எழுத்துகள் இருக்க வேண்டும்",
+  "Please select at least 1 tag (max 2)": "குறைந்தபட்சம் 1 குறிச்சொல்லை (அதிகபட்சம் 2) தேர்ந்தெடுக்கவும்"
 }

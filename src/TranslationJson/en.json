@@ -246,7 +246,7 @@
     "Loading post...": "Loading post...",
     "Loading": "Loading",
     "Error: {error}": "Error: {error}",
-    "You haven’t posted anything yet.": "You haven’t posted anything yet.",
+    "You haven't posted anything yet.": "You haven't posted anything yet.",
     "Previously Uploaded:": "Previously Uploaded:",
     "New Media:": "New Media:",
     "Posted:": "Posted:",
@@ -282,5 +282,10 @@
     "Personal Mental Health": "Personal Mental Health",
     "Financial & Legal Help": "Financial & Legal Help",
     "Hospitals and Clinics": "Hospitals and Clinics",
-    "Subsidies and Govt Support": "Subsidies and Govt Support"
+    "Subsidies and Govt Support": "Subsidies and Govt Support",
+    "Title is required": "Title is required",
+    "Content is required": "Content is required",
+    "Content must be at least 20 characters": "Content must be at least 20 characters",
+    "Please select at least 1 tag (max 2)": "Please select at least 1 tag (max 2)"
+
 }

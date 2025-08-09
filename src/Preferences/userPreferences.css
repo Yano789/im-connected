@@ -140,7 +140,8 @@
 
 .error-message{
   text-size: var(--user-font-size);
-  colour: var(--error-text);
+  color: var(--error-text);
+   justify-content: center;
 }
 
 .content-mode-options {

@@ -10,14 +10,11 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [draftPostId, setDraftPostId] = useState(null);
-
   const [existingMedia, setExistingMedia] = useState([]);
-
   const [mediaToRemove, setMediaToRemove] = useState([]);
-
-  // New files user uploads (File objects)
   const [mediaFiles, setMediaFiles] = useState([]);
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
 
@@ -55,17 +52,14 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
     });
   }, []);
 
-  // Called by MediaUploader when user uploads new files
   const handleNewMediaChange = (files) => {
     setMediaFiles(files);
   };
 
-  // Called by MediaUploader when user removes a new uploaded file (optional, if your uploader supports it)
   const handleRemoveNewFile = (indexToRemove) => {
     setMediaFiles((prev) => prev.filter((_, i) => i !== indexToRemove));
   };
 
-  // When user removes existing media (already uploaded, saved on backend)
   const handleRemoveExistingMedia = (public_idToRemove) => {
     setExistingMedia((prev) =>
       prev.filter((media) => media.public_id !== public_idToRemove)
@@ -74,6 +68,26 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
   };
 
   const handleSubmit = async (isDraft = true) => {
+    setErrorMessage("");
+    if (!isDraft) {
+      if (!title.trim()) {
+        setErrorMessage(t("Title is required"));
+        return;
+      }
+      if (!content.trim()) {
+        setErrorMessage(t("Content is required"));
+        return;
+      }
+      if (content.trim().length < 20) {
+        setErrorMessage(t("Content must be at least 20 characters"));
+        return;
+      }
+      if (selectedTags.length === 0) {
+        setErrorMessage(t("Please select at least 1 tag (max 2)"));
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const formData = new FormData();
@@ -82,11 +96,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
       formData.append("content", content);
       formData.append("draft", isDraft);
       selectedTags.forEach((tag) => formData.append("tags", tag));
-
-      // Append new files
       mediaFiles.forEach((file) => formData.append("media", file));
-
-      // Append JSON string of public_ids to remove
       mediaToRemove.forEach((id) => {
         formData.append("mediaToRemove[]", id);
       });
@@ -95,14 +105,11 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
 
       if (isDraft && draftPostId) {
         const encodedPostId = encodeURIComponent(draftPostId);
-        response = await fetch(
-          API_ENDPOINTS.POST_EDIT_DRAFT(encodedPostId),
-          {
-            method: "PUT",
-            credentials: "include",
-            body: formData,
-          }
-        );
+        response = await fetch(API_ENDPOINTS.POST_EDIT_DRAFT(encodedPostId), {
+          method: "PUT",
+          credentials: "include",
+          body: formData,
+        });
       } else {
         response = await fetch(API_ENDPOINTS.POST_CREATE, {
           method: "POST",
@@ -148,9 +155,9 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
       setContent(renderDraft.content || "");
       setSelectedTags(renderDraft.tags || []);
       setDraftPostId(renderDraft.postId || null);
-      setExistingMedia(renderDraft.media || []); // set full media objects here
-      setMediaFiles([]); // clear new files when loading draft
-      setMediaToRemove([]); // clear removed media list on draft load
+      setExistingMedia(renderDraft.media || []);
+      setMediaFiles([]);
+      setMediaToRemove([]);
     } else {
       setTitle("");
       setContent("");
@@ -257,6 +264,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
             <div className="tagText">{t("Save as Draft")}</div>
           </button>
         </div>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
       </form>
     </div>
   );

@@ -2,7 +2,6 @@ import "./MyPostBody.css";
 import ForumCard from "../ForumCard/ForumCard";
 import Filter from "../Filter/Filter";
 import ToPost from "../ToPost/ToPost";
-import TopicSelector from "../TopicSelector/TopicSelector";
 import Delete from "../Delete/Delete";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";

@@ -246,7 +246,7 @@
   "Loading post...": "Memuatkan siaran...",
   "Loading": "Memuatkan",
   "Error: {error}": "Ralat: {error}",
-  "You haven’t posted anything yet.": "Anda belum menyiarkan apa-apa lagi.",
+  "You haven't posted anything yet.": "Anda belum menyiarkan apa-apa lagi.",
   "Previously Uploaded:": "Dimuat Naik Sebelum Ini:",
   "New Media:": "Media Baharu:",
   "Posted:": "Disiarkan:",
@@ -282,5 +282,9 @@
   "Personal Mental Health": "Kesihatan Mental Peribadi",
   "Financial & Legal Help": "Bantuan Kewangan & Undang-undang",
   "Hospitals and Clinics": "Hospital dan Klinik",
-  "Subsidies and Govt Support": "Subsidi dan Sokongan Kerajaan"
+  "Subsidies and Govt Support": "Subsidi dan Sokongan Kerajaan",
+  "Title is required": "Tajuk diperlukan",
+  "Content is required": "Kandungan diperlukan",
+  "Content must be at least 20 characters": "Kandungan mestilah sekurang-kurangnya 20 aksara",
+  "Please select at least 1 tag (max 2)": "Sila pilih sekurang-kurangnya 1 teg (maks 2)"
 }
