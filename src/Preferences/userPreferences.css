@@ -136,10 +136,7 @@
   color: var(--border-2);
 }
 
-.language-btn:hover, .text-size-btn:hover, .topic-btn:hover {
-  opacity: 0.8;
-  background: var(--button-colour-1-onhover);
-}
+
 
 .error-message{
   text-size: var(--user-font-size);
@@ -172,9 +169,6 @@
   border: 1px solid var(--border-2);
 }
 
-.content-mode-card:hover {
-  opacity: 0.8;
-}
 
 
 .mode-preview {
