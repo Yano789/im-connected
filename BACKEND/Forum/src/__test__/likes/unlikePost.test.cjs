@@ -44,7 +44,7 @@ describe("unlike a post",()=>{
         expect(result).toEqual({unlikedPost:mockData,post:mockUpdatedPost})
         expect(Post.findOneAndUpdate).toHaveBeenCalledWith({postId:mockPostId,draft:false},{ $inc: {likes: -1} },{new:true})
     })
-    test("throw error if unlike a post that was not liked by that user",async()=>{
+    test("Throws an error if the user unlikes a post that he didn’t like previously",async()=>{
         const mockPostId = "postId123"
         const mockUser = "john"
 

@@ -24,17 +24,18 @@ describe('createComment', () => {
         User.findOne.mockResolvedValue({ username: 'john' });
         Post.updateOne.mockResolvedValue({ matchedCount: 1 });
         hashData.mockResolvedValue('fakeHashedId');
-        const savedComment = { commentId: 'fakeHashedId', content: 'Nice post' };
-        Comment.mockImplementation(() => ({
-            save: jest.fn().mockResolvedValue(savedComment),
-        }));
-
-        const data = {
+                const data = {
             postId: 'post1',
             parentCommentId: null,
             username: 'john',
             content: 'Nice post',
         };
+        const savedComment = { ...data,commentId: 'fakeHashedId', content: 'Nice post' };
+        Comment.mockImplementation(() => ({
+            save: jest.fn().mockResolvedValue(savedComment),
+        }));
+
+
 
         const result = await createComment(data);
         expect(result).toEqual(savedComment);

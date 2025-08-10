@@ -30,6 +30,7 @@ describe("Set User Preferences (Mocked Controller)", () => {
     await User.deleteMany();
   });
 
+
   beforeEach(async () => {
     jest.clearAllMocks();
 

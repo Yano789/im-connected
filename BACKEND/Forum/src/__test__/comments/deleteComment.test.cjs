@@ -42,7 +42,7 @@ describe("deleteComment", () => {
         expect(result).toEqual(mockComment);
     });
 
-    test('should delete a nested comment and reparent its children', async () => {
+    test('should delete a nested comment and return it', async () => {
         const nestedComment = {
             ...mockComment,
             parentCommentId: 'parent123',

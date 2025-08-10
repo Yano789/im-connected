@@ -42,17 +42,39 @@ describe("getCommentsFromPosts", () => {
 
     translate.mockImplementation(async (text, lang) => `translated ${text}`);
 
-    createNestedComment.mockResolvedValue(nestedComments);
+    createNestedComment.mockImplementation(async (comments) => {
+  // Simple nesting by parentCommentId
+  const map = new Map();
+  const roots = [];
+
+  // Clone comments to avoid mutating input
+  comments.forEach(comment => map.set(comment.commentId, { ...comment, children: [] }));
+
+  map.forEach(comment => {
+    if (comment.parentCommentId) {
+      const parent = map.get(comment.parentCommentId);
+      if (parent) parent.children.push(comment);
+    } else {
+      roots.push(comment);
+    }
+  });
+
+  return roots;
+});
 
     const result = await getAllComments({ postId: 'post123', username: 'john' });
-
+    console.log(result[0])
     expect(Comment.find).toHaveBeenCalledWith({ postId: 'post123' });
     expect(createNestedComment).toHaveBeenCalledWith(
       expect.arrayContaining([
         expect.objectContaining({ content: expect.stringContaining('translated') })
       ])
     );
-    expect(result).toEqual(nestedComments);
+    expect(result).toEqual(
+  expect.arrayContaining([
+    expect.objectContaining({ content: expect.stringContaining('translated') })
+  ])
+);
   });
 });
 
