@@ -10,8 +10,18 @@ const cors = require("cors");
 const path = require("path");
 const routes = require("./routes/index.cjs");
 
-// Import CSP configuration
-const { CSP_STRING } = require("../../../csp-config.js");
+// CSP configuration to fix Railway security policy issues
+const CSP_STRING = "default-src 'self' https:; " +
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'sha256-ieoeWczDHkReVBsRBqaal5AFMlBtNjMzgwKvLqi/tSU=' https: blob:; " +
+  "style-src 'self' 'unsafe-inline' https:; " +
+  "img-src 'self' data: https: blob:; " +
+  "font-src 'self' https: data:; " +
+  "connect-src 'self' https: wss: ws:; " +
+  "media-src 'self' https: blob:; " +
+  "object-src 'none'; " +
+  "base-uri 'self'; " +
+  "form-action 'self'; " +
+  "frame-ancestors 'none';";
 
 //create server app
 const app = express();
