@@ -26,6 +26,21 @@ const CSP_STRING = "default-src 'self' https:; " +
 //create server app
 const app = express();
 
+// Set security headers as early as possible to override Railway defaults
+app.use((req, res, next) => {
+  // Override any existing CSP headers
+  res.removeHeader('Content-Security-Policy');
+  res.setHeader('Content-Security-Policy', CSP_STRING);
+  
+  // Add other security headers
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  
+  next();
+});
+
 //middleware
 app.use(cookieParser());
 app.use(cors({
@@ -65,6 +80,11 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.use("/api/v1",routes);
+
+// Health check endpoint for Railway
+app.get("/api/v1/health", (req, res) => {
+  res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
+});
 
 // Serve frontend for all non-API routes in production
 if (process.env.NODE_ENV === "production") {
