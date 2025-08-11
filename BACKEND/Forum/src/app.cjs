@@ -28,8 +28,9 @@ const app = express();
 
 // Set security headers as early as possible to override Railway defaults
 app.use((req, res, next) => {
-  // Override any existing CSP headers
+  // Force override any existing CSP headers
   res.removeHeader('Content-Security-Policy');
+  res.removeHeader('content-security-policy');
   res.setHeader('Content-Security-Policy', CSP_STRING);
   
   // Add other security headers
@@ -61,13 +62,16 @@ app.use(cors({
 
 // Content Security Policy middleware
 app.use((req, res, next) => {
+  // Set CSP header again to ensure it overrides any Railway defaults
+  res.removeHeader('Content-Security-Policy');
+  res.removeHeader('content-security-policy'); 
   res.setHeader('Content-Security-Policy', CSP_STRING);
   next();
 });
 
 app.use(bodyParser());
 
-// Serve static files from the public directory (built frontend)
+// Serve static files from the public directory (built frontend) - BEFORE API routes
 if (process.env.NODE_ENV === "production") {
   // In Docker, working directory is /app and frontend files are in /app/public
   const publicPath = path.join(process.cwd(), "public");
@@ -79,19 +83,39 @@ if (process.env.NODE_ENV === "production") {
   console.log("Looking for index.html at:", path.join(publicPath, "index.html"));
 }
 
-app.use("/api/v1",routes);
-
 // Health check endpoint for Railway
 app.get("/api/v1/health", (req, res) => {
+  res.setHeader('Content-Security-Policy', CSP_STRING);
   res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
 });
+
+// Root route - serve index.html
+app.get("/", (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    const indexPath = path.join(process.cwd(), "public", "index.html");
+    console.log("Serving root route - index.html from:", indexPath);
+    res.setHeader('Content-Security-Policy', CSP_STRING);
+    res.sendFile(indexPath);
+  } else {
+    res.json({ message: "IM-CONNECTED Development Server" });
+  }
+});
+
+app.use("/api/v1",routes);
 
 // Serve frontend for all non-API routes in production
 if (process.env.NODE_ENV === "production") {
   app.get(/^(?!\/api).*/, (req, res) => {  // Matches everything except /api routes
     const indexPath = path.join(process.cwd(), "public", "index.html");
+    console.log("SPA fallback route hit for:", req.url);
     console.log("Attempting to serve index.html from:", indexPath);
-    res.sendFile(indexPath);
+    res.setHeader('Content-Security-Policy', CSP_STRING);
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error("Error serving index.html:", err);
+        res.status(404).send("Frontend file not found");
+      }
+    });
   });
 }
 
