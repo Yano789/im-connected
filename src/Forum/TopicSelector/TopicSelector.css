@@ -47,3 +47,23 @@
   border-style: solid;
   gap: 1.25rem; 
 }
+
+@media (max-width: 768px) {
+  .topicTags {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(5, auto);
+  gap: 0.625rem;
+  text-align: center;
+  font-size: 1.125rem;
+}
+
+.topicTags > * {
+  align-self: start;
+  justify-self: start;
+  height: 100%;
+  max-height: 100%;
+}
+
+}
+
