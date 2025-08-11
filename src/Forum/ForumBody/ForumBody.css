@@ -8,6 +8,7 @@
 @media (min-width: 768px) {
   .forumMain {
     flex-direction: row;
+    align-items: flex-start;
   }
 }
 
@@ -16,25 +17,13 @@
   order: 1;
   flex-shrink: 0;
   display: flex;
-  flex-direction: row;
   gap: 1.25rem; 
   padding: 1.25rem; 
   overflow: hidden;
   min-width: 0;
-}
-
-@media (min-width: 640px) {
-  .forumLeftBar {
-    flex-direction: column;
-    gap: 2.5rem; 
-  }
-}
-
-@media (min-width: 768px) {
-  .forumLeftBar {
-    width: 20%; 
-    order: 1; 
-  }
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start; 
 }
 
 .forumRightBar {
@@ -55,31 +44,7 @@
   .forumRightBar {
     justify-content: center;
     gap: 2.5rem;
+    justify-content: center;
   }
 }
 
-@media (min-width: 768px) {
-  .forumRightBar {
-    width: 20%; 
-    order: 3; 
-  }
-}
-
-.forumBody {
-  width: 100%;
-  order: 3;
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem; 
-  padding: 1.25rem; 
-  min-width: 0;
-  overflow: hidden;
-}
-
-@media (min-width: 768px) {
-  .forumBody {
-    width: 60%; 
-    order: 2; 
-  }
-}
