@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
+import { API_ENDPOINTS } from "../config/api";
 import "./userPreferences.css";
 import Children from "../assets/Children.png";
 import Depression from "../assets/Depression.png";
@@ -150,7 +151,7 @@ useEffect(() => {
 
 
     try {
-      const res = await fetch("http://localhost:5001/api/v1/user/preferences", {
+      const res = await fetch(API_ENDPOINTS.USER_PREFERENCES, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -204,7 +205,7 @@ useEffect(() => {
     };
 
     try {
-      const res = await fetch("http://localhost:5001/api/v1/user/preferences", {
+      const res = await fetch(API_ENDPOINTS.USER_PREFERENCES, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

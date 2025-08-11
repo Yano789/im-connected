@@ -10,9 +10,6 @@ const cors = require("cors");
 const path = require("path");
 const routes = require("./routes/index.cjs");
 
-// Import CSP configuration
-const { CSP_STRING } = require("../../../csp-config.js");
-
 //create server app
 const app = express();
 
@@ -34,34 +31,50 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept']
 }));
 
-// Content Security Policy middleware
-app.use((req, res, next) => {
-  res.setHeader('Content-Security-Policy', CSP_STRING);
-  next();
-});
-
 app.use(bodyParser());
 
-// Serve static files from the public directory (built frontend)
+// Serve static files from the public directory (built frontend) - BEFORE API routes
 if (process.env.NODE_ENV === "production") {
-  // In Docker, files are copied to ./public relative to the working directory (/app)
-  const publicPath = path.join(__dirname, "../public");
+  // In Docker, working directory is /app and frontend files are in /app/public
+  const publicPath = path.join(process.cwd(), "public");
   app.use(express.static(publicPath));
   
   // Debug: Log the public directory path
+  console.log("Working directory:", process.cwd());
   console.log("Serving static files from:", publicPath);
   console.log("Looking for index.html at:", path.join(publicPath, "index.html"));
 }
 
+// Health check endpoint for Railway
+app.get("/api/v1/health", (req, res) => {
+  res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
+});
+
+// Root route - serve index.html
+app.get("/", (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    const indexPath = path.join(process.cwd(), "public", "index.html");
+    console.log("Serving root route - index.html from:", indexPath);
+    res.sendFile(indexPath);
+  } else {
+    res.json({ message: "IM-CONNECTED Development Server" });
+  }
+});
+
 app.use("/api/v1",routes);
 
 // Serve frontend for all non-API routes in production
-// Serve frontend for all non-API routes in production
 if (process.env.NODE_ENV === "production") {
   app.get(/^(?!\/api).*/, (req, res) => {  // Matches everything except /api routes
-    const indexPath = path.join(__dirname, "../public/index.html");
+    const indexPath = path.join(process.cwd(), "public", "index.html");
+    console.log("SPA fallback route hit for:", req.url);
     console.log("Attempting to serve index.html from:", indexPath);
-    res.sendFile(indexPath);
+    res.sendFile(indexPath, (err) => {
+      if (err) {
+        console.error("Error serving index.html:", err);
+        res.status(404).send("Frontend file not found");
+      }
+    });
   });
 }
 
