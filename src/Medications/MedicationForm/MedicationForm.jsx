@@ -143,7 +143,7 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
             console.log('Checking scanner API health...');
             const isApiAvailable = await medicationScannerService.checkApiHealth();
             if (!isApiAvailable) {
-                throw new Error(t('Scanner service is not available. Please ensure the scanner server is running on port 3001.'));
+                throw new Error(t('Scanner service is temporarily unavailable. Please try again later or manually enter medication information.'));
             }
 
             console.log('Scanner API is available, proceeding with scan...');
