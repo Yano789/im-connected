@@ -10,6 +10,9 @@ const cors = require("cors");
 const path = require("path");
 const routes = require("./routes/index.cjs");
 
+// Import CSP configuration
+const { CSP_STRING } = require("../../../csp-config.js");
+
 //create server app
 const app = express();
 
@@ -30,6 +33,13 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept']
 }));
+
+// Content Security Policy middleware
+app.use((req, res, next) => {
+  res.setHeader('Content-Security-Policy', CSP_STRING);
+  next();
+});
+
 app.use(bodyParser());
 
 // Serve static files from the public directory (built frontend)
