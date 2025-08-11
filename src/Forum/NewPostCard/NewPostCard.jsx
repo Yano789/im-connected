@@ -103,14 +103,15 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
 
       let response;
 
-      if (isDraft && draftPostId) {
-        const encodedPostId = encodeURIComponent(draftPostId);
-        response = await fetch(API_ENDPOINTS.POST_EDIT_DRAFT(encodedPostId), {
+      if (draftPostId) {
+        formData.set("draft", isDraft);
+        response = await fetch(API_ENDPOINTS.POST_EDIT_DRAFT(draftPostId), {
           method: "PUT",
           credentials: "include",
           body: formData,
         });
       } else {
+        formData.set("draft", isDraft);
         response = await fetch(API_ENDPOINTS.POST_CREATE, {
           method: "POST",
           credentials: "include",
