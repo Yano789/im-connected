@@ -127,11 +127,37 @@ const updateUserDetails = async(data) => {
       throw new Error(errorMessage.join(''));
     }
 
+    // Update user profile
     const newUser = await User.findOneAndUpdate(
       { username: username },
       { name: name, username: newUsername, email: email, number: number },
       { new: true }
     );
+
+    // If username changed, update all associated data
+    if (username !== newUsername) {
+      // Import required models
+      const { Post } = require("../post/model.cjs");
+      const Comment = require("../comment/model.cjs");
+      const likedPost = require("../likes/model.cjs");
+      const savedPost = require("../savedPosts/model.cjs");
+      const { CareRecipient, Medication } = require("../medication/model.cjs");
+
+      // Update all records that reference the old username
+      await Promise.all([
+        // Forum data
+        Post.updateMany({ username }, { username: newUsername }),
+        Comment.updateMany({ username }, { username: newUsername }),
+        likedPost.updateMany({ username }, { username: newUsername }),
+        savedPost.updateMany({ username }, { username: newUsername }),
+        // Medical data
+        CareRecipient.updateMany({ username }, { username: newUsername }),
+        Medication.updateMany({ username }, { username: newUsername })
+      ]);
+
+      console.log(`Successfully migrated all data from username '${username}' to '${newUsername}'`);
+    }
+
     const tokenData = { userId: newUser._id, email: newUser.email, username: newUser.username };
     const token = await createToken(tokenData);
     return { token, newUser };
