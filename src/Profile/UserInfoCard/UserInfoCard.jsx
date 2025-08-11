@@ -11,12 +11,12 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, errors }
             <div className="user-card">
                 <div className="user-details">
                     <div className="detail-row edit-mode">
-                        <label htmlFor="name" className="detail-label">{t("Name:")}</label>
+                        <label htmlFor="name" className="detail-label">{t("Name")}</label>
                         <input type="text" id="name" name="name" value={user.name || ''} onChange={onChange} />
                         {errors.name && <p className="error-text">{errors.name}</p>}
                     </div>
                     <div className="detail-row edit-mode">
-                        <label htmlFor="username" className="detail-label">{t("Username:")}</label>
+                        <label htmlFor="username" className="detail-label">{t("Username")}</label>
                         <input type="text" id="username" name="username" value={user.username || ''} onChange={onChange} />
                         {errors.username && <p className="error-text">{errors.username}</p>}
                     </div>
@@ -55,14 +55,14 @@ function UserInfoCard({ user, isEditing, onChange, onSave, onEditClick, errors }
             <div className="user-details">
                 <div className="detail-row">
                     <div>
-                        <span className="detail-label">{t("Name:")}</span>
+                        <span className="detail-label">{t("Name")}</span>
                         <span className="detail-value">{user.name}</span>
                     </div>
                     <button onClick={onEditClick} className="edit-icon-button">✏️</button>
                 </div>
                 <div className="detail-row">
                     <div>
-                        <span className="detail-label">{t("Username:")}</span>
+                        <span className="detail-label">{t("Username")}</span>
                         <span className="detail-value">{user.username}</span>
                     </div>
                      <button onClick={onEditClick} className="edit-icon-button">✏️</button>

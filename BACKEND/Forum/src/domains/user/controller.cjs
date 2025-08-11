@@ -1,6 +1,10 @@
 const User = require("./model.cjs");
 const { hashData, verifyHashedData } = require("../../utils/hashData.cjs");
 const createToken = require("../../utils/createToken.cjs");
+const {Post} = require("./../post/model.cjs")
+const savedPost = require("./../savedPosts/model.cjs")
+const likedPost = require("./../likes/model.cjs")
+const Comment = require("./../comment/model.cjs")
 
 const authenticateUser = async (data) => {
     try {
@@ -165,7 +169,6 @@ const updateUserDetails = async(data) => {
     throw error;
   }
 };
-
 
 const getUser = async (username)=>{
     try {
