@@ -5,9 +5,12 @@ import cors from 'cors';
  */
 const corsConfig = cors({
   origin: function (origin, callback) {
-    // In Docker/production, be more permissive for internal network communication
-    if (process.env.NODE_ENV === 'production') {
-      console.log('CORS: Production mode - allowing all origins for Docker networking');
+    console.log('CORS: NODE_ENV =', process.env.NODE_ENV);
+    console.log('CORS: Request from origin:', origin);
+    
+    // In production or Railway environment, be more permissive
+    if (process.env.NODE_ENV === 'production' || process.env.RAILWAY_ENVIRONMENT) {
+      console.log('CORS: Production/Railway mode - allowing all origins');
       callback(null, true);
       return;
     }
@@ -19,6 +22,10 @@ const corsConfig = cors({
       'http://localhost:80',   // Docker frontend
       'http://localhost',      // Docker frontend (without port)
       'http://localhost:8080', // Nginx proxy
+      // Production Railway URLs
+      'https://im-connected-production.up.railway.app', // Production frontend
+      'https://ai-chatbot-production-c94d.up.railway.app', // Production AI chatbot
+      'https://scanner-service.up.railway.app', // Production scanner service
       // Docker network internal communication
       'http://frontend',
       'http://im-connected-frontend',
@@ -31,13 +38,10 @@ const corsConfig = cors({
       'http://172.20.0.1'
     ];
     
-    console.log('CORS: Request from origin:', origin);
-    
     // Allow requests with no origin (mobile apps, curl, etc.) or from allowed origins
     if (!origin || allowedOrigins.includes(origin)) {
       console.log('CORS allowed for origin:', origin || 'no-origin');
-      // Pass the specific origin back, or '*' for no-origin requests
-      callback(null, origin || '*');
+      callback(null, true);
     } else {
       console.log('CORS blocked for origin:', origin);
       callback(new Error('Not allowed by CORS'));
