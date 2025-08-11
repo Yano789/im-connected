@@ -27,7 +27,7 @@ function NewPostCard({ onDraftAdded, renderDraft }) {
     { key: "Subsidies and Govt Support", label: t("Tag4") },
     { key: "Pediatric Care", label: t("Tag5") },
     { key: "End of Life Care", label: t("Tag6") },
-    { key: "Finacial & Legal Help", label: t("Tag7") },
+    { key: "Financial & Legal Help", label: t("Tag7") },
     { key: "Mental Disability", label: t("Tag8") },
     { key: "Hospitals and Clinics", label: t("Tag9") },
   ];
