@@ -344,8 +344,15 @@
 /* Responsive design */
 @media (max-width: 768px) {
     .form-card {
-        padding: 1rem;
-        margin: 0.5rem;
+        padding: 2rem;
+        border-radius: 16px;
+        background-color: var(--border-1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        height: auto;         
+        max-height: none;    
+        overflow-y: visible; 
+        width: 100%;
+        max-width: 100%;
     }
     
     .form-actions {
