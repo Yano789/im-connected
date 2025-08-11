@@ -7,12 +7,28 @@ const router = express.Router();
  * Health check endpoint
  */
 router.get('/health', (req, res) => {
-  res.json({
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    service: constants.APP_NAME,
-    version: constants.APP_VERSION
-  });
+  try {
+    // Ensure CORS headers are set
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Origin, Accept');
+    
+    console.log('Health check requested from:', req.get('Origin') || 'unknown');
+    
+    res.status(200).json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      service: constants.APP_NAME,
+      version: constants.APP_VERSION,
+      environment: process.env.NODE_ENV || 'unknown'
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.status(500).json({
+      status: 'error',
+      error: error.message
+    });
+  }
 });
 
 /**

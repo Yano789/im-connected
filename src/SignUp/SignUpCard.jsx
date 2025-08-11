@@ -5,6 +5,7 @@ import { ChevronDown, Eye, EyeOff } from "lucide-react";
 import SignUpPeople from "../assets/SignUpPeople.png";
 import "./SignUpCard.css";
 import { useTranslation } from "react-i18next";
+import { API_ENDPOINTS } from "../config/api.js";
 
 import { t } from "i18next";
 
@@ -91,7 +92,7 @@ function SignUpCard() {
     };
 
     try {
-      const res = await fetch("http://localhost:5001/api/v1/user/signup", {
+      const res = await fetch(API_ENDPOINTS.USER_SIGNUP, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

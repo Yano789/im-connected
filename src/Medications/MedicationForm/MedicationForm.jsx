@@ -143,7 +143,12 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
             console.log('Checking scanner API health...');
             const isApiAvailable = await medicationScannerService.checkApiHealth();
             if (!isApiAvailable) {
-                throw new Error(t('Scanner service is not available. Please ensure the scanner server is running on port 3001.'));
+                setScanError(t('Scanner service is temporarily unavailable. You can still manually enter medication information below.'));
+                // Auto-clear error message after 6 seconds to guide user to manual entry
+                setTimeout(() => {
+                    setScanError('');
+                }, 6000);
+                return;
             }
 
             console.log('Scanner API is available, proceeding with scan...');
@@ -189,6 +194,11 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
         } catch (error) {
             console.error('Scanning error:', error);
             setScanError(t('Scanning failed: {{message}}', { message: error.message }));
+            
+            // Auto-clear error message after 8 seconds to avoid blocking the UI
+            setTimeout(() => {
+                setScanError('');
+            }, 8000);
         } finally {
             setIsScanning(false);
         }
@@ -293,47 +303,49 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                 )}
             </div>
 
-            {/* Medication Scanner Section */}
-            <div className="scanner-section">
-                <h3>📷 {t("Scan Medication")}</h3>
-                <div className="scanner-controls">
-                    <input 
-                        type="file" 
-                        ref={fileInputRef}
-                        onChange={handleFileSelect}
-                        accept="image/*"
-                        className="file-input"
-                    />
-                    {selectedFile && (
-                        <div className="file-preview">
-                            <img src={previewUrl} alt={t("Selected medication")} className="preview-image" />
-                            <button type="button" onClick={clearFile} className="clear-file-btn">❌ {t("Remove")}</button>
+            {/* Medication Scanner Section - Only show when adding new medication */}
+            {!isEditing && (
+                <div className="scanner-section">
+                    <h3>📷 {t("Scan Medication")}</h3>
+                    <div className="scanner-controls">
+                        <input 
+                            type="file" 
+                            ref={fileInputRef}
+                            onChange={handleFileSelect}
+                            accept="image/*"
+                            className="file-input"
+                        />
+                        {selectedFile && (
+                            <div className="file-preview">
+                                <img src={previewUrl} alt={t("Selected medication")} className="preview-image" />
+                                <button type="button" onClick={clearFile} className="clear-file-btn">❌ {t("Remove")}</button>
+                            </div>
+                        )}
+                        <div className="scanner-actions">
+                            <button 
+                                type="button" 
+                                onClick={handleScanMedication}
+                                disabled={!selectedFile || isScanning}
+                                className="scan-button"
+                            >
+                                {isScanning ? t('Scanning...') : 
+                                 selectedRecipient ? t(' Scan & Save to Database') : t(' Scan Medication (Preview)')}
+                            </button>
                         </div>
-                    )}
-                    <div className="scanner-actions">
-                        <button 
-                            type="button" 
-                            onClick={handleScanMedication}
-                            disabled={!selectedFile || isScanning}
-                            className="scan-button"
-                        >
-                            {isScanning ? t('Scanning...') : 
-                             selectedRecipient ? t(' Scan & Save to Database') : t(' Scan Medication (Preview)')}
-                        </button>
+                    </div>
+                    
+                    {/* Scanner feedback */}
+                    {scanError && <div className="scan-error"> {scanError}</div>}
+                    {scanSuccess && <div className="scan-success"> {scanSuccess}</div>}
+                    {uploadError && <div className="scan-error"> {t("Upload Error")}: {uploadError}</div>}
+                    {uploadSuccess && <div className="scan-success"> {uploadSuccess}</div>}
+                    {isScanning && <div className="scan-progress">{t("Processing image and extracting medication information...")}</div>}
+                    
+                    <div className="scanner-divider">
+                        <span>{t("OR")}</span>
                     </div>
                 </div>
-                
-                {/* Scanner feedback */}
-                {scanError && <div className="scan-error"> {scanError}</div>}
-                {scanSuccess && <div className="scan-success"> {scanSuccess}</div>}
-                {uploadError && <div className="scan-error"> {t("Upload Error")}: {uploadError}</div>}
-                {uploadSuccess && <div className="scan-success"> {uploadSuccess}</div>}
-                {isScanning && <div className="scan-progress">{t("Processing image and extracting medication information...")}</div>}
-                
-                <div className="scanner-divider">
-                    <span>{t("OR")}</span>
-                </div>
-            </div>
+            )}
 
             {/* Manual Entry Section */}
             <div className="manual-entry-section">

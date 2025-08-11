@@ -91,8 +91,8 @@ function MedicationsPage() {
                 
                 setCareRecipients(transformedRecipients);
                 
-                // Set first recipient as selected if any exist
-                if (transformedRecipients.length > 0) {
+                // Set first recipient as selected ONLY if no recipient is currently selected and recipients exist
+                if (transformedRecipients.length > 0 && !selectedRecipientId) {
                     setSelectedRecipientId(transformedRecipients[0].id);
                 }
             } else {
@@ -225,7 +225,19 @@ function MedicationsPage() {
 
             // Reload care recipients and medications from the database
             console.log('Reloading care recipients...');
+            const currentSelectedRecipientId = selectedRecipientId; // Remember current selection
             await loadCareRecipients();
+            
+            // After reload, ensure we maintain the same recipient selection and update medication list
+            if (currentSelectedRecipientId) {
+                // The recipient ID should remain the same, medications will be refreshed
+                setSelectedRecipientId(currentSelectedRecipientId);
+                
+                // Clear medication selection to show the updated list
+                setSelectedMedicationId(null);
+                
+                console.log('Medication saved and data reloaded for recipient:', currentSelectedRecipientId);
+            }
             
             setMode('view');
             setCapturedFile(null);
