@@ -9,14 +9,15 @@ import { API_ENDPOINTS } from '../../config/api.js';
 
 const summarize_text = async (postTitle): Promise<string> => {
   console.log('I entered summary.ts summarize_text()')
-  console.log(`this is what what inputted ${postTitle}`);
+  console.log(`this is what what inputted "${postTitle}"`);
   if (typeof postTitle !== "string" || !postTitle.trim()) {
     throw new Error("summarize_text requires a non‑empty title string");
   }
 
-  const encodedTitle = encodeURIComponent(postTitle.trim());
+  //const encodedTitle = encodeURIComponent(postTitle.trim());
+  console.log("Final URL:", API_ENDPOINTS.POST_BY_TITLE(postTitle.trim()));
   const resp = await fetch(
-    API_ENDPOINTS.POST_BY_TITLE(encodedTitle),
+    API_ENDPOINTS.POST_BY_TITLE(postTitle.trim()),
     {
       method:      "GET",
       credentials: "include"
