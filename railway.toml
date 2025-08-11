@@ -9,6 +9,6 @@ restartPolicyType = "on_failure"
 [env]
 NODE_ENV = "production"
 
-# Disable Railway's default security headers so we can set our own
-[security]
-disableDefaultHeaders = true
+# Try to disable Railway's default security headers
+[experimental]
+disableSecurityHeaders = true

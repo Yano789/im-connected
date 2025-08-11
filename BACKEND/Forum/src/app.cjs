@@ -11,23 +11,39 @@ const path = require("path");
 const routes = require("./routes/index.cjs");
 
 // CSP configuration to fix Railway security policy issues
-const CSP_STRING = "default-src 'self' https:; " +
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' 'sha256-ieoeWczDHkReVBsRBqaal5AFMlBtNjMzgwKvLqi/tSU=' https: blob:; " +
-  "style-src 'self' 'unsafe-inline' https:; " +
-  "img-src 'self' data: https: blob:; " +
-  "font-src 'self' https: data:; " +
-  "connect-src 'self' https: wss: ws:; " +
-  "media-src 'self' https: blob:; " +
-  "object-src 'none'; " +
-  "base-uri 'self'; " +
-  "form-action 'self'; " +
-  "frame-ancestors 'none';";
+const CSP_STRING = "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; " +
+  "script-src * 'unsafe-inline' 'unsafe-eval' 'sha256-ieoeWczDHkReVBsRBqaal5AFMlBtNjMzgwKvLqi/tSU=' data: blob:; " +
+  "style-src * 'unsafe-inline' data:; " +
+  "img-src * data: blob:; " +
+  "font-src * data:; " +
+  "connect-src * data:; " +
+  "media-src * data: blob:; " +
+  "frame-src *; " +
+  "child-src *; " +
+  "worker-src * data: blob:; " +
+  "object-src *; " +
+  "base-uri *; " +
+  "form-action *;";
 
 //create server app
 const app = express();
 
 // Set security headers as early as possible to override Railway defaults
 app.use((req, res, next) => {
+  // Use writeHead to forcefully override headers
+  const originalWriteHead = res.writeHead;
+  const originalSetHeader = res.setHeader;
+  
+  res.writeHead = function(statusCode, headers) {
+    // Force override CSP headers
+    this.setHeader('Content-Security-Policy', CSP_STRING);
+    this.setHeader('X-Frame-Options', 'DENY');
+    this.setHeader('X-Content-Type-Options', 'nosniff');
+    this.setHeader('X-XSS-Protection', '1; mode=block');
+    this.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    return originalWriteHead.call(this, statusCode, headers);
+  };
+  
   // Force override any existing CSP headers
   res.removeHeader('Content-Security-Policy');
   res.removeHeader('content-security-policy');
