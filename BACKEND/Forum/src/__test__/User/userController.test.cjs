@@ -1,13 +1,23 @@
 jest.mock("./../../domains/user/model.cjs")
+jest.mock("./../../domains/post/model.cjs")
+jest.mock("./../../domains/savedPosts/model.cjs")
+jest.mock("./../../domains/likes/model.cjs")
+jest.mock("./../../domains/comment/model.cjs")
+jest.mock("./../../domains/medication/model.cjs")
 jest.mock("./../../utils/hashData.cjs")
 jest.mock("./../../utils/createToken.cjs")
 
 
+
 const User = require("./../../domains/user/model.cjs")
+const {Post} = require("./../../domains/post/model.cjs")
+const savedPost = require("./../../domains/savedPosts/model.cjs")
+const likedPost = require("./../../domains/likes/model.cjs")
+const Comment = require("./../../domains/comment/model.cjs")
 const { hashData, verifyHashedData } = require("./../../utils/hashData.cjs")
 const createToken = require("./../../utils/createToken.cjs")
 const { createNewUser,authenticateUser, updateUserPreferences,getUser ,updateUserDetails} = require("./../../domains/user/controller.cjs")
-
+const { CareRecipient, Medication } = require("./../../domains/medication/model.cjs");
 
 describe("createNewUser", () => {
     beforeEach(() => {
@@ -296,6 +306,12 @@ describe("updateUserDetails", () => {
     .mockResolvedValueOnce(null); // check number
 
   User.findOneAndUpdate.mockResolvedValue(updatedUser);
+  Post.updateMany.mockResolvedValue({});
+  savedPost.updateMany.mockResolvedValue({});
+  likedPost.updateMany.mockResolvedValue({});
+  Comment.updateMany.mockResolvedValue({});
+  CareRecipient.updateMany.mockResolvedValue({});
+  Medication.updateMany.mockResolvedValue({});
 
   createToken.mockResolvedValue("mock.jwt.token");
 
