@@ -1,7 +1,7 @@
 jest.mock("./../../domains/post/model.cjs");
 jest.mock("./../../utils/hashData.cjs");
 jest.mock("./../../domains/user/model.cjs");
-jest.mock("../../config/gcsStorage.cjs", () => ({
+jest.mock("../../config/googleConfig.cjs", () => ({
   bucket: {
     file: jest.fn().mockReturnThis(),
     getSignedUrl: jest.fn().mockResolvedValue(["http://example.com/signed.jpg"]),
@@ -88,7 +88,7 @@ describe("create post/draft", () => {
     ).rejects.toThrow("Username does not exist");
   });
 
-  test("Create a post with media and addCacheBuster", async () => {
+  test("Create a post with media ", async () => {
     const username = "userWithMedia";
     const mockData = {
       title: "Media Post",

@@ -3,7 +3,7 @@ jest.mock("../../../domains/post/controller.cjs", () => ({
     // simulate media upload without appending cache buster to the signed URL
     const media = (data.media || []).map((file) => ({
       ...file,
-      url: file.url, // no ?cb=1234567890
+      url: file.url, 
       secure_url: file.secure_url || file.url,
     }));
 
@@ -22,18 +22,8 @@ jest.mock("../../../domains/post/controller.cjs", () => ({
 }));
 
 
-// Optional: mock internal utils
-let postIdCounter = 0;
-jest.mock("../../../utils/hashData.cjs", () => ({
-  hashData: jest.fn(() => {
-    postIdCounter++;
-    return Promise.resolve(`mockedPostId_${postIdCounter}`);
-  }),
-  verifyHashedData: jest.fn(),
-}));
 
-
-// Step 2: Import AFTER mocks
+// testing route functionality and its middleware
 const path = require("path");
 require("../setUpMongo.cjs");
 const fs = require("fs");
@@ -93,6 +83,7 @@ describe("Create Post (Mocked Controller)", () => {
       console.log("❌ Response Body:", res.body);
       console.log("❌ Response Text:", res.text);
     }
+    console.log(res.body)
     expect(res.statusCode).toBe(200);
     expect(res.body.title).toBe("Mocked Post1");
     expect(res.body.tags).toEqual(["Mental Disability"]);
@@ -121,8 +112,111 @@ describe("Create Post (Mocked Controller)", () => {
       console.log("❌ Response Body:", res.body);
       console.log("❌ Response Text:", res.text);
     }
+    console.log(res.body)
     expect(res.statusCode).toBe(200);
     expect(res.body.tags).toEqual(["Mental Disability", "Pediatric Care"]);
     expect(res.body.media).toBeDefined();
   });
+
+    test("should fail without right auth token",async()=>{
+        const res = await request(app)
+            .post(`/api/v1/post/create`)
+            .set("Cookie",["token=fakeToken"])
+            .send({
+                    title: "Test Tags Array1",
+                    content: "Testing tags array",
+                    draft: false,
+                    tags: ["Mental Disability"],
+                  })
+            console.log(res.text)
+    expect(res.statusCode).toBe(401);
+    expect(res.text).toMatch("Invalid Token provided!");   
+    })
+
+
+test("should handle multiple media files", async () => {
+    const imagePath1 = path.join(__dirname, "../../dummy_media/dummy.png");
+    const imagePath2 = path.join(__dirname, "../../dummy_media/dummy.png"); 
+    
+    const res = await request(app)
+      .post("/api/v1/post/create")
+      .set("Cookie", [`token=${token}`])
+      .field("title", "Multiple Media Post")
+      .field("content", "Post with multiple media files")
+      .field("tags", "Mental Disability")
+      .attach("media", fs.createReadStream(imagePath1))
+      .attach("media", fs.createReadStream(imagePath2));
+
+    expect(res.statusCode).toBe(200);
+    const {createPost} = require("../../../domains/post/controller.cjs")
+    expect(createPost).toHaveBeenCalledWith(
+      expect.objectContaining({
+        media: expect.arrayContaining([
+          expect.objectContaining({
+            url: expect.any(String),
+            type: expect.any(String),
+            public_id: expect.any(String),
+            original_filename: expect.any(String),
+            mimetype: expect.any(String),
+            format: expect.any(String)
+          })
+        ])
+      })
+    );
+});
+ test("should fail validation with empty title", async () => {
+    const res = await request(app)
+      .post("/api/v1/post/create")
+      .set("Cookie", [`token=${token}`])
+      .send({
+        title: "", // Empty title
+        content: "Valid content",
+        tags: ["Mental Disability"],
+      });
+
+    expect(res.statusCode).toBe(400);
+    const {createPost} = require("../../../domains/post/controller.cjs")
+    expect(createPost).not.toHaveBeenCalled();
+    expect(res.text).toMatch( "{\"error\":\"\\\"title\\\" cannot be empty\"}")
+  });
+
+  test("should fail validation with empty content", async () => {
+    const res = await request(app)
+      .post("/api/v1/post/create")
+      .set("Cookie", [`token=${token}`])
+      .send({
+        title: "Valid title",
+        content: "", // Empty content
+        tags: ["Mental Disability"],
+      });
+
+    expect(res.statusCode).toBe(400);
+    const {createPost} = require("../../../domains/post/controller.cjs")
+    expect(createPost).not.toHaveBeenCalled();
+    expect(res.text).toMatch("{\"error\":\"\\\"content\\\" cannot be empty\"}")
+  });
+
+test("should handle concurrent requests", async () => {
+    const promises = Array.from({ length: 3 }, (_, i) =>
+      request(app)
+        .post("/api/v1/post/create")
+        .set("Cookie", [`token=${token}`])
+        .send({
+          title: `Concurrent Post ${i}`,
+          content: `Concurrent content ${i}`,
+          tags: ["Mental Disability"],
+        })
+    );
+
+    const responses = await Promise.all(promises);
+    
+    responses.forEach((res, i) => {
+      expect(res.statusCode).toBe(200);
+      expect(res.body.title).toBe(`Concurrent Post ${i}`);
+    });
+    const {createPost} = require("../../../domains/post/controller.cjs")
+    expect(createPost).toHaveBeenCalledTimes(3);
+  });
+
+
 });

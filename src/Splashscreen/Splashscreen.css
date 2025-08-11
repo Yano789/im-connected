@@ -232,12 +232,14 @@
   .splash-header {
     grid-template-columns: 1fr;
     text-align: center;
+    flex-direction: column;
+    align-items: center;
   }
-  .header-left {
+  .header-left,.header-right{
     margin-bottom: 8px;
     text-align: center;
   }
-
+  
   .header-left .sponsor-text {
     font-size: clamp(13px, 3vw, 22px);
   }

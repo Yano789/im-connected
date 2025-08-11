@@ -1,4 +1,4 @@
-// Mock your internal helpers similarly BEFORE imports
+
 let postIdCounter = 0;
 jest.mock("../../../utils/hashData.cjs", () => ({
   hashData: jest.fn(() => {
@@ -9,7 +9,7 @@ jest.mock("../../../utils/hashData.cjs", () => ({
 }));
 
 
-// Now import app and other dependencies AFTER mocks
+
 const path = require("path");
 require("../setUpMongo.cjs");
 const fs = require("fs");
@@ -18,8 +18,9 @@ const app = require("../../../app.cjs");
 const User = require("../../../domains/user/model.cjs");
 const { Post } = require("../../../domains/post/model.cjs");
 
+//testing the controller function with inner function mocked
 describe("Create Post", () => {
-  // Utility helper to create user and token for each test
+ 
   async function createUserAndToken() {
     const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
     const username = `testuser2_${uniqueId}`;
@@ -75,6 +76,7 @@ describe("Create Post", () => {
     // Check mocks called
     const { hashData } = require("../../../utils/hashData.cjs");
     expect(hashData).toHaveBeenCalled();
+    expect(response.body.postId).toMatch("mockedPostId")
   });
 
   test("should fail if required fields are missing", async () => {
@@ -176,4 +178,21 @@ describe("Create Post", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.tags).toEqual(["Mental Disability"]);
   });
+  
+    test("should fail without right auth token",async()=>{
+        const res = await request(app)
+            .post(`/api/v1/post/create`)
+            .set("Cookie",["token=fakeToken"])
+            .send({
+                    title: "Test Tags Array1",
+                    content: "Testing tags array",
+                    draft: false,
+                    tags: ["Mental Disability"],
+                  })
+            console.log(res.text)
+    expect(res.statusCode).toBe(401);
+    expect(res.text).toMatch("Invalid Token provided!");   
+    })
+
+
 });

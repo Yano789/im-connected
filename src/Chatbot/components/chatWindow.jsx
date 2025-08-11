@@ -261,11 +261,7 @@ const ChatWindow = ({
     });
   };
 
-  /*
-    =======================
-    === Utility Helpers ===
-    =======================
-  */
+  /* Utility Helpers */
 
   const appendToLastMessage = (text) => {
     setMessages((prevMessages) => {

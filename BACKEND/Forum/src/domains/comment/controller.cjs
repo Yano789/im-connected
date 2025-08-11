@@ -83,21 +83,16 @@ const deleteComment = async (data) => {
 }
 
 
-const getAllComments = async ({postId,username}) => {
+const getAllComments = async ({ postId, username }) => {
   try {
     const allComments = await Comment.find({ postId }).sort({ createdAt: -1 }).lean();
 
+    const user = await User.findOne({ username }).lean();
+    const preferredLang = user?.preferences.preferredLanguage || 'en';
+
     const translatedComments = await Promise.all(
       allComments.map(async (comment) => {
-        // Get user's language preference
-        const user = await User.findOne({username}).lean();
-        console.log(user)
-        const preferredLang = user?.preferences.preferredLanguage || 'en';
-        console.log(preferredLang);
-
-        // Translate the content
         const translatedContent = await translate(comment.content, preferredLang);
-
         return {
           ...comment,
           content: translatedContent,
@@ -112,6 +107,7 @@ const getAllComments = async ({postId,username}) => {
     throw error;
   }
 };
+
 
 const getComment = async (data) => {
     try {

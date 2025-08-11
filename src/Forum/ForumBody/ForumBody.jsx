@@ -11,10 +11,11 @@ import { API_ENDPOINTS } from "../../config/api.js";
 function ForumBody() {
   const [posts, setPosts] = useState([]);
   const [savedPostIds, setSavedPostIds] = useState(new Set());
+  const [likedPostIds, setLikedPostIds] = useState(new Set());
+  const [selectedTopics, setSelectedTopics] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [likedPostIds, setLikedPostIds] = useState(new Set());
-  const {t} = useTranslation();
+  const { t } = useTranslation();
 
   const [query, setQuery] = useState({
     filter: "default",
@@ -22,18 +23,29 @@ function ForumBody() {
     sort: "latest",
   });
 
-  const tagKeyMap = {
-  "All": "Tag1",
-  "Physical Disability & Chronic Illness": "Tag2",
-  "Personal Mental Health": "Tag3",
-  "Subsidies and Govt Support": "Tag4",
-  "Pediatric Care": "Tag5",
-  "End of Life Care": "Tag6",
-  "Financial & Legal Help": "Tag7",
-  "Mental Disability": "Tag8",
-  "Hospitals and Clinic": "Tag9"
-};
+  const TAGS = {
+    1: "All",
+    2: "Physical Disability & Chronic Illness",
+    3: "Personal Mental Health",
+    4: "Subsidies and Govt Support",
+    5: "Pediatric Care",
+    6: "End of Life Care",
+    7: "Financial & Legal Help",
+    8: "Mental Disability",
+    9: "Hospitals and Clinics",
+  };
 
+  const tagKeyMap = {
+    All: "Tag1",
+    "Physical Disability & Chronic Illness": "Tag2",
+    "Personal Mental Health": "Tag3",
+    "Subsidies and Govt Support": "Tag4",
+    "Pediatric Care": "Tag5",
+    "End of Life Care": "Tag6",
+    "Financial & Legal Help": "Tag7",
+    "Mental Disability": "Tag8",
+    "Hospitals and Clinics": "Tag9",
+  };
 
   const updateQuery = (newParams) => {
     setQuery((prev) => ({
@@ -42,8 +54,19 @@ function ForumBody() {
     }));
   };
 
-  const handleTagFilterChange = (filterString) => {
-    updateQuery({ filter: filterString || "default" });
+  const handleTagFilterChange = (selection) => {
+    setSelectedTopics(selection);
+
+    if (selection.includes(1)) {
+      updateQuery({ filter: "default", source: "all" });
+    } else {
+      const selectedTagNames = selection
+        .map((id) => TAGS[id])
+        .filter(Boolean)
+        .sort((a, b) => a.localeCompare(b))
+        .join(",");
+      updateQuery({ filter: selectedTagNames, source: "default" });
+    }
   };
 
   useEffect(() => {
@@ -55,23 +78,59 @@ function ForumBody() {
           method: "GET",
           credentials: "include",
         });
+        console.log(`${API_ENDPOINTS.POST_BASE}/?${params}`);
         if (!res.ok) throw new Error("Failed to fetch posts");
         const data = await res.json();
         setPosts(data);
+        setError(null);
       } catch (err) {
         setError(err.message);
       } finally {
         setLoading(false);
       }
     };
-
     fetchPosts();
   }, [query]);
 
   useEffect(() => {
+    const fetchUserPreferences = async () => {
+      try {
+        const res = await fetch(API_ENDPOINTS.USER_GET, {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!res.ok) throw new Error("Failed to fetch user preferences");
+        const data = await res.json();
+        const topicIds = (data.preferences.topics || [])
+          .map((t) => {
+            if (typeof t === "number") return t;
+            return (
+              Object.entries(TAGS).find(([id, name]) => name === t)?.[0] * 1
+            );
+          })
+          .filter(Boolean)
+          .slice(0, 2);
+
+        if (topicIds.length === 0) {
+          setSelectedTopics([1]);
+          handleTagFilterChange([1]);
+        } else {
+          setSelectedTopics(topicIds);
+          handleTagFilterChange(topicIds);
+        }
+      } catch (err) {
+        console.error("Error fetching preferences:", err.message);
+        setSelectedTopics([1]);
+        handleTagFilterChange([1]);
+      }
+    };
+
+    fetchUserPreferences();
+  }, []);
+
+  useEffect(() => {
     const fetchSavedAndLiked = async () => {
       try {
-
         const savedRes = await fetch(API_ENDPOINTS.SAVED_POSTS, {
           method: "GET",
           credentials: "include",
@@ -91,7 +150,6 @@ function ForumBody() {
         console.error("Error fetching saved/liked posts:", err.message);
       }
     };
-
     fetchSavedAndLiked();
   }, []);
 
@@ -135,7 +193,10 @@ function ForumBody() {
       </div>
 
       <div className="forumRightBar">
-        <TopicSelector onTagFilterChange={handleTagFilterChange} />
+        <TopicSelector
+          onTagFilterChange={handleTagFilterChange}
+          clickedTopics={selectedTopics}
+        />
       </div>
     </div>
   );

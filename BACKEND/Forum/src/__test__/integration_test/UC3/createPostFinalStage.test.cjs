@@ -5,14 +5,14 @@ const request = require("supertest");
 const app = require("../../../app.cjs");
 const User = require("../../../domains/user/model.cjs");
 const { Post } = require("../../../domains/post/model.cjs");
-
+// we are testing the entire route+controller now
 describe("Create Post", () => {
   beforeAll(async () => {
     await User.deleteMany();
     await Post.deleteMany();
   });
 
-  // Utility helper to create user and return token
+
   async function createUserAndToken() {
     const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
     const username = `testuser3_${uniqueId}`;
@@ -148,4 +148,18 @@ describe("Create Post", () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.tags).toEqual(["Mental Disability"]);
   });
+      test("should fail without right auth token",async()=>{
+          const res = await request(app)
+              .post(`/api/v1/post/create`)
+              .set("Cookie",["token=fakeToken"])
+              .send({
+                      title: "Test Tags Array1",
+                      content: "Testing tags array",
+                      draft: false,
+                      tags: ["Mental Disability"],
+                    })
+              console.log(res.text)
+      expect(res.statusCode).toBe(401);
+      expect(res.text).toMatch("Invalid Token provided!");   
+      })
 });

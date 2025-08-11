@@ -13,11 +13,12 @@ jest.mock('../../middleware/auth.cjs', () => {
     next();
   };
 });
-jest.mock("../../config/gcsStorage.cjs", () => ({
+jest.mock("../../config/googleConfig.cjs", () => ({
   gcsClient: {
     url: jest.fn(async (publicId) => `http://example.com/${publicId}.jpg`),
   },
 }));
+
 
 /* Mock User model BEFORE app import*/
 jest.mock('../../domains/user/model.cjs', () => ({
@@ -73,7 +74,7 @@ describe('GET /api/v1/user/threadId (chat‑bot feature)', () => {
     expect(res.statusCode).toBe(200);
     expect(res.body.threadId).toBe('T999');
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://ai-chatbot:3000/api/assistants/threads",
+      "http://localhost:3000/api/assistants/threads",
       { method: 'POST' }
     );
     expect(mockUser.save).toHaveBeenCalled();

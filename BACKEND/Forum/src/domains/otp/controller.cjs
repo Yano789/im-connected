@@ -19,7 +19,7 @@ const verifyOTP = async({email,otp})=>{
         const {expiresAt} = matchedOTPRecord;
         if(expiresAt < Date.now()){
             await OTP.deleteOne({email});
-            throw Error("Code has expired. REquest for a new one.");
+            throw Error("Code has expired. Request for a new one.");
         }
 
         const hashedOTP = matchedOTPRecord.otp;

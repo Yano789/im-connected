@@ -10,11 +10,11 @@ import DepressionIcon from "../../assets/Depression.png";
 import HospitalIcon from "../../assets/Hospital.png";
 
 import Topic from "../Topic/Topic";
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-function TopicSelector({ onTagFilterChange }) {
+function TopicSelector({ onTagFilterChange, clickedTopics = [] }) {
   const { t } = useTranslation();
+
   const TAGS = [
     { id: 1, name: "All", localName: t("Tag1"), image: AllIcon },
     {
@@ -66,30 +66,27 @@ function TopicSelector({ onTagFilterChange }) {
       image: HospitalIcon,
     },
   ];
-  const [clickedTopics, setClickedTopics] = useState([]);
 
   const handleTopicClicked = (topicId) => {
-    let updatedTopics;
-    if (clickedTopics.includes(topicId)) {
-      updatedTopics = clickedTopics.filter((id) => id !== topicId);
-    } else {
-      updatedTopics =
-        clickedTopics.length < 2 ? [...clickedTopics, topicId] : clickedTopics;
-    }
-    setClickedTopics(updatedTopics);
-
-    if (updatedTopics.includes(1)) {
-      onTagFilterChange("");
+    if (topicId === 1) {
+      onTagFilterChange([1]);
       return;
     }
 
-    const selectedTagNames = updatedTopics
-      .map((id) => TAGS.find((t) => t.id === id)?.name)
-      .filter(Boolean)
-      .sort((a, b) => a.localeCompare(b))
-      .join(",");
+    const topicsExcludingAll = clickedTopics.filter((id) => id !== 1);
+    let updatedTopics;
 
-    onTagFilterChange(selectedTagNames);
+    if (topicsExcludingAll.includes(topicId)) {
+      updatedTopics = topicsExcludingAll.filter((id) => id !== topicId);
+      if (updatedTopics.length === 0) {
+        updatedTopics = [1];
+      }
+    } else {
+      if (topicsExcludingAll.length >= 2) return;
+      updatedTopics = [...topicsExcludingAll, topicId];
+    }
+
+    onTagFilterChange(updatedTopics);
   };
 
   return (

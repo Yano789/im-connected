@@ -5,7 +5,7 @@ const Comment = require("../comment/model.cjs")
 const createNestedComment = require("../../utils/buildNestedComments.cjs")
 const translate = require("./../../domains/translation/controller.cjs")
 const savedPost = require("../savedPosts/model.cjs")
-const { gcsClient } = require('../../config/gcsStorage.cjs');
+const { gcsClient } = require('../../config/googleConfig.cjs');
 
 
 
@@ -46,10 +46,10 @@ const editDraft = async (data) => {
     const toRemoveSet = new Set(mediaToRemove || []);
     const mediaToDelete = currentMedia.filter(m => toRemoveSet.has(m.public_id));
 
-    // Delete media files from GCS using destroy method
+    // Delete media files from GCS instead of Cloudinary
     const deletePromises = mediaToDelete.map(async (file) => {
       try {
-        await gcsClient.destroy(file.public_id);
+        await gcsClient.bucket.file(file.public_id).delete();
         console.log(`Deleted GCS file: ${file.public_id}`);
       } catch (err) {
         console.error(`Error deleting media ${file.public_id}:`, err);
@@ -97,8 +97,8 @@ const deletePost = async (data) => {
       const deletionPromises = existingPost.media.map(async (file) => {
         console.log(`Deleting media: public_id=${file.public_id}, type=${file.type}`);
         try {
-          // Delete file from GCS bucket using destroy method
-          await gcsClient.destroy(file.public_id);
+          // Delete file from GCS bucket
+          await gcsClient.bucket.file(file.public_id).delete();
           return { success: true, public_id: file.public_id };
         } catch (err) {
           console.error(`Failed to delete media ${file.public_id}:`, err);
@@ -133,16 +133,16 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
         const preferredLang = user?.preferences?.preferredLanguage
         console.log(preferredTags)
 
-        if (tags.length === 0) {
+        if (tags.length === 0 && source !== "personalized") {
             if (Array.isArray(preferredTags) && preferredTags.length > 0) {
                 tags = preferredTags.map(tag => tag.trim()).filter(tag => tag.length > 0);
             }
         }
 
 
-        if (tags.length === 1) {
+        if (tags.length === 1 && source !== "personalized") {
             filter.tags = tags[0];
-        } else if (tags.length > 1) {
+        } else if (tags.length > 1 && source !== "personalized") {
             filter.tags = { $in: tags };
         }
 
@@ -179,7 +179,7 @@ const getFilteredPosts = async ({ tags = [], sort = "latest", source = "default"
         console.log(filter)
 
         let num = mode ==="default"? 10 : 5 //mode limiter
-
+        console.log({ ...filter, draft: false })
         let posts = await Post.find({ ...filter, draft: false }).sort(sortOptions).limit(num);
         console.log(posts)
         if (posts.length === 0 && source === "default") {

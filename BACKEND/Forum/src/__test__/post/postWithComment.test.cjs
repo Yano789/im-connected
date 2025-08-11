@@ -3,7 +3,7 @@ jest.mock("./../../domains/comment/model.cjs");
 jest.mock("../../utils/buildNestedComments.cjs");
 jest.mock("../../domains/user/model.cjs");
 jest.mock("../../domains/translation/controller.cjs");
-jest.mock("../../config/gcsStorage.cjs", () => ({
+jest.mock("../../config/googleConfig.cjs", () => ({
   gcsClient: {
     url: jest.fn(async (publicId) => `http://example.com/${publicId}.jpg`),
   },
@@ -92,7 +92,7 @@ describe("getPostWithComment", () => {
     createNestedComment.mockResolvedValue(nestedMock);
 
     const result = await getPostWithComment({ postId: mockPostId, username: mockUsername });
-
+    console.log(result)
     expect(User.findOne).toHaveBeenCalledWith({ username: mockUsername });
     expect(Post.findOne).toHaveBeenCalledWith({ postId: mockPostId });
     expect(Comment.find).toHaveBeenCalledWith({ postId: mockPostId });

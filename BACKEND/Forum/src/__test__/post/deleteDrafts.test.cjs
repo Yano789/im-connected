@@ -3,7 +3,7 @@ jest.mock("./../../domains/post/model.cjs");
 
 const mockDelete = jest.fn().mockResolvedValue();
 
-jest.mock("../../config/gcsStorage.cjs", () => ({
+jest.mock("../../config/googleConfig.cjs", () => ({
   gcsClient: {
     bucket: {
       file: jest.fn(() => ({
@@ -47,7 +47,7 @@ describe("deleteDrafts", () => {
     });
 
  expect(mockDelete).toHaveBeenCalledTimes(2);
-const { gcsClient } = require("../../config/gcsStorage.cjs");
+const { gcsClient } = require("../../config/googleConfig.cjs");
 expect(gcsClient.bucket.file).toHaveBeenCalledWith("media1");
 expect(gcsClient.bucket.file).toHaveBeenCalledWith("media2");
 

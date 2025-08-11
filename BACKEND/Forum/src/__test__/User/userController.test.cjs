@@ -115,7 +115,7 @@ describe("authenticateUser", () => {
 
         const updatedUser = { ...mockUser, token: "fake-jwt-token" }
         User.findOne.mockResolvedValueOnce(mockUser)
-        User.findOneAndUpdate = jest.fn().mockResolvedValue(updatedUser)
+        User.findOne.mockResolvedValueOnce(updatedUser)
         verifyHashedData.mockResolvedValue(true)
         createToken.mockResolvedValue("fake-jwt-token")
 
@@ -123,7 +123,7 @@ describe("authenticateUser", () => {
             username: "johndoe",
             password: "password123"
         });
-
+        console.log(authenticated)
         expect(verifyHashedData).toHaveBeenCalledWith("password123", "hashedpassword");
         expect(createToken).toHaveBeenCalledWith({
             userId: "user123",
@@ -131,6 +131,7 @@ describe("authenticateUser", () => {
             username: "johndoe"
         });
         expect(authenticated.token).toBe("fake-jwt-token");
+        expect(authenticated.authenticatedUser).toBe(updatedUser)
     });
 
     test("should throw error for invalid username", async () => {
