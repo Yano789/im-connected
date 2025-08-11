@@ -10,53 +10,8 @@ const cors = require("cors");
 const path = require("path");
 const routes = require("./routes/index.cjs");
 
-// CSP configuration to fix Railway security policy issues
-const CSP_STRING = "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; " +
-  "script-src * 'unsafe-inline' 'unsafe-eval' 'sha256-ieoeWczDHkReVBsRBqaal5AFMlBtNjMzgwKvLqi/tSU=' data: blob:; " +
-  "style-src * 'unsafe-inline' data:; " +
-  "img-src * data: blob:; " +
-  "font-src * data:; " +
-  "connect-src * data:; " +
-  "media-src * data: blob:; " +
-  "frame-src *; " +
-  "child-src *; " +
-  "worker-src * data: blob:; " +
-  "object-src *; " +
-  "base-uri *; " +
-  "form-action *;";
-
 //create server app
 const app = express();
-
-// Set security headers as early as possible to override Railway defaults
-app.use((req, res, next) => {
-  // Use writeHead to forcefully override headers
-  const originalWriteHead = res.writeHead;
-  const originalSetHeader = res.setHeader;
-  
-  res.writeHead = function(statusCode, headers) {
-    // Force override CSP headers
-    this.setHeader('Content-Security-Policy', CSP_STRING);
-    this.setHeader('X-Frame-Options', 'DENY');
-    this.setHeader('X-Content-Type-Options', 'nosniff');
-    this.setHeader('X-XSS-Protection', '1; mode=block');
-    this.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-    return originalWriteHead.call(this, statusCode, headers);
-  };
-  
-  // Force override any existing CSP headers
-  res.removeHeader('Content-Security-Policy');
-  res.removeHeader('content-security-policy');
-  res.setHeader('Content-Security-Policy', CSP_STRING);
-  
-  // Add other security headers
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  
-  next();
-});
 
 //middleware
 app.use(cookieParser());
@@ -76,15 +31,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept']
 }));
 
-// Content Security Policy middleware
-app.use((req, res, next) => {
-  // Set CSP header again to ensure it overrides any Railway defaults
-  res.removeHeader('Content-Security-Policy');
-  res.removeHeader('content-security-policy'); 
-  res.setHeader('Content-Security-Policy', CSP_STRING);
-  next();
-});
-
 app.use(bodyParser());
 
 // Serve static files from the public directory (built frontend) - BEFORE API routes
@@ -101,7 +47,6 @@ if (process.env.NODE_ENV === "production") {
 
 // Health check endpoint for Railway
 app.get("/api/v1/health", (req, res) => {
-  res.setHeader('Content-Security-Policy', CSP_STRING);
   res.status(200).json({ status: "healthy", timestamp: new Date().toISOString() });
 });
 
@@ -110,7 +55,6 @@ app.get("/", (req, res) => {
   if (process.env.NODE_ENV === "production") {
     const indexPath = path.join(process.cwd(), "public", "index.html");
     console.log("Serving root route - index.html from:", indexPath);
-    res.setHeader('Content-Security-Policy', CSP_STRING);
     res.sendFile(indexPath);
   } else {
     res.json({ message: "IM-CONNECTED Development Server" });
@@ -125,7 +69,6 @@ if (process.env.NODE_ENV === "production") {
     const indexPath = path.join(process.cwd(), "public", "index.html");
     console.log("SPA fallback route hit for:", req.url);
     console.log("Attempting to serve index.html from:", indexPath);
-    res.setHeader('Content-Security-Policy', CSP_STRING);
     res.sendFile(indexPath, (err) => {
       if (err) {
         console.error("Error serving index.html:", err);

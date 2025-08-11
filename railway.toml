@@ -8,7 +8,3 @@ restartPolicyType = "on_failure"
 
 [env]
 NODE_ENV = "production"
-
-# Try to disable Railway's default security headers
-[experimental]
-disableSecurityHeaders = true
