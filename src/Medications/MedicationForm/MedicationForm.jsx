@@ -303,47 +303,49 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
                 )}
             </div>
 
-            {/* Medication Scanner Section */}
-            <div className="scanner-section">
-                <h3>📷 {t("Scan Medication")}</h3>
-                <div className="scanner-controls">
-                    <input 
-                        type="file" 
-                        ref={fileInputRef}
-                        onChange={handleFileSelect}
-                        accept="image/*"
-                        className="file-input"
-                    />
-                    {selectedFile && (
-                        <div className="file-preview">
-                            <img src={previewUrl} alt={t("Selected medication")} className="preview-image" />
-                            <button type="button" onClick={clearFile} className="clear-file-btn">❌ {t("Remove")}</button>
+            {/* Medication Scanner Section - Only show when adding new medication */}
+            {!isEditing && (
+                <div className="scanner-section">
+                    <h3>📷 {t("Scan Medication")}</h3>
+                    <div className="scanner-controls">
+                        <input 
+                            type="file" 
+                            ref={fileInputRef}
+                            onChange={handleFileSelect}
+                            accept="image/*"
+                            className="file-input"
+                        />
+                        {selectedFile && (
+                            <div className="file-preview">
+                                <img src={previewUrl} alt={t("Selected medication")} className="preview-image" />
+                                <button type="button" onClick={clearFile} className="clear-file-btn">❌ {t("Remove")}</button>
+                            </div>
+                        )}
+                        <div className="scanner-actions">
+                            <button 
+                                type="button" 
+                                onClick={handleScanMedication}
+                                disabled={!selectedFile || isScanning}
+                                className="scan-button"
+                            >
+                                {isScanning ? t('Scanning...') : 
+                                 selectedRecipient ? t(' Scan & Save to Database') : t(' Scan Medication (Preview)')}
+                            </button>
                         </div>
-                    )}
-                    <div className="scanner-actions">
-                        <button 
-                            type="button" 
-                            onClick={handleScanMedication}
-                            disabled={!selectedFile || isScanning}
-                            className="scan-button"
-                        >
-                            {isScanning ? t('Scanning...') : 
-                             selectedRecipient ? t(' Scan & Save to Database') : t(' Scan Medication (Preview)')}
-                        </button>
+                    </div>
+                    
+                    {/* Scanner feedback */}
+                    {scanError && <div className="scan-error"> {scanError}</div>}
+                    {scanSuccess && <div className="scan-success"> {scanSuccess}</div>}
+                    {uploadError && <div className="scan-error"> {t("Upload Error")}: {uploadError}</div>}
+                    {uploadSuccess && <div className="scan-success"> {uploadSuccess}</div>}
+                    {isScanning && <div className="scan-progress">{t("Processing image and extracting medication information...")}</div>}
+                    
+                    <div className="scanner-divider">
+                        <span>{t("OR")}</span>
                     </div>
                 </div>
-                
-                {/* Scanner feedback */}
-                {scanError && <div className="scan-error"> {scanError}</div>}
-                {scanSuccess && <div className="scan-success"> {scanSuccess}</div>}
-                {uploadError && <div className="scan-error"> {t("Upload Error")}: {uploadError}</div>}
-                {uploadSuccess && <div className="scan-success"> {uploadSuccess}</div>}
-                {isScanning && <div className="scan-progress">{t("Processing image and extracting medication information...")}</div>}
-                
-                <div className="scanner-divider">
-                    <span>{t("OR")}</span>
-                </div>
-            </div>
+            )}
 
             {/* Manual Entry Section */}
             <div className="manual-entry-section">
