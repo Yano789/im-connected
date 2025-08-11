@@ -109,12 +109,13 @@ router.get('/threadId', auth, async (req, res) => {
     if (!threadId) {
       //Create a new thread via the Quick‑start POST /api/assistants/threads
 
-      const AI_BASE = process.env.AI_CHATBOT_URL || 'http://localhost:3000';
-      console.log('[threadId] no threadId in user, calling Quick-start API…');
-      /*const createRes = await fetch(
-        "http://localhost:3000/api/assistants/threads",
-        { method: "POST" }
-      );*/
+      // Use production AI chatbot URL when NODE_ENV is production
+      const AI_BASE = process.env.NODE_ENV === 'production' 
+        ? 'https://ai-chatbot-production-c94d.up.railway.app'
+        : (process.env.AI_CHATBOT_URL || 'http://localhost:3000');
+      
+      console.log('[threadId] no threadId in user, calling Quick-start API at:', AI_BASE);
+      
       const createRes = await fetch(
         `${AI_BASE}/api/assistants/threads`,
         { method: "POST" }
@@ -145,7 +146,7 @@ router.get('/language', auth, async (req, res) => {
     const username = req.currentUser.username;
     const user = await getUser(username);
     let language = user.preferences.preferredLanguage;
-    return res.status.json({ language });
+    return res.status(200).json({ language });
   } catch (err) {
     console.error('Could not retrieve language settings', err);
     return res.status(500).send('Could not retrieve language settings');
