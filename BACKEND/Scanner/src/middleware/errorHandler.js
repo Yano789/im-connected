@@ -4,6 +4,12 @@ import multer from 'multer';
  * Error handling middleware
  */
 const errorHandler = (error, req, res, next) => {
+  // Ensure CORS headers are always present in error responses
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Origin, Accept');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
   // Only log errors in non-test environments
   if (process.env.NODE_ENV !== 'test') {
     console.error('Server error:', error);
