@@ -143,7 +143,12 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
             console.log('Checking scanner API health...');
             const isApiAvailable = await medicationScannerService.checkApiHealth();
             if (!isApiAvailable) {
-                throw new Error(t('Scanner service is temporarily unavailable. Please try again later or manually enter medication information.'));
+                setScanError(t('Scanner service is temporarily unavailable. You can still manually enter medication information below.'));
+                // Auto-clear error message after 6 seconds to guide user to manual entry
+                setTimeout(() => {
+                    setScanError('');
+                }, 6000);
+                return;
             }
 
             console.log('Scanner API is available, proceeding with scan...');
@@ -189,6 +194,11 @@ function MedicationForm({ medication, onSave, onCancel, onDelete, capturedFile =
         } catch (error) {
             console.error('Scanning error:', error);
             setScanError(t('Scanning failed: {{message}}', { message: error.message }));
+            
+            // Auto-clear error message after 8 seconds to avoid blocking the UI
+            setTimeout(() => {
+                setScanError('');
+            }, 8000);
         } finally {
             setIsScanning(false);
         }
